@@ -33,15 +33,13 @@ public class Main {
         Collections.shuffle(stars);
 
         DustDetector dustDetector = new DustDetector(stars, 800.0);
+        SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes(), dustDetector.getSlopeStdErrs());
+        HammerProjection hammerProjection = new HammerProjection(f, 240);
+        hammerProjection.setSize(2 * SIZE, SIZE);
 
         JWindow slopeWindow = new JWindow();
         slopeWindow.setSize(2 * SIZE, SIZE);
-        slopeWindow.getContentPane().add(dustDetector.getSlopeDistribution(SIZE));
+        slopeWindow.getContentPane().add(hammerProjection);
         slopeWindow.setVisible(true);
-
-        JWindow interceptWindow = new JWindow();
-        interceptWindow.setSize(2 * SIZE, SIZE);
-        interceptWindow.getContentPane().add(dustDetector.getInterceptDistribution(SIZE));
-        interceptWindow.setVisible(true);
     }
 }
