@@ -1,1 +1,5 @@
-This file was created by IntelliJ IDEA 12.1.6 for binding GitHub repository
+Resources/Ejection folder:
+    transcript of a-18-10_per.png:
+        "a" is slope distribution, "b" is intercept distribution
+        "18" is healpix "n" (number of sides)
+        "10_per" is percents of ejections in Least Squares Method
