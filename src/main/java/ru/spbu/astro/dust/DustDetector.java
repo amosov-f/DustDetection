@@ -3,23 +3,20 @@ package ru.spbu.astro.dust;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.asterope.healpix.PixTools;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class DustDetector {
 
-    private static final int N_SIDE = 15;
+    private static final int N_SIDE = 18;
+    private static final double EJECTION = 0.1;
 
     private final List<Star>[] rings;
 
     private double[] slopes;
-    private double[] slopeStdErrs;
+    private double[] slopeErrs;
 
     private double[] intercepts;
-    private double[] interceptStdErrs;
+    private double[] interceptErrs;
 
     PixTools pixTools;
 
@@ -40,22 +37,39 @@ public class DustDetector {
             }
 
             double theta = Math.PI / 2 - star.getDir().getB();
-            double phi = star.getDir().getL() - Math.PI;
+            double phi = star.getDir().getL();
 
             rings[(int)pixTools.ang2pix(theta, phi)].add(star);
         }
 
         slopes = new double[rings.length];
-        slopeStdErrs = new double[rings.length];
+        slopeErrs = new double[rings.length];
         intercepts = new double[rings.length];
-        interceptStdErrs = new double[rings.length];
+        interceptErrs = new double[rings.length];
 
         for (int i = 0; i < rings.length; ++i) {
             SimpleRegression regression = getRegression(rings[i]);
+
+            final double a = regression.getSlope();
+            final double b = regression.getSlope();
+
+            Collections.sort(rings[i], new Comparator<Star>() {
+                @Override
+                public int compare(Star star1, Star star2) {
+                    return Double.compare(
+                            Math.pow(a * star1.getR() + b - star1.getExt(), 2),
+                            Math.pow(a * star2.getR() + b - star2.getExt(), 2)
+                    );
+                }
+            });
+
+            regression = getRegression(rings[i].subList(0, rings[i].size() - (int)(EJECTION * rings[i].size())));
+
             slopes[i] = regression.getSlope();
-            slopeStdErrs[i] = regression.getSlopeStdErr();
             intercepts[i] = regression.getIntercept();
-            interceptStdErrs[i] = regression.getInterceptStdErr();
+
+            slopeErrs[i] = Math.min(Math.abs(regression.getSlopeStdErr() / regression.getSlope()), 1);
+            interceptErrs[i] = Math.min(Math.abs(regression.getInterceptStdErr() / regression.getIntercept()), 1);
         }
     }
 
@@ -63,16 +77,16 @@ public class DustDetector {
         return slopes;
     }
 
-    public double[] getSlopeStdErrs() {
-        return slopeStdErrs;
+    public double[] getSlopeErrs() {
+        return slopeErrs;
     }
 
     public double[] getIntercepts() {
         return intercepts;
     }
 
-    public double[] getInterceptStdErrs() {
-        return interceptStdErrs;
+    public double[] getInterceptErrs() {
+        return interceptErrs;
     }
 
     /*public Component getInterceptDistribution(final int height) throws Exception {
@@ -84,14 +98,14 @@ public class DustDetector {
                 double intercept1 = Collections.min(intercepts);
                 double intercept2 = Collections.max(intercepts);
 
-                double interceptStdErr1 = Collections.min(interceptStdErrs);
-                double interceptStdErr2 = Collections.max(interceptStdErrs);
+                double interceptStdErr1 = Collections.min(interceptErrs);
+                double interceptStdErr2 = Collections.max(interceptErrs);
 
                 for (int i = 0; i < rings.length; ++i) {
                     for (Star star : rings[i]) {
                         //int color = 255 - (int)((slopes.get(i) - slope1) / (slope2 - slope1) * 255);
                         double intercept = intercepts.get(i);
-                        double interceptStdErr = interceptStdErrs.get(i);
+                        double interceptStdErr = interceptErrs.get(i);
 
                         g.setColor(Color.getHSBColor(
                                 (float)300.0 / 360,

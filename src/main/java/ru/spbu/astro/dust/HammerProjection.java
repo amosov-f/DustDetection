@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust;
 
 import java.awt.*;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +26,7 @@ public class HammerProjection extends Component {
         setSize(2 * getHeight(), getHeight());
 
         List<Double> values = new ArrayList();
-        List<Double> stdErrs = new ArrayList();
+        List<Double> errs = new ArrayList();
 
         for (int x = 0; x < getWidth(); ++x) {
             for (int y = 0; y < getHeight(); ++y) {
@@ -35,17 +36,24 @@ public class HammerProjection extends Component {
                 }
 
                 double value = f.get(dir)[0];
-                double stdErr = f.get(dir)[1];
+                double err = f.get(dir)[1];
 
-                values.add(value);
-                stdErrs.add(stdErr);
+                if (!Double.isNaN(value)) {
+                    values.add(value);
+                }
+                if (!Double.isNaN(err)) {
+                    errs.add(err);
+                }
             }
         }
 
         double minValue = Collections.min(values);
         double maxValue = Collections.max(values);
-        double minStdErr = Collections.min(stdErrs);
-        double maxStdErr = Collections.max(stdErrs);
+        double minErr = Collections.min(errs);
+        double maxErr = Collections.max(errs);
+
+        System.out.println(minErr);
+        System.out.println(maxErr);
 
         for (int x = 0; x < getWidth(); ++x) {
             for (int y = 0; y < getHeight(); ++y) {
@@ -60,7 +68,7 @@ public class HammerProjection extends Component {
                 g.setColor(Color.getHSBColor(
                         (float)hue / 360,
                         normalize(value, minValue, maxValue),
-                        (float)1.0 - normalize(stdErr, minStdErr, maxStdErr)
+                        (float)1.0 - normalize(stdErr, minErr, maxErr)
                 ));
 
                 g.drawLine(x, y, x, y);

@@ -1,7 +1,6 @@
 package ru.spbu.astro.dust;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.FileInputStream;
 import java.util.*;
 import java.util.List;
@@ -33,7 +32,7 @@ public class Main {
         Collections.shuffle(stars);
 
         DustDetector dustDetector = new DustDetector(stars, 800.0);
-        SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes(), dustDetector.getSlopeStdErrs());
+        SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes(), dustDetector.getSlopeErrs());
         HammerProjection hammerProjection = new HammerProjection(f, 240);
         hammerProjection.setSize(2 * SIZE, SIZE);
 
