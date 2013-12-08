@@ -3,7 +3,10 @@ package ru.spbu.astro.dust;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.asterope.healpix.PixTools;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class DustDetector {
 
@@ -36,8 +39,8 @@ public class DustDetector {
                 continue;
             }
 
-            double theta = Math.PI / 2 - star.getDir().getB();
-            double phi = star.getDir().getL();
+            double theta = star.getDir().getTheta();
+            double phi = star.getDir().getPhi();
 
             rings[(int)pixTools.ang2pix(theta, phi)].add(star);
         }
@@ -48,22 +51,7 @@ public class DustDetector {
         interceptErrs = new double[rings.length];
 
         for (int i = 0; i < rings.length; ++i) {
-            SimpleRegression regression = getRegression(rings[i]);
-
-            final double a = regression.getSlope();
-            final double b = regression.getSlope();
-
-            Collections.sort(rings[i], new Comparator<Star>() {
-                @Override
-                public int compare(Star star1, Star star2) {
-                    return Double.compare(
-                            Math.pow(a * star1.getR() + b - star1.getExt(), 2),
-                            Math.pow(a * star2.getR() + b - star2.getExt(), 2)
-                    );
-                }
-            });
-
-            regression = getRegression(rings[i].subList(0, rings[i].size() - (int)(EJECTION * rings[i].size())));
+            SimpleRegression regression = getRegression(getSupportStars(rings[i]));
 
             slopes[i] = regression.getSlope();
             intercepts[i] = regression.getIntercept();
@@ -89,44 +77,58 @@ public class DustDetector {
         return interceptErrs;
     }
 
-    /*public Component getInterceptDistribution(final int height) throws Exception {
-        return new Component() {
+    private List<Star> getSupportStars(final List<Star> stars) {
+        List<Star> temp = new ArrayList(stars);
+
+        SimpleRegression regression = getRegression(temp);
+
+        final double a = regression.getSlope();
+        final double b = regression.getSlope();
+
+        Collections.sort(temp, new Comparator<Star>() {
             @Override
-            public void paint(Graphics g) {
-                setSize(2 * height, height);
-
-                double intercept1 = Collections.min(intercepts);
-                double intercept2 = Collections.max(intercepts);
-
-                double interceptStdErr1 = Collections.min(interceptErrs);
-                double interceptStdErr2 = Collections.max(interceptErrs);
-
-                for (int i = 0; i < rings.length; ++i) {
-                    for (Star star : rings[i]) {
-                        //int color = 255 - (int)((slopes.get(i) - slope1) / (slope2 - slope1) * 255);
-                        double intercept = intercepts.get(i);
-                        double interceptStdErr = interceptErrs.get(i);
-
-                        g.setColor(Color.getHSBColor(
-                                (float)300.0 / 360,
-                                normalize(intercept, intercept1, intercept2),
-                                (float)1.0 - normalize(interceptStdErr, interceptStdErr1, interceptStdErr2)
-                        ));
-
-                        double x = aitoffProjection(star.getDir()).getX();
-                        double y = aitoffProjection(star.getDir()).getY();
-
-                        g.fillOval((int)(x - 3), (int)(y - 3), 6, 6);
-                    }
-                }
-
+            public int compare(Star star1, Star star2) {
+                return Double.compare(
+                        Math.pow(a * star1.getR() + b - star1.getExt(), 2),
+                        Math.pow(a * star2.getR() + b - star2.getExt(), 2)
+                );
             }
+        });
 
-            private float normalize(double x, double min, double max) {
-                return (float)((x - min) / (max - min));
-            }
-        };
-    }   */
+        return temp.subList(0, temp.size() - (int)(EJECTION * temp.size()));
+    }
+
+    public List<Star> getSupportStars(final Spheric dir) {
+        double theta = dir.getTheta();
+        double phi = dir.getPhi();
+
+        return getSupportStars(rings[(int)pixTools.ang2pix(theta, phi)]);
+    }
+
+    public List<Star> getMissStars(final Spheric dir) {
+        double theta = dir.getTheta();
+        double phi = dir.getPhi();
+        int pix = (int)pixTools.ang2pix(theta, phi);
+
+        List<Star> result = new ArrayList(rings[pix]);
+        result.removeAll(getSupportStars(dir));
+
+        return result;
+    }
+
+    public double getSlope(final Spheric dir) {
+        double theta = dir.getTheta();
+        double phi = dir.getPhi();
+
+        return slopes[(int)pixTools.ang2pix(theta, phi)];
+    }
+
+    public double getIntercept(final Spheric dir) {
+        double theta = dir.getTheta();
+        double phi = dir.getPhi();
+
+        return intercepts[(int)pixTools.ang2pix(theta, phi)];
+    }
 
     private static SimpleRegression getRegression(final List<Star> stars) {
         SimpleRegression regression = new SimpleRegression();

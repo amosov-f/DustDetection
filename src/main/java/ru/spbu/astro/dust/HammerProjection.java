@@ -1,11 +1,9 @@
 package ru.spbu.astro.dust;
 
 import java.awt.*;
-import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.*;
 import java.util.List;
 
 public class HammerProjection extends Component {
@@ -13,8 +11,8 @@ public class HammerProjection extends Component {
     private SphericDistribution f;
     private int hue;
 
-    private final int PARALLEL_COUNT = 10;
-    private final int MERIDIAN_COUNT = 24;
+    private static final int PARALLEL_COUNT = 10;
+    private static final int MERIDIAN_COUNT = 24;
 
     public HammerProjection(final SphericDistribution f, int hue) {
         this.f = f;
@@ -52,9 +50,6 @@ public class HammerProjection extends Component {
         double minErr = Collections.min(errs);
         double maxErr = Collections.max(errs);
 
-        System.out.println(minErr);
-        System.out.println(maxErr);
-
         for (int x = 0; x < getWidth(); ++x) {
             for (int y = 0; y < getHeight(); ++y) {
                 Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
@@ -90,7 +85,7 @@ public class HammerProjection extends Component {
         }
     }
 
-    private static Point2D.Double shperic2plane(final Spheric dir) {
+    public static Point2D.Double shperic2plane(final Spheric dir) {
         double l = dir.getL();
         double b = dir.getB();
 
@@ -106,7 +101,7 @@ public class HammerProjection extends Component {
         return new Point2D.Double(x, y);
     }
 
-    private static Spheric plane2spheric(final Point2D.Double p) {
+    public static Spheric plane2spheric(final Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 
@@ -125,7 +120,7 @@ public class HammerProjection extends Component {
         return new Spheric(l, b);
     }
 
-    private Point toWindow(Point2D.Double p) {
+    public Point toWindow(Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 
@@ -145,4 +140,5 @@ public class HammerProjection extends Component {
     private static float normalize(double x, double min, double max) {
         return (float)((x - min) / (max - min));
     }
+
 }

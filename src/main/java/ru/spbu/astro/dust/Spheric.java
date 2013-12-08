@@ -26,6 +26,14 @@ public class Spheric implements Comparable {
         this.b = b;
     }
 
+    public double getTheta() {
+        return Math.PI / 2 - b;
+    }
+
+    public double getPhi() {
+        return l;
+    }
+
     @Override
     public int compareTo(Object o) {
         if (o == null || getClass() != o.getClass()) {

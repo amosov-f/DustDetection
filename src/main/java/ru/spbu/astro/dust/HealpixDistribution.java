@@ -22,8 +22,8 @@ public class HealpixDistribution extends SphericDistribution {
 
     @Override
     double[] get(final Spheric dir) {
-        double theta = Math.PI / 2 - dir.getB();
-        double phi = dir.getL();
+        double theta = dir.getTheta();
+        double phi = dir.getPhi();
 
         int pix = (int)pixTools.ang2pix(theta, phi);
 

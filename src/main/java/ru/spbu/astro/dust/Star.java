@@ -61,6 +61,33 @@ public class Star implements Comparable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Star)) {
+            return false;
+        }
+
+        Star star = (Star) o;
+
+        if (Double.compare(star.ext, ext) != 0) {
+            return false;
+        }
+        if (Double.compare(star.r, r) != 0) {
+            return false;
+        }
+        if (!dir.equals(star.dir)) {
+            return false;
+        }
+        if (!name.equals(star.name)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public String toString() {
         return String.format(
                 "(%s: l = %.3f, b = %.3f, r = %.3f, ext = %.3f)",
