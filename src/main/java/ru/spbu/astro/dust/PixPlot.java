@@ -16,7 +16,9 @@ public class PixPlot extends Plot2DPanel {
     }
 
     public void plot(final Spheric dir) {
-        //setName(String.format("Extinction distribution in the (%.2f, %.2f) direction", dir.getL(), dir.getB()));
+        if (dir == null) {
+            return;
+        }
 
         List<Star> supportStars = dustDetector.getSupportStars(dir);
         List<Star> missStars = dustDetector.getMissStars(dir);
