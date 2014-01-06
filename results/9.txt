@@ -1,0 +1,4 @@
+Таблица B-V получена путем слияния таблиц
+http://obswww.unige.ch/gcpd/mk01bv.html
+и
+http://www.stsci.edu/~inr/intrins.html
