@@ -29,11 +29,11 @@
             <version>3.2</version>
         </dependency>
         <dependency>
-            <groupId>org.asterope.healpix</groupId>
+            <groupId>gov.fnal.eag.healpix</groupId>
             <artifactId>healpix</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/org.asterope.healpix.jar</systemPath>
+            <systemPath>${project.basedir}/lib/PixTools.jar</systemPath>
         </dependency>
     </dependencies>
 
