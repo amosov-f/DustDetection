@@ -7,14 +7,15 @@ import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class PixPlot extends Plot2DPanel {
 
-    DustDetector dustDetector;
+    private final DustDetector dustDetector;
 
-    public PixPlot(DustDetector dustDetector) {
+    public PixPlot(final DustDetector dustDetector) {
         this.dustDetector = dustDetector;
         plot(new Spheric(0, 0));
     }
@@ -24,7 +25,7 @@ public class PixPlot extends Plot2DPanel {
         removeAllPlotables();
 
         addLegend("SOUTH");
-        setFont(new Font(Font.SERIF, Font.TYPE1_FONT, 15));
+        setFont(new Font(Font.SERIF, Font.BOLD, 15));
         setAxisLabels("r [пк]", "E(r)\n[зв. вел.]");
 
         BaseLabel title = new BaseLabel(
@@ -50,8 +51,8 @@ public class PixPlot extends Plot2DPanel {
             return;
         }
 
-        List<Star> supportStars = dustDetector.getSupportStars(dir);
-        List<Star> missStars = dustDetector.getMissStars(dir);
+        final List<Star> supportStars = dustDetector.getSupportStars(dir);
+        final List<Star> missStars = dustDetector.getMissStars(dir);
 
         if (!supportStars.isEmpty()) {
             double[] x = new double[supportStars.size()];
@@ -73,15 +74,15 @@ public class PixPlot extends Plot2DPanel {
             addScatterPlot("Выбросы", new Color(78, 77, 75), getX(x, y), getY(x, y));
         }
 
-        double a = dustDetector.getSlope(dir);
-        double b = dustDetector.getIntercept(dir);
+        double a = dustDetector.getSlope(dir).value;
+        double b = dustDetector.getIntercept(dir).value;
 
-        List<Star> stars = supportStars;
+        final List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
         Collections.sort(stars);
 
-        double[] x = new double[stars.size() + 1];
-        double[] y = new double[stars.size() + 1];
+        final double[] x = new double[stars.size() + 1];
+        final double[] y = new double[stars.size() + 1];
         x[0] = 0;
         y[0] = b;
         for (int i = 0; i < stars.size(); ++i) {

@@ -3,16 +3,12 @@ package ru.spbu.astro.dust.model;
 import java.util.Random;
 
 public class Spheric implements Comparable {
-    private double l;
-    private double b;
+    public final double l;
+    public final double b;
 
     public Spheric(double l, double b) {
         this.l = l;
         this.b = b;
-    }
-
-    public Spheric() {
-        this(0, 0);
     }
 
     public static Spheric randomUniform() {
@@ -34,22 +30,6 @@ public class Spheric implements Comparable {
         return new Spheric(l, b);
     }
 
-    public double getL() {
-        return l;
-    }
-
-    public void setL(double l) {
-        this.l = l;
-    }
-
-    public double getB() {
-        return b;
-    }
-
-    public void setB(double b) {
-        this.b = b;
-    }
-
     public double getTheta() {
         return Math.PI / 2 - b;
     }
@@ -64,10 +44,10 @@ public class Spheric implements Comparable {
             throw new ClassCastException();
         }
         Spheric other = (Spheric)o;
-        if (l < other.getL()) {
+        if (l < other.l) {
             return -1;
         }
-        if (l > other.getL()) {
+        if (l > other.l) {
             return 1;
         }
         return 0;

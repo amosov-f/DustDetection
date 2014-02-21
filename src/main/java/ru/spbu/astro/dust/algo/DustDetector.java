@@ -1,17 +1,14 @@
 package ru.spbu.astro.dust.algo;
 
+import gov.fnal.eag.healpix.PixTools;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
-
-import org.math.plot.FrameView;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.Value;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import gov.fnal.eag.healpix.PixTools;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DustDetector {
@@ -19,23 +16,27 @@ public class DustDetector {
     private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
 
-    private final List<Star>[] rings;
+    private final List<List<Star>> rings;
 
-    private double[] slopes;
-    private double[] slopeErrs;
-    private double[] fullSlopeErrs;
+    private final Value[] slopes;
+    private final Value[] intercepts;
 
-    private double[] intercepts;
-    private double[] interceptErrs;
-    private double[] fullInterceptErrs;
+    //private final double[] slopes;
+    //private final double[] slopeErrs;
+    //private final double[] fullSlopeErrs;
 
-    PixTools pixTools = new PixTools();
+    //private final double[] intercepts;
+    //private final double[] interceptErrs;
+    //private final double[] fullInterceptErrs;
 
-    public DustDetector(final List<Star> stars, Double r) {
+    private final PixTools pixTools;
 
-        rings = new List[12 * N_SIDE * N_SIDE];
-        for (int i = 0; i < rings.length; ++i) {
-            rings[i] = new ArrayList();
+    public DustDetector(final List<Star> stars, final Double r) {
+        pixTools = new PixTools();
+
+        rings = new ArrayList<>();
+        for (int i = 0; i < 12 * N_SIDE * N_SIDE; ++i) {
+            rings.add(new ArrayList<Star>());
         }
 
         for (Star star : stars) {
@@ -46,63 +47,45 @@ public class DustDetector {
                 continue;
             }
 
-            rings[getPix(star.getDir())].add(star);
+            rings.get(getPix(star.getDir())).add(star);
         }
 
-        slopes = new double[rings.length];
-        slopeErrs = new double[rings.length];
-        fullSlopeErrs = new double[rings.length];
-        intercepts = new double[rings.length];
-        interceptErrs = new double[rings.length];
-        fullInterceptErrs = new double[rings.length];
+        slopes = new Value[rings.size()];
+        //slopeErrs = new double[rings.size()];
+        //fullSlopeErrs = new double[rings.size()];
+        intercepts = new Value[rings.size()];
+        //interceptErrs = new double[rings.size()];
+        //fullInterceptErrs = new double[rings.size()];
 
-        List<Integer> ringSizes = new ArrayList();
+        for (int i = 0; i < rings.size(); ++i) {
+            SimpleRegression regression = getRegression(getSupportStars(rings.get(i)));
 
-        for (int i = 0; i < rings.length; ++i) {
-            SimpleRegression regression = getRegression(getSupportStars(rings[i]));
+            double a = regression.getSlope();
+            double b = regression.getIntercept();
 
-            slopes[i] = regression.getSlope();
-            intercepts[i] = regression.getIntercept();
+            slopes[i] = new Value(a, Math.abs(regression.getSlopeStdErr() / a));
+            intercepts[i] = new Value(b, Math.abs(regression.getInterceptStdErr() / b));
 
-            fullSlopeErrs[i] = Math.abs(regression.getSlopeStdErr() / slopes[i]);
-            fullInterceptErrs[i] = Math.abs(regression.getInterceptStdErr() / intercepts[i]);
+            //fullSlopeErrs[i] = Math.abs(regression.getSlopeStdErr() / slopes[i]);
+            //fullInterceptErrs[i] = Math.abs(regression.getInterceptStdErr() / intercepts[i]);
 
-            slopeErrs[i] = Math.min(fullSlopeErrs[i], 1);
-            interceptErrs[i] = Math.min(fullInterceptErrs[i], 1);
-
-            ringSizes.add(rings[i].size());
+            //slopeErrs[i] = Math.min(fullSlopeErrs[i], 1);
+            //interceptErrs[i] = Math.min(fullInterceptErrs[i], 1);
         }
     }
 
-    public double[] getSlopes() {
+    public Value[] getSlopes() {
         return slopes;
     }
 
-    public double[] getSlopeErrs() {
-        return slopeErrs;
-    }
-
-    public double[] getIntercepts() {
+    public Value[] getIntercepts() {
         return intercepts;
     }
 
-    public double[] getInterceptErrs() {
-        return interceptErrs;
-    }
-
-    public double[] getFullSlopeErrs() {
-        return fullSlopeErrs;
-    }
-
-    public double[] getFullInterceptErrs() {
-        return fullInterceptErrs;
-    }
-
-
     private List<Star> getSupportStars(final List<Star> stars) {
-        List<Star> temp = new ArrayList(stars);
+        final List<Star> temp = new ArrayList<>(stars);
 
-        SimpleRegression regression = getRegression(temp);
+        final SimpleRegression regression = getRegression(temp);
 
         final double a = regression.getSlope();
         final double b = regression.getIntercept();
@@ -121,11 +104,11 @@ public class DustDetector {
     }
 
     public List<Star> getSupportStars(final Spheric dir) {
-        return getSupportStars(rings[getPix(dir)]);
+        return getSupportStars(rings.get(getPix(dir)));
     }
 
     public List<Star> getMissStars(final List<Star> stars) {
-        List<Star> missStars = new ArrayList(stars);
+        List<Star> missStars = new ArrayList<>(stars);
         missStars.removeAll(getSupportStars(stars));
         return missStars;
     }
@@ -133,30 +116,30 @@ public class DustDetector {
     public List<Star> getMissStars(final Spheric dir) {
         int pix = getPix(dir);
 
-        List<Star> missStars = new ArrayList(rings[pix]);
+        List<Star> missStars = new ArrayList<>(rings.get(pix));
         missStars.removeAll(getSupportStars(dir));
 
         return missStars;
     }
 
-    public double getSlope(final Spheric dir) {
+    public Value getSlope(final Spheric dir) {
         return slopes[getPix(dir)];
     }
 
-    public double getIntercept(final Spheric dir) {
+    public Value getIntercept(final Spheric dir) {
         return intercepts[getPix(dir)];
     }
 
     public List<Star> getMissStars() {
-        List<Star> missStars = new ArrayList();
-        for (int i = 0; i < rings.length; ++i) {
-            missStars.addAll(getMissStars(rings[i]));
+        final List<Star> missStars = new ArrayList<>();
+        for (List<Star> ring : rings) {
+            missStars.addAll(getMissStars(ring));
         }
         return missStars;
     }
 
     private static SimpleRegression getRegression(final List<Star> stars) {
-        SimpleRegression regression = new SimpleRegression();
+        final SimpleRegression regression = new SimpleRegression();
 
         for (Star star : stars) {
             regression.addData(star.getR(), star.getExt());
@@ -198,9 +181,9 @@ public class DustDetector {
                     l,
                     b,
                     1000 * slope,
-                    (int)(100 * slopeErr),
+                    (int) (100 * slopeErr),
                     intercept,
-                    (int)(100 * interceptErr),
+                    (int) (100 * interceptErr),
                     n
             );
         }
@@ -208,15 +191,15 @@ public class DustDetector {
     }
 
     public List<DustPix> getDustPixes() {
-        List<DustPix> dustPixes = new ArrayList();
-        for (int i = 0; i < rings.length; ++i) {
+        final List<DustPix> dustPixes = new ArrayList<>();
+        for (int i = 0; i < rings.size(); ++i) {
             double l = pixTools.pix2ang_ring(N_SIDE, i)[1];
             double b = Math.PI / 2 - pixTools.pix2ang_ring(N_SIDE, i)[0];
-            double slope = slopes[i];
-            double slopeErr = fullSlopeErrs[i];
-            double intercept = intercepts[i];
-            double interceptErr = fullInterceptErrs[i];
-            int n = rings[i].size();
+            double slope = slopes[i].value;
+            double slopeErr = slopes[i].err;
+            double intercept = intercepts[i].value;
+            double interceptErr = intercepts[i].err;
+            int n = rings.get(i).size();
 
             dustPixes.add(new DustPix(l, b, slope, slopeErr, intercept, interceptErr, n));
         }

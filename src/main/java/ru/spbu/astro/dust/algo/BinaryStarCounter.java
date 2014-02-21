@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+@Deprecated
 public class BinaryStarCounter extends StarCounter {
 
     private List<Double>[] latitudeBands;
@@ -19,7 +20,7 @@ public class BinaryStarCounter extends StarCounter {
 
         starBands = new List[getBand(Math.PI / 2) + 1];
         for (int i = 0; i < starBands.length; ++i) {
-            starBands[i] = new ArrayList();
+            starBands[i] = new ArrayList<>();
         }
 
         for (Star star : this.stars) {
@@ -35,33 +36,33 @@ public class BinaryStarCounter extends StarCounter {
             });
         }
 
-        latitudeBands = new List[starBands.length];
+        latitudeBands = new ArrayList[starBands.length];
         for (int i = 0; i < latitudeBands.length; ++i) {
-            latitudeBands[i] = new ArrayList();
+            latitudeBands[i] = new ArrayList<>();
 
             for (Star star : starBands[i]) {
-                latitudeBands[i].add(star.getDir().getL() - 2 * Math.PI);
+                latitudeBands[i].add(star.getDir().l - 2 * Math.PI);
             }
             for (Star star : starBands[i]) {
-                latitudeBands[i].add(star.getDir().getL());
+                latitudeBands[i].add(star.getDir().l);
             }
             for (Star star : starBands[i]) {
-                latitudeBands[i].add(star.getDir().getL() + 2 * Math.PI);
+                latitudeBands[i].add(star.getDir().l + 2 * Math.PI);
             }
         }
     }
 
     @Override
     public List<Star> getConeStars(Spheric dir) {
-        int b1 = Math.max(getBand(dir.getB() - alpha), 0);
-        int b2 = Math.min(getBand(dir.getB() + alpha) + 1, starBands.length);
+        int b1 = Math.max(getBand(dir.b - alpha), 0);
+        int b2 = Math.min(getBand(dir.b + alpha) + 1, starBands.length);
 
-        List<Star> candidates = new ArrayList();
+        List<Star> candidates = new ArrayList<>();
         for (int b = b1; b < b2; ++b) {
-            double beta = Math.atan2(Math.tan(alpha), Math.cos(dir.getB()));
+            double beta = Math.atan2(Math.tan(alpha), Math.cos(dir.b));
 
-            int i1 = Math.abs(Collections.binarySearch(latitudeBands[b], dir.getL() - beta) + 1);
-            int i2 = Math.abs(Collections.binarySearch(latitudeBands[b], dir.getL() + beta) + 1);
+            int i1 = Math.abs(Collections.binarySearch(latitudeBands[b], dir.l - beta) + 1);
+            int i2 = Math.abs(Collections.binarySearch(latitudeBands[b], dir.l + beta) + 1);
 
             for (int i = i1; i < i2; ++i) {
                 candidates.add(starBands[b].get(i % starBands[b].size()));
@@ -77,6 +78,6 @@ public class BinaryStarCounter extends StarCounter {
     }
 
     private int getBand(Star star) {
-        return getBand(star.getDir().getB());
+        return getBand(star.getDir().b);
     }
 }

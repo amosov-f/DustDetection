@@ -7,9 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated
 public class StarCounter {
 
-    protected List<Star> stars = new ArrayList();
+    protected List<Star> stars = new ArrayList<>();
     protected double alpha;
     protected Double r;
 
@@ -28,11 +29,11 @@ public class StarCounter {
     }
 
     public List<Star> getConeStars(Spheric dir) {
-        List<Star> result = new ArrayList();
+        List<Star> result = new ArrayList<>();
 
         for (Star star : stars) {
-            double mult = Math.sin(dir.getB()) * Math.sin(star.getDir().getB()) +
-                    Math.cos(dir.getB()) * Math.cos(star.getDir().getB()) * Math.cos(star.getDir().getL() - dir.getL());
+            double mult = Math.sin(dir.b) * Math.sin(star.getDir().b) +
+                    Math.cos(dir.b) * Math.cos(star.getDir().b) * Math.cos(star.getDir().l - dir.l);
 
             if (Math.acos(mult) < alpha) {
                 result.add(star);

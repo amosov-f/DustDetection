@@ -20,12 +20,12 @@ import java.util.List;
 
 public class DustDetectionEngine {
 
-    public static int SIZE = 500;
+    public static final int SIZE = 500;
 
     public static List<Star> getStars() {
-        List<Star> stars = new ArrayList();
+        final List<Star> stars = new ArrayList<>();
 
-        Scanner fin;
+        final Scanner fin;
         try {
             fin = new Scanner(new FileInputStream("Datasets/data.txt"));
         } catch(Exception e) {
@@ -52,7 +52,7 @@ public class DustDetectionEngine {
     }
 
     public static void main(String[] args) throws Exception {
-        DustDetector dustDetector = getDustDetector();
+        final DustDetector dustDetector = getDustDetector();
 
         PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
         fout.println("L\t\t\tB\t\t\ta\t\tsigma_a\tb\t\tsigma_b\tn");
@@ -62,19 +62,19 @@ public class DustDetectionEngine {
         fout.flush();
 
 
-        SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes(), dustDetector.getSlopeErrs());
+        SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);
         final PixPlot pixPlot = new PixPlot(dustDetector);
 
         hammerProjection.setSize(2 * SIZE, SIZE);
-        JFrame map = new JFrame();
+        final JFrame map = new JFrame();
         map.setSize(2 * SIZE, SIZE);
         map.add(hammerProjection);
         map.setVisible(true);
         map.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
+                final Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
                 pixPlot.plot(dir);
             }
 

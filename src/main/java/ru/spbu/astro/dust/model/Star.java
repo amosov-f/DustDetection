@@ -59,7 +59,7 @@ public class Star implements Comparable {
             return false;
         }
 
-        Star star = (Star)o;
+        Star star = (Star) o;
 
         if (Double.compare(star.extError, extError) != 0) {
             return false;
@@ -85,7 +85,7 @@ public class Star implements Comparable {
     public String toString() {
         return String.format(
                 "(%s: l = %.3f, b = %.3f, r = %.3f, ext = %.3f, extError = %.3f)",
-                name, dir.getL(), dir.getB(), r, ext, extError
+                name, dir.l, dir.b, r, ext, extError
         );
     }
 }

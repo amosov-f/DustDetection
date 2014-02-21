@@ -14,11 +14,11 @@ import java.util.List;
 
 public class MissObservingEngine {
 
-    static List<String> types = Arrays.asList("O", "B", "A", "F", "G", "K", "M");
+    private static final List<String> types = Arrays.asList("O", "B", "A", "F", "G", "K", "M");
 
     private static void processSpectTypeHistogram(List<Star> missStars, int prefixLength) throws Exception {
-        Map<String, HipparcosReadingEngine.Star> name2star = new HashMap();
-        final Map<String, Integer> spectTypeCount = new HashMap();
+        Map<String, HipparcosReadingEngine.Star> name2star = new HashMap<>();
+        final Map<String, Integer> spectTypeCount = new HashMap<>();
         for (HipparcosReadingEngine.Star star : HipparcosReadingEngine.getStars()) {
 
             name2star.put(star.name, star);
@@ -34,7 +34,7 @@ public class MissObservingEngine {
         PrintWriter fout10 = new PrintWriter(new FileOutputStream("results/10.txt"));
         PrintWriter fout7 = new PrintWriter(new FileOutputStream("results/7.txt"));
 
-        final Map<String, Integer> missSpectTypeCount = new HashMap();
+        final Map<String, Integer> missSpectTypeCount = new HashMap<>();
         for (Star star : missStars) {
             HipparcosReadingEngine.Star primitiveStar = name2star.get(star.getName().replace('_', ' '));
             fout10.println(primitiveStar.name.substring(4));
@@ -56,7 +56,7 @@ public class MissObservingEngine {
         fout7.close();
         fout10.close();
 
-        List<String> spectTypes = new ArrayList(spectTypeCount.keySet());
+        final List<String> spectTypes = new ArrayList<>(spectTypeCount.keySet());
 
         Collections.sort(spectTypes, new Comparator<String>() {
             private Integer getMissCount(String spectType) {
@@ -86,7 +86,7 @@ public class MissObservingEngine {
             }
         });
 
-        List<String> mainSpectTypes = new ArrayList();
+        final List<String> mainSpectTypes = new ArrayList<>();
 
         int ym[] = new int[types.size() * 2];
         int yn[] = new int[types.size() * 2];
@@ -147,7 +147,7 @@ public class MissObservingEngine {
 
     private static List<Star> getNativeMissStars() {
         List<Star> stars = DustDetectionEngine.getStars();
-        List<Star> missStars = new ArrayList();
+        List<Star> missStars = new ArrayList<>();
         for (Star star : stars) {
             if (star.getExt() + 2 * star.getExtError() < 0) {
                 missStars.add(star);

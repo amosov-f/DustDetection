@@ -1,8 +1,10 @@
 package ru.spbu.astro.dust.func;
 
 import ru.spbu.astro.dust.model.Spheric;
+import ru.spbu.astro.dust.model.Value;
 
 public interface SphericDistribution {
-    double[] get(final Spheric dir);
-    int dim();
+
+    Value get(final Spheric dir);
+
 }

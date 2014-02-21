@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class HipparcosReadingEngine {
     
-    public static Map<String, List<Point2D.Double>> intrinsics = new HashMap();
+    public static final Map<String, List<Point2D.Double>> intrinsics = new HashMap<>();
     
     public static void getIntrinsics() {
         Scanner fin;
@@ -121,7 +121,7 @@ public class HipparcosReadingEngine {
         
         spectType = m.group(1);
         
-        Map<String, Integer> start = new HashMap();
+        Map<String, Integer> start = new HashMap<>();
         
         start.put("O", -10);
         start.put("B", 0);
@@ -225,7 +225,7 @@ public class HipparcosReadingEngine {
             return null;
         }
 
-        List<Star> stars = new ArrayList();
+        final List<Star> stars = new ArrayList<>();
 
         fin.nextLine();
         while (fin.hasNextLine()) {
