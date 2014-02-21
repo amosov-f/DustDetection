@@ -146,8 +146,8 @@ public class MissObservingEngine {
     }
 
     private static List<Star> getNativeMissStars() {
-        List<Star> stars = DustDetectionEngine.getStars();
-        List<Star> missStars = new ArrayList<>();
+        final List<Star> stars = DustDetectionEngine.getStars();
+        final List<Star> missStars = new ArrayList<>();
         for (Star star : stars) {
             if (star.getExt() + 2 * star.getExtError() < 0) {
                 missStars.add(star);
