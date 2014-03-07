@@ -1,18 +1,22 @@
 package ru.spbu.astro.dust;
 
 import org.math.plot.FrameView;
+import org.math.plot.plots.ScatterPlot;
 import ru.spbu.astro.dust.algo.DustDetector;
 import ru.spbu.astro.dust.func.HealpixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.graph.PixPlot;
+import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
 import javax.swing.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.*;
@@ -22,48 +26,31 @@ public class DustDetectionEngine {
 
     public static final int SIZE = 500;
 
-    public static List<Star> getStars() {
-        final List<Star> stars = new ArrayList<>();
+    public static List<Star> getStars() throws FileNotFoundException {
+        Catalogue hipparcos1997 = new Catalogue("datasets/hipparcos1997.txt");
+        Catalogue hipparcos2007 = new Catalogue("datasets/hipparcos2007.txt");
 
-        final Scanner fin;
-        try {
-            fin = new Scanner(new FileInputStream("Datasets/data.txt"));
-        } catch(Exception e) {
-            return null;
-        }
-
-        while (fin.hasNext()) {
-            String name = fin.next();
-            double l = fin.nextDouble();
-            double b = fin.nextDouble();
-            double r = fin.nextDouble();
-            double ext = fin.nextDouble();
-            double extError = fin.nextDouble();
-
-            stars.add(new Star(name, new Spheric(l, b), r, ext, extError));
-        }
-
-        Collections.shuffle(stars);
-        return stars;
+        return hipparcos1997.updateBy(hipparcos2007).getStars();
     }
 
-    public static DustDetector getDustDetector() {
+    public static DustDetector getDustDetector() throws FileNotFoundException {
         return new DustDetector(getStars(), 300.0);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws FileNotFoundException {
         final DustDetector dustDetector = getDustDetector();
 
+        /*
         PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
         fout.println("L\t\t\tB\t\t\ta\t\tsigma_a\tb\t\tsigma_b\tn");
         for (DustDetector.DustPix dustPix : dustDetector.getDustPixes()) {
             fout.println(dustPix);
         }
         fout.flush();
-
+        */
 
         SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
-        final HammerProjection hammerProjection = new HammerProjection(f);
+        final HammerProjection hammerProjection = new HammerProjection(f, HammerProjection.Mode.VALUES_ONLY);
         final PixPlot pixPlot = new PixPlot(dustDetector);
 
         hammerProjection.setSize(2 * SIZE, SIZE);
@@ -71,27 +58,11 @@ public class DustDetectionEngine {
         map.setSize(2 * SIZE, SIZE);
         map.add(hammerProjection);
         map.setVisible(true);
-        map.addMouseListener(new MouseListener() {
+        map.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 final Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
                 pixPlot.plot(dir);
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
             }
         });
 

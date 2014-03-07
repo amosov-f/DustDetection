@@ -31,7 +31,7 @@ public class BinaryStarCounter extends StarCounter {
             Collections.sort(band, new Comparator<Star>() {
                 @Override
                 public int compare(Star s1, Star s2) {
-                    return s1.getDir().compareTo(s2.getDir());
+                    return s1.dir.compareTo(s2.dir);
                 }
             });
         }
@@ -41,13 +41,13 @@ public class BinaryStarCounter extends StarCounter {
             latitudeBands[i] = new ArrayList<>();
 
             for (Star star : starBands[i]) {
-                latitudeBands[i].add(star.getDir().l - 2 * Math.PI);
+                latitudeBands[i].add(star.dir.l - 2 * Math.PI);
             }
             for (Star star : starBands[i]) {
-                latitudeBands[i].add(star.getDir().l);
+                latitudeBands[i].add(star.dir.l);
             }
             for (Star star : starBands[i]) {
-                latitudeBands[i].add(star.getDir().l + 2 * Math.PI);
+                latitudeBands[i].add(star.dir.l + 2 * Math.PI);
             }
         }
     }
@@ -78,6 +78,6 @@ public class BinaryStarCounter extends StarCounter {
     }
 
     private int getBand(Star star) {
-        return getBand(star.getDir().b);
+        return getBand(star.dir.b);
     }
 }

@@ -45,7 +45,7 @@ public class HammerProjection extends Component {
                     continue;
                 }
 
-                f[x][y] = new Value(distribution.get(dir).value, Math.min(distribution.get(dir).err, 1));
+                f[x][y] = new Value(distribution.get(dir).value, Math.min(distribution.get(dir).error, 1));
 
                 if (!Double.isNaN(f[x][y].value) && !Double.isInfinite(f[x][y].value)) {
                     values.add(f[x][y].value);
@@ -80,13 +80,13 @@ public class HammerProjection extends Component {
                         color = Color.getHSBColor(
                                 240f / 360,
                                 (float) Math.abs(d),
-                                (float) (1.0 - normalize(f[x][y].err, 0, 1))
+                                (float) (1.0 - normalize(f[x][y].error, 0, 1))
                         );
                     } else {
                         color = Color.getHSBColor(
                                 0,
                                 (float) d,
-                                (float) (1.0 - normalize(f[x][y].err, 0, 1))
+                                (float) (1.0 - normalize(f[x][y].error, 0, 1))
                         );
                     }
                 }

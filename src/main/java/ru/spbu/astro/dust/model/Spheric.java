@@ -1,8 +1,7 @@
 package ru.spbu.astro.dust.model;
 
-import java.util.Random;
-
 public class Spheric implements Comparable {
+
     public final double l;
     public final double b;
 

@@ -1,18 +1,16 @@
 package ru.spbu.astro.dust.model;
 
 public class Star implements Comparable {
-    private String name;
-    private Spheric dir;
-    private double r;
-    private double ext;
-    private double extError;
+    public final int id;
+    public final Spheric dir;
+    public final Value parallax;
+    public final Value ext;
     
-    public Star(String name, Spheric dir, double r, double ext, double extError) {
-        this.name = name;
+    public Star(int id, final Spheric dir, final Value parallax, final Value ext) {
+        this.id = id;
         this.dir = dir;
-        this.r = r;
+        this.parallax = parallax;
         this.ext = ext;
-        this.extError = extError;
     }
     
     @Override
@@ -21,33 +19,25 @@ public class Star implements Comparable {
             throw new ClassCastException();
         }
         Star other = (Star)o;
-        if (r < other.r) {
+        if (parallax.value > other.parallax.value) {
             return -1;
         }
-        if (r > other.r) {
+        if (parallax.value < other.parallax.value) {
             return 1;
         }
         return 0;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Spheric getDir() {
-        return dir;
+    public int getId() {
+        return id;
     }
 
     public double getR() {
-        return r;
+        return 1000 / parallax.value;
     }
 
-    public double getExt() {
-        return ext;
-    }
-
-    public double getExtError() {
-        return extError;
+    public double getRError() {
+        return 1000 * parallax.error / Math.pow(parallax.value, 2);
     }
 
     @Override
@@ -61,31 +51,14 @@ public class Star implements Comparable {
 
         Star star = (Star) o;
 
-        if (Double.compare(star.extError, extError) != 0) {
-            return false;
-        }
-
-        if (Double.compare(star.ext, ext) != 0) {
-            return false;
-        }
-        if (Double.compare(star.r, r) != 0) {
-            return false;
-        }
-        if (!dir.equals(star.dir)) {
-            return false;
-        }
-        if (!name.equals(star.name)) {
-            return false;
-        }
-
-        return true;
+        return id == star.id;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "(%s: l = %.3f, b = %.3f, r = %.3f, ext = %.3f, extError = %.3f)",
-                name, dir.l, dir.b, r, ext, extError
+                "(%d: l = %.3f, b = %.3f, pi = %.3f, dpi = %.3f, ext = %.3f, extError = %.3f)",
+                id, dir.l, dir.b, parallax.value, parallax.error, ext.value, ext.error
         );
     }
 }

@@ -2,7 +2,6 @@ package ru.spbu.astro.dust;
 
 import org.math.plot.FrameView;
 import org.math.plot.Plot2DPanel;
-import org.math.plot.plots.HistogramPlot2D;
 import ru.spbu.astro.dust.model.Star;
 
 import java.awt.*;
@@ -12,16 +11,17 @@ import java.io.PrintWriter;
 import java.util.*;
 import java.util.List;
 
+@Deprecated
 public class MissObservingEngine {
 
     private static final List<String> types = Arrays.asList("O", "B", "A", "F", "G", "K", "M");
 
     private static void processSpectTypeHistogram(List<Star> missStars, int prefixLength) throws Exception {
-        Map<String, HipparcosReadingEngine.Star> name2star = new HashMap<>();
+        Map<Integer, CatalogueReadingEngine.Star> id2star = new HashMap<>();
         final Map<String, Integer> spectTypeCount = new HashMap<>();
-        for (HipparcosReadingEngine.Star star : HipparcosReadingEngine.getStars()) {
+        for (CatalogueReadingEngine.Star star : CatalogueReadingEngine.getStars()) {
 
-            name2star.put(star.name, star);
+            id2star.put(1, star);
 
             String spectTypePrefix = star.spectType.substring(0, Math.min(prefixLength, star.spectType.length()));
             if (!spectTypeCount.containsKey(spectTypePrefix)) {
@@ -36,14 +36,14 @@ public class MissObservingEngine {
 
         final Map<String, Integer> missSpectTypeCount = new HashMap<>();
         for (Star star : missStars) {
-            HipparcosReadingEngine.Star primitiveStar = name2star.get(star.getName().replace('_', ' '));
+            CatalogueReadingEngine.Star primitiveStar = id2star.get(star.getId());
             fout10.println(primitiveStar.name.substring(4));
 
             String spectTypePrefix = primitiveStar.spectType.substring(0, Math.min(prefixLength, primitiveStar.spectType.length()));
             if (primitiveStar.spectType.contains("III")) {
-                fout7.println(star.getName() + " " + spectTypePrefix + "III");
+                fout7.println(star.getId() + " " + spectTypePrefix + "III");
             } else if (primitiveStar.spectType.contains("V") && !primitiveStar.spectType.contains("IV")) {
-                fout7.println(star.getName() + " " + spectTypePrefix + "V");
+                fout7.println(star.getId() + " " + spectTypePrefix + "V");
             }
 
 
@@ -145,18 +145,18 @@ public class MissObservingEngine {
         new FrameView(missSpectTypeHistogram);
     }
 
-    private static List<Star> getNativeMissStars() {
+    private static List<Star> getNativeMissStars() throws FileNotFoundException {
         final List<Star> stars = DustDetectionEngine.getStars();
         final List<Star> missStars = new ArrayList<>();
         for (Star star : stars) {
-            if (star.getExt() + 2 * star.getExtError() < 0) {
+            if (star.ext.value + 2 * star.ext.error < 0) {
                 missStars.add(star);
             }
         }
         return missStars;
     }
 
-    private static List<Star> getLeastSquaresMissStars() {
+    private static List<Star> getLeastSquaresMissStars() throws FileNotFoundException {
         return DustDetectionEngine.getDustDetector().getMissStars();
     }
 
