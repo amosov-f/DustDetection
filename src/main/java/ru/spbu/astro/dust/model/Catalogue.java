@@ -117,7 +117,7 @@ public class Catalogue implements Iterable<Catalogue.Row> {
 
     public static class Row {
 
-        private final int id;
+        public final int id;
         private final Map<String, String> title2value;
 
         private Row(int id, final Map<String, String> title2value) {

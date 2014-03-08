@@ -7,6 +7,10 @@ import java.util.*;
 
 public class SpectralType {
 
+    public static final List<String> parseLuminosityClasses = Arrays.asList(
+            "I", "Ia", "Ib", "Iab", "II", "IIb", "III", "IIIa", "IIIb", "IV", "IVa", "V", "Va", "Vb", "VI", "VII"
+    );
+
     private enum Relation {
         OR, INTERMEDIATE
     }
@@ -260,27 +264,11 @@ public class SpectralType {
         return null;
     }
 
-    private static final Map<String, Integer> lumin2int = new HashMap<>();
-
-    static {
-        lumin2int.put("0", 0);
-        lumin2int.put("I", 1);
-        lumin2int.put("II", 2);
-        lumin2int.put("III", 3);
-        lumin2int.put("IV", 4);
-        lumin2int.put("V", 5);
-        lumin2int.put("VI", 6);
-        lumin2int.put("VII", 7);
-    }
-
-    public Integer getLuminosityClass() {
+    public String getLuminosityClass() {
         if (luminosityClasses.isEmpty()) {
             return null;
         }
-        if (lumin2int.containsKey(luminosityClasses.get(0).value)) {
-            return lumin2int.get(luminosityClasses.get(0).value);
-        }
-        return null;
+        return luminosityClasses.get(0).value;
     }
 
     private static final Map<String, List<Point2D.Double>> lumin2bvs = new HashMap<>();

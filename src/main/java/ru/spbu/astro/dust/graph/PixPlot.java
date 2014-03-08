@@ -97,14 +97,14 @@ public class PixPlot extends Plot2DPanel {
 
     }
 
-    private double[] getX(double[] x, double[] y) {
+    static double[] getX(double[] x, double[] y) {
         if (x.length == 2) {
             return new double[]{x[0], y[0]};
         }
         return x;
     }
 
-    private double[] getY(double[] x, double[] y) {
+    static double[] getY(double[] x, double[] y) {
         if (x.length == 2) {
             return new double[]{x[1], y[1]};
         }
