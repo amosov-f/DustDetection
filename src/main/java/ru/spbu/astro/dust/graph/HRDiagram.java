@@ -2,18 +2,19 @@ package ru.spbu.astro.dust.graph;
 
 import org.math.plot.FrameView;
 import org.math.plot.Plot2DPanel;
+import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.SpectralType;
+import ru.spbu.astro.dust.model.Star;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static ru.spbu.astro.dust.algo.LuminosityClassifier.Star;
-import static ru.spbu.astro.dust.model.Catalogue.*;
-
-public class HRDiagram extends Plot2DPanel {
+public final class HRDiagram extends Plot2DPanel {
 
     public HRDiagram(final Catalogue catalogue) {
         addLegend("SOUTH");
@@ -22,32 +23,31 @@ public class HRDiagram extends Plot2DPanel {
         for (final String luminosityClass : SpectralType.parseLuminosityClasses) {
             class2stars.put(luminosityClass, new ArrayList<Star>());
         }
-        for (final Row row : catalogue) {
-            final Star s = new Star(row);
-            if (s.parallax > 5 && s.luminosityClass != null) {
-                System.out.println(s.luminosityClass);
-                class2stars.get(s.luminosityClass).add(s);
-
+        for (final Star s : catalogue.getStars()) {
+            if (s.parallax.value > 10 && s.spectralType.getLuminosityClass() != null) {
+                class2stars.get(s.spectralType.getLuminosityClass()).add(s);
             }
         }
 
         for (final List<Star> stars : class2stars.values()) {
             addLuminosityClassStars(stars);
         }
+
+        setFixedBounds(new double[]{-0.5, -15}, new double[]{2.0, 5});
     }
 
     private void addLuminosityClassStars(final List<Star> stars) {
         if (stars.isEmpty()) {
             return;
         }
-        final String luminosityClass = stars.get(0).luminosityClass;
+        final String luminosityClass = stars.get(0).spectralType.getLuminosityClass();
 
         final double[] x = new double[stars.size()];
         final double[] y = new double[stars.size()];
 
         for (int i = 0; i < stars.size(); ++i) {
-            x[i] = stars.get(i).bvColor;
-            y[i] = -stars.get(i).mag;
+            x[i] = stars.get(i).bvColor.value;
+            y[i] = -stars.get(i).getAbsoluteMagnitude();
         }
 
         System.out.println("#" + luminosityClass + ": " + stars.size());
@@ -63,7 +63,9 @@ public class HRDiagram extends Plot2DPanel {
     public static void main(final String[] args) {
         final Catalogue catalogue;
         try {
-            catalogue = new Catalogue("datasets/hipparcos1997.txt").updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+            catalogue = new Catalogue("datasets/hipparcos1997.txt");
+            catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+            //catalogue.updateBy(new LuminosityClassifier(catalogue));
         } catch (final FileNotFoundException e) {
             e.printStackTrace();
             return;

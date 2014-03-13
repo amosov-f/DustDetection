@@ -59,8 +59,8 @@ public class PixPlot extends Plot2DPanel {
             double[] x = new double[supportStars.size()];
             double[] y = new double[supportStars.size()];
             for (int i = 0; i < supportStars.size(); ++i) {
-                x[i] = supportStars.get(i).getR();
-                y[i] = supportStars.get(i).ext.value;
+                x[i] = supportStars.get(i).getR().value;
+                y[i] = supportStars.get(i).getExtinction().value;
                 plotErrs(supportStars.get(i));
             }
             addScatterPlot("Звезды, по которым строится тренд", new Color(17, 18, 255), getX(x, y), getY(x, y));
@@ -70,8 +70,8 @@ public class PixPlot extends Plot2DPanel {
             double[] x = new double[missStars.size()];
             double[] y = new double[missStars.size()];
             for (int i = 0; i < missStars.size(); ++i) {
-                x[i] = missStars.get(i).getR();
-                y[i] = missStars.get(i).ext.value;
+                x[i] = missStars.get(i).getR().value;
+                y[i] = missStars.get(i).getExtinction().value;
                 plotErrs(missStars.get(i));
             }
             addScatterPlot("Выбросы", Color.BLACK, getX(x, y), getY(x, y)); //new Color(78, 77, 75)
@@ -89,8 +89,8 @@ public class PixPlot extends Plot2DPanel {
         x[0] = 0;
         y[0] = b;
         for (int i = 0; i < stars.size(); ++i) {
-            x[i + 1] = stars.get(i).getR();
-            y[i + 1] = a * stars.get(i).getR() + b;
+            x[i + 1] = stars.get(i).getR().value;
+            y[i + 1] = a * stars.get(i).getR().value + b;
         }
         addLinePlot("Тренд", new Color(255, 9, 17), getX(x, y), getY(x, y));
 
@@ -112,10 +112,10 @@ public class PixPlot extends Plot2DPanel {
     }
 
     private void plotErrs(final Star star) {
-        double r = star.getR();
-        double dr = star.getRError();
-        double ext = star.ext.value;
-        double dExt = star.ext.error;
+        double r = star.getR().value;
+        double dr = star.getR().error;
+        double ext = star.getExtinction().value;
+        double dExt = star.getExtinction().error;
         final Color color = new Color(150, 150, 150);
         addPlotable(new Line(color, new double[]{r - dr, ext}, new double[]{r + dr, ext}));
         addPlotable(new Line(color, new double[]{r, ext - dExt}, new double[]{r, ext + dExt}));

@@ -149,7 +149,7 @@ public class MissObservingEngine {
         final List<Star> stars = DustDetectionEngine.getStars();
         final List<Star> missStars = new ArrayList<>();
         for (Star star : stars) {
-            if (star.ext.value + 2 * star.ext.error < 0) {
+            if (star.getExtinction().value + 2 * star.getExtinction().error < 0) {
                 missStars.add(star);
             }
         }

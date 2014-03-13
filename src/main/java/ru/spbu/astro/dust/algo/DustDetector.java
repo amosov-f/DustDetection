@@ -11,23 +11,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class DustDetector {
+public final class DustDetector {
 
-    private static final int N_SIDE = 10; //18
+    private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
 
     private final List<List<Star>> rings;
 
     private final Value[] slopes;
     private final Value[] intercepts;
-
-    //private final double[] slopes;
-    //private final double[] slopeErrs;
-    //private final double[] fullSlopeErrs;
-
-    //private final double[] intercepts;
-    //private final double[] interceptErrs;
-    //private final double[] fullInterceptErrs;
 
     private final PixTools pixTools;
 
@@ -45,10 +37,10 @@ public class DustDetector {
 
         int count = 0;
         for (Star star : stars) {
-            if (star.getR() < 0) {
+            if (star.getR().value < 0) {
                 continue;
             }
-            if (r != null && star.getR() > r) {
+            if (r != null && star.getR().value > r) {
                 continue;
             }
 
@@ -101,8 +93,8 @@ public class DustDetector {
             @Override
             public int compare(Star star1, Star star2) {
                 return Double.compare(
-                        Math.abs(a * star1.getR() + b - star1.ext.value),
-                        Math.abs(a * star2.getR() + b - star2.ext.value)
+                        Math.abs(a * star1.getR().value + b - star1.getExtinction().value),
+                        Math.abs(a * star2.getR().value + b - star2.getExtinction().value)
                 );
             }
         });
@@ -149,7 +141,7 @@ public class DustDetector {
         final SimpleRegression regression = new SimpleRegression();
 
         for (Star star : stars) {
-            regression.addData(star.getR(), star.ext.value);
+            regression.addData(star.getR().value, star.getExtinction().value);
         }
 
         return regression;
@@ -159,59 +151,7 @@ public class DustDetector {
         double theta = dir.getTheta();
         double phi = dir.getPhi();
 
-        return (int)pixTools.ang2pix_ring(N_SIDE, theta, phi);
+        return (int) pixTools.ang2pix_ring(N_SIDE, theta, phi);
     }
-
-    /*public class DustPix {
-        public double l;
-        public double b;
-        public double slope;
-        public double slopeErr;
-        public double intercept;
-        public double interceptErr;
-        public int n;
-
-        public DustPix(double l, double b, double slope, double slopeErr, double intercept, double interceptErr, int n) {
-            this.l = l;
-            this.b = b;
-            this.slope = slope;
-            this.slopeErr = slopeErr;
-            this.intercept = intercept;
-            this.interceptErr = interceptErr;
-            this.n = n;
-        }
-
-        @Override
-        public String toString() {
-            return String.format(
-                    "%f\t%f\t%.2f\t%d%%\t%.3f\t%d%%\t%d",
-                    l,
-                    b,
-                    1000 * slope,
-                    (int) (100 * slopeErr),
-                    intercept,
-                    (int) (100 * interceptErr),
-                    n
-            );
-        }
-
-    }
-
-    public List<DustPix> getDustPixes() {
-        final List<DustPix> dustPixes = new ArrayList<>();
-        for (int i = 0; i < rings.size(); ++i) {
-            double l = pixTools.pix2ang_ring(N_SIDE, i)[1];
-            double b = Math.PI / 2 - pixTools.pix2ang_ring(N_SIDE, i)[0];
-            double slope = slopes[i].value;
-            double slopeErr = slopes[i].error;
-            double intercept = intercepts[i].value;
-            double interceptErr = intercepts[i].error;
-            int n = rings.get(i).size();
-
-            dustPixes.add(new DustPix(l, b, slope, slopeErr, intercept, interceptErr, n));
-        }
-        return dustPixes;
-    }      */
-
 
 }

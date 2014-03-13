@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class HammerProjection extends Component {
+public final class HammerProjection extends Component {
 
     private final SphericDistribution distribution;
     private final Mode mode;

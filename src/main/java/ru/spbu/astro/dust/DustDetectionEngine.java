@@ -3,6 +3,8 @@ package ru.spbu.astro.dust;
 import org.math.plot.FrameView;
 import org.math.plot.plots.ScatterPlot;
 import ru.spbu.astro.dust.algo.DustDetector;
+import ru.spbu.astro.dust.algo.LuminosityClassifier;
+import ru.spbu.astro.dust.func.CountHealpixDistribution;
 import ru.spbu.astro.dust.func.HealpixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.graph.HammerProjection;
@@ -27,10 +29,27 @@ public class DustDetectionEngine {
     public static final int SIZE = 500;
 
     public static List<Star> getStars() throws FileNotFoundException {
-        Catalogue hipparcos1997 = new Catalogue("datasets/hipparcos1997.txt");
-        Catalogue hipparcos2007 = new Catalogue("datasets/hipparcos2007.txt");
+        final Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
+        final Catalogue hipparcos2007 = new Catalogue("datasets/hipparcos2007.txt");
 
-        return hipparcos1997.updateBy(hipparcos2007).getStars();
+        hipparcos.updateBy(hipparcos2007);
+        hipparcos.updateBy(new LuminosityClassifier(hipparcos));
+
+        return hipparcos.getStars();
+    }
+
+    private static Spheric[] getDirs() throws FileNotFoundException {
+        final Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
+        final Catalogue hipparcos2007 = new Catalogue("datasets/hipparcos2007.txt");
+
+        hipparcos.updateBy(hipparcos2007);
+
+        final List<Star> stars = hipparcos.getStars();
+        final Spheric[] dirs = new Spheric[stars.size()];
+        for (int i = 0; i < dirs.length; ++i) {
+            dirs[i] = stars.get(i).dir;
+        }
+        return dirs;
     }
 
     public static DustDetector getDustDetector() throws FileNotFoundException {
@@ -38,7 +57,7 @@ public class DustDetectionEngine {
     }
 
     public static void main(final String[] args) throws FileNotFoundException {
-        final DustDetector dustDetector = getDustDetector();
+
 
         /*
         PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
@@ -49,7 +68,9 @@ public class DustDetectionEngine {
         fout.flush();
         */
 
+        final DustDetector dustDetector = getDustDetector();
         SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
+        //SphericDistribution f = new CountHealpixDistribution(18, getDirs());
         final HammerProjection hammerProjection = new HammerProjection(f, HammerProjection.Mode.VALUES_ONLY);
         final PixPlot pixPlot = new PixPlot(dustDetector);
 

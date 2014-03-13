@@ -59,7 +59,6 @@ public class SpectralType {
         public boolean add(char c) {
             if (value.isEmpty()) {
                 if (isComponentSymbol(c)) {
-                    //System.out.println("type symbol: " + c);
                     value += c;
                     return true;
                 }
@@ -67,6 +66,9 @@ public class SpectralType {
             }
 
             if (getType() == getType(c)) {
+                if (typeSymbols.contains(c)) {
+                    return false;
+                }
                 value += c;
                 return true;
             }
@@ -96,11 +98,11 @@ public class SpectralType {
             return typeSymbols.contains(c) || c == '.' || Character.isDigit(c);
         }
 
-        private boolean isLuminosityClassSymbol(char c) {
+        private static boolean isLuminosityClassSymbol(char c) {
             return luminosityClassSymbols.contains(c);
         }
 
-        private boolean isComponentSymbol(char c) {
+        private static boolean isComponentSymbol(char c) {
             return isTypeSymbol(c) || isLuminosityClassSymbol(c);
         }
 
@@ -114,6 +116,7 @@ public class SpectralType {
             = Arrays.asList("R", "S", "N", "C", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "WR", "WN", "WC");
 
     public SpectralType(final String str) throws IllegalArgumentException {
+
         for (String exceptionSpectralType : exceptionSpectralTypes) {
             if (str.startsWith(exceptionSpectralType)) {
                 throw new IllegalArgumentException();
@@ -136,6 +139,8 @@ public class SpectralType {
                 .replaceAll("[^OBAFGKM\\d\\.IVab/\\-:]", "")
                 + STOP_SYMBOL;
 
+        //System.out.println(s);
+
         Component cur = new Component();
         for (char c : s.toCharArray()) {
             if (cur.add(c)) {
@@ -144,6 +149,7 @@ public class SpectralType {
 
             if (cur.getType() == Component.Type.TYPE) {
                 if (!types.isEmpty()) {
+                    //System.out.println(cur + " " + types.get(types.size() - 1));
                     cur.completeBy(types.get(types.size() - 1));
                 }
                 types.add(cur);
@@ -209,15 +215,8 @@ public class SpectralType {
     }
 
     public Value toBV() {
-        //return null;
         final List<Double> bvs = new ArrayList<>();
         for (Component type : types) {
-            //if (luminosityClasses.isEmpty()) {
-            //    Double bv = toBV(type.value, "V");
-            //    if (bv != null) {
-            //        bvs.add(bv);
-            //    }
-            //}
             for (Component luminosityClass : luminosityClasses) {
                 Double bv = toBV(type.value, luminosityClass.value);
                 if (bv != null) {
@@ -254,6 +253,10 @@ public class SpectralType {
         }
         List<Point2D.Double> bvs = lumin2bvs.get(luminosityClass);
 
+        if (type.length() < 2) {
+            return null;
+        }
+        //System.out.println(types);
         double code = start.get(type.substring(0, 1)) + Double.valueOf(type.substring(1, type.length()));
         for (int i = 0; i < bvs.size() - 1; ++i) {
             if (bvs.get(i).x <= code && code < bvs.get(i + 1).x) {

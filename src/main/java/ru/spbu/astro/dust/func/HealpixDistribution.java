@@ -11,7 +11,7 @@ public class HealpixDistribution implements SphericDistribution {
     private final PixTools pixTools;
     private final long nSide;
 
-    public HealpixDistribution(final Value[] values) throws IllegalArgumentException {
+    public HealpixDistribution(final Value[] values) {
         pixTools = new PixTools();
         nSide = Math.round(Math.sqrt(values.length / 12.0));
 

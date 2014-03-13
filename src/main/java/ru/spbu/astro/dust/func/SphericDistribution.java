@@ -5,6 +5,6 @@ import ru.spbu.astro.dust.model.Value;
 
 public interface SphericDistribution {
 
-    Value get(final Spheric dir);
+    Value get(Spheric dir);
 
 }

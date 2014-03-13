@@ -16,10 +16,10 @@ public class StarCounter {
 
     public StarCounter(final List<Star> stars, double alpha, Double r) {
         for (Star star : stars) {
-            if (star.getR() < 0) {
+            if (star.getR().value < 0) {
                 continue;
             }
-            if (r != null && star.getR() > r) {
+            if (r != null && star.getR().value > r) {
                 continue;
             }
             this.stars.add(star);
