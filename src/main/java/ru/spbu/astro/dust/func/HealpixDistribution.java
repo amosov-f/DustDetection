@@ -6,26 +6,27 @@ import ru.spbu.astro.dust.model.Value;
 
 public class HealpixDistribution implements SphericDistribution {
 
-    private final Value[] values;
+    protected final Value[] values;
 
-    private final PixTools pixTools;
-    private final long nSide;
+    public HealpixDistribution(int nSide) {
+        values = new Value[12 * nSide * nSide];
+    }
 
     public HealpixDistribution(final Value[] values) {
-        pixTools = new PixTools();
-        nSide = Math.round(Math.sqrt(values.length / 12.0));
-
         this.values = values;
     }
 
     @Override
     public Value get(final Spheric dir) {
-        double theta = dir.getTheta();
-        double phi = dir.getPhi();
+        return values[getPix(dir)];
+    }
 
-        int pix = (int) pixTools.ang2pix_ring(nSide, theta, phi);
+    public int getPix(final Spheric dir) {
+        return (int) new PixTools().ang2pix_ring(getNSide(), dir.getTheta(), dir.getPhi());
+    }
 
-        return values[pix];
+    public int getNSide() {
+        return (int) Math.round(Math.sqrt(values.length / 12.0));
     }
 
 }

@@ -1,9 +1,10 @@
-package ru.spbu.astro.dust.graph;
+package ru.spbu.astro.dust.graphics;
 
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Value;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Collection;
@@ -11,13 +12,15 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public final class HammerProjection extends Component {
+public final class HammerProjection extends JWindow {
 
     private final SphericDistribution distribution;
     private final Mode mode;
 
     private static final int PARALLEL_COUNT = 10;
     private static final int MERIDIAN_COUNT = 24;
+
+    public static final int SIZE = 500;
 
     public static enum Mode {
         DEFAULT, VALUES_ONLY
@@ -30,6 +33,8 @@ public final class HammerProjection extends Component {
     public HammerProjection(final SphericDistribution distribution, final Mode mode) {
         this.distribution = distribution;
         this.mode = mode;
+        setSize(2 * SIZE, SIZE);
+        setVisible(true);
     }
 
     @Override
@@ -45,7 +50,7 @@ public final class HammerProjection extends Component {
                     continue;
                 }
 
-                f[x][y] = new Value(distribution.get(dir).value, Math.min(distribution.get(dir).error, 1));
+                f[x][y] = new Value(distribution.get(dir).value, Math.min(distribution.get(dir).getRelativeError(), 1));
 
                 if (!Double.isNaN(f[x][y].value) && !Double.isInfinite(f[x][y].value)) {
                     values.add(f[x][y].value);
@@ -53,7 +58,7 @@ public final class HammerProjection extends Component {
             }
         }
 
-        removeExtremeValues(values);
+        //removeExtremeValues(values);
 
         double minValue = Collections.min(values);
         double maxValue = Collections.max(values);
@@ -67,26 +72,28 @@ public final class HammerProjection extends Component {
 
                 double d = normalize(f[x][y].value, minValue, maxValue);
 
+                //System.out.println(d + " " + f[x][y].value + " " + minValue + " " + maxValue);
+
                 final Color color;
 
                 if (mode == Mode.VALUES_ONLY) {
-                    if (d > 0) {
-                        color = new Color((float)d, 0, 0);
+                    if (d >= 0) {
+                        color = new Color((float) d, 0, 0);
                     } else {
-                        color = new Color(0, 0, (float)Math.abs(d));
+                        color = new Color(0, 0, (float) Math.abs(d));
                     }
                 } else {
                     if (d < 0) {
                         color = Color.getHSBColor(
                                 240f / 360,
                                 (float) Math.abs(d),
-                                (float) (1.0 - normalize(f[x][y].error, 0, 1))
+                                (float) (1.0 - normalize(f[x][y].getRelativeError(), 0, 1))
                         );
                     } else {
                         color = Color.getHSBColor(
                                 0,
                                 (float) d,
-                                (float) (1.0 - normalize(f[x][y].error, 0, 1))
+                                (float) (1.0 - normalize(f[x][y].getRelativeError(), 0, 1))
                         );
                     }
                 }
@@ -197,13 +204,12 @@ public final class HammerProjection extends Component {
     }
 
     private static void removeExtremeValues(final Collection<Double> values) {
-        if (values.size() > 2) {
+        if (values.size() > 2 && Collections.max(values) > 0) {
             values.remove(Collections.max(values));
         }
-        if (values.size() > 2) {
+        if (values.size() > 2 && Collections.min(values) < 0) {
             values.remove(Collections.min(values));
         }
     }
 
 }
-//0.006443230944889031

@@ -10,6 +10,10 @@ public class Value {
         this.error = error;
     }
 
+    public double getRelativeError() {
+        return Math.abs(error / value);
+    }
+
     public Value add(final Value other) {
         return new Value(value + other.value, Math.sqrt(Math.pow(error, 2) + Math.pow(other.error, 2)));
     }

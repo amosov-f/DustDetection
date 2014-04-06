@@ -7,25 +7,25 @@ import java.util.*;
 
 public class Catalogue implements Iterable<Catalogue.Row> {
 
-    private final String[] titles;
+    private final TreeMap<Integer, Row> id2row = new TreeMap<>();
 
-    private final Map<Integer, Row> id2row = new HashMap<>();
+    public Catalogue() {
+    }
 
-    public Catalogue(final String name) throws FileNotFoundException {
-        final Scanner fin = new Scanner(new FileInputStream(name));
-        titles = fin.nextLine().trim().split("\\|");
+    public Catalogue(final String path) throws FileNotFoundException {
+        final Scanner fin = new Scanner(new FileInputStream(path));
+        final String[] titles = fin.nextLine().trim().split("\\|");
         for (int i = 1; i < titles.length; ++i) {
             titles[i] = titles[i].trim();
         }
 
         while (fin.hasNextLine()) {
             try {
-                final Row row = new Row(fin.nextLine());
+                final Row row = new Row(fin.nextLine(), titles);
                 id2row.put(row.id, row);
             } catch (Exception ignored) {
             }
         }
-        //System.out.println(Arrays.toString(titles));
 
         System.out.println("reading completed");
     }
@@ -45,13 +45,14 @@ public class Catalogue implements Iterable<Catalogue.Row> {
                 continue;
             }
             final String luminosityClass = s.spectralType.getLuminosityClass();
-            //System.out.println(luminosityClass);
             if (luminosityClass == null) {
-                //System.out.print(s.spectralType + " -> ");
-                row.title2value.put("spect_type", s.spectralType + classifier.getLuminosityClass(s) + ":");
-                //System.out.println(row.title2value.get("spect_type"));
+                row.title2value.put(SPECT_TYPE, s.spectralType + classifier.getLuminosityClass(s) + ":");
             }
         }
+    }
+
+    public void add(final Star s) {
+        id2row.put(s.id, new Row(s));
     }
 
     public List<Star> getStars() {
@@ -77,13 +78,51 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         return deg / 180 * Math.PI;
     }
 
+    private static double rad2deg(double rad) {
+        return rad / Math.PI * 180;
+    }
+
     @Override
     public String toString() {
-        String str = "";
-        for (Row s : id2row.values()) {
-            str += s + "\n";
+        if (id2row.isEmpty()) {
+            return "Catalogue is empty";
         }
-        return str;
+        String s = format("id");
+        for (final Map.Entry<String, String> entry : id2row.firstEntry().getValue().title2value.entrySet()) {
+            s += format(entry.getKey());
+        }
+        s += "\n";
+        for (final Row row : id2row.values()) {
+            s += format(String.valueOf(row.id));
+            for (final Map.Entry<String, String> entry : row.title2value.entrySet()) {
+                s += format(entry.getValue());
+            }
+            s += "\n";
+        }
+        return s;
+    }
+
+    private static String format(final String s) {
+        String format;
+        try {
+            {
+                double value = new Double(s);
+                format = String.format("%.2f", value);
+            }
+            {
+                int value = new Integer(s);
+                format = String.format("%d", value);
+            }
+        } catch (NumberFormatException e) {
+            format = s;
+        }
+        if (format.length() > 7) {
+            format = format.substring(0, 7);
+        }
+        if (format.length() < 4) {
+            format = format + "\t";
+        }
+        return format + "\t\t";
     }
 
     @Override
@@ -94,9 +133,9 @@ public class Catalogue implements Iterable<Catalogue.Row> {
     public class Row {
 
         public final int id;
-        private final Map<String, String> title2value = new HashMap<>();
+        private final Map<String, String> title2value = new TreeMap<>();
 
-        private Row(final String row) throws EmptyFieldException, NegativeParallaxException, MissingIdException {
+        private Row(final String row, final String[] titles) throws EmptyFieldException, NegativeParallaxException, MissingIdException {
             final String[] fields = row.split("\\|");
 
             int id = -1;
@@ -107,22 +146,21 @@ public class Catalogue implements Iterable<Catalogue.Row> {
                     throw new EmptyFieldException();
                 }
 
-                if (titles[i].equals("hip_number")) {
+                if (titles[i].equals(HIP_NUMBER)) {
                     id = new Integer(fields[i]);
                     continue;
                 }
 
-
                 final String value;
                 switch (titles[i]) {
-                    case "parallax":
+                    case PARALLAX:
                         if (new Double(fields[i]) <= 0) {
                             throw new NegativeParallaxException();
                         }
-                    case "number_components":
+                    case NUMBER_COMPONENTS:
                         value = fields[i];
                         break;
-                    case "spect_type":
+                    case SPECT_TYPE:
                         value = fields[i];
                         break;
                     default:
@@ -140,11 +178,22 @@ public class Catalogue implements Iterable<Catalogue.Row> {
             }
         }
 
+        private Row(final Star s) {
+            id = s.id;
+            title2value.put(LII, String.valueOf(rad2deg(s.dir.l)));
+            title2value.put(BII, String.valueOf(rad2deg(s.dir.b)));
+            title2value.put(PARALLAX, String.valueOf(s.parallax.value));
+            title2value.put(PARALLAX_ERROR, String.valueOf(s.parallax.error));
+            title2value.put(VMAG, String.valueOf(s.vMag));
+            title2value.put(SPECT_TYPE, s.spectralType.toString());
+            title2value.put(BV_COLOR, String.valueOf(s.bvColor.value));
+            title2value.put(BV_COLOR_ERROR, String.valueOf(s.bvColor.error));
+        }
+
         private void updateBy(final Row row) {
             if (id != row.id) {
                 return;
             }
-            //title2value.keySet().addAll(row.title2value.keySet());
             for (final String title : row.title2value.keySet()) {
                 title2value.put(title, row.title2value.get(title));
             }
@@ -155,18 +204,18 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         }
 
         public Star toStar() {
-            if (title2value.containsKey("number_components") && new Integer(get("number_components")) > 1) {
+            if (title2value.containsKey(NUMBER_COMPONENTS) && new Integer(get(NUMBER_COMPONENTS)) > 1) {
                 return null;
             }
 
             try {
                 return new Star(
                         id,
-                        new Spheric(deg2rad(new Double(get("lii"))), deg2rad(new Double(get("bii")))),
-                        new Value(new Double(get("parallax")), new Double(get("parallax_error"))),
-                        new Double(get("vmag")),
-                        new SpectralType(get("spect_type")),
-                        new Value(new Double(get("bv_color")), new Double(get("bv_color_error")))
+                        new Spheric(deg2rad(new Double(get(LII))), deg2rad(new Double(get(BII)))),
+                        new Value(new Double(get(PARALLAX)), new Double(get(PARALLAX_ERROR))),
+                        new Double(get(VMAG)),
+                        new SpectralType(get(SPECT_TYPE)),
+                        new Value(new Double(get(BV_COLOR)), new Double(get(BV_COLOR_ERROR)))
                 );
             } catch (Exception e) {
                 return null;
@@ -189,6 +238,19 @@ public class Catalogue implements Iterable<Catalogue.Row> {
 
     private class MissingIdException extends Exception {
     }
+
+    private static final String LII = "lii";
+    private static final String BII = "bii";
+    private static final String PARALLAX_ERROR = "parallax_error";
+    private static final String VMAG = "vmag";
+    private static final String BV_COLOR = "bv_color";
+    private static final String BV_COLOR_ERROR = "bv_color_error";
+    private static final String PARALLAX = "parallax";
+    private static final String NUMBER_COMPONENTS = "number_components";
+    private static final String SPECT_TYPE = "spect_type";
+    private static final String HIP_NUMBER = "hip_number";
+
+
 
     public static void main(final String[] args) throws FileNotFoundException {
         final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");

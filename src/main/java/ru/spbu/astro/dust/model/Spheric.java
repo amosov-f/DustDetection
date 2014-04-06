@@ -10,25 +10,6 @@ public class Spheric implements Comparable {
         this.b = b;
     }
 
-    public static Spheric randomUniform() {
-        double x = Math.random() * 2 - 1;
-        double y = Math.random() * 2 - 1;
-        double z = Math.random() * 2 - 1;
-        double r = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
-
-        if (r > 1) {
-            return randomUniform();
-        }
-
-        double l = Math.atan2(y, x);
-        if (l < 0) {
-            l += 2 * Math.PI;
-        }
-        double b = Math.PI / 2 - Math.acos(z / r);
-
-        return new Spheric(l, b);
-    }
-
     public double getTheta() {
         return Math.PI / 2 - b;
     }

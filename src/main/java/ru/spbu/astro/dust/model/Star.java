@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.model;
 
 public class Star implements Comparable {
+
     public final int id;
     public final Spheric dir;
     public final Value parallax;
@@ -16,7 +17,7 @@ public class Star implements Comparable {
         this.spectralType = spectralType;
         this.bvColor = bvColor;
     }
-    
+
     @Override
     public int compareTo(Object o) throws ClassCastException {
         if (o == null || getClass() != o.getClass()) {
@@ -32,10 +33,6 @@ public class Star implements Comparable {
         return 0;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public Value getR() {
         return new Value(1000 / parallax.value, 1000 * parallax.error / Math.pow(parallax.value, 2));
     }
@@ -44,8 +41,11 @@ public class Star implements Comparable {
         return bvColor.subtract(spectralType.toBV());
     }
 
-    public double getAbsoluteMagnitude() {
-        return vMag + 5 * Math.log10(parallax.value) - 10;
+    public Value getAbsoluteMagnitude() {
+        return new Value(
+                vMag + 5 * Math.log10(parallax.value) - 10,
+                2.5 * Math.log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))
+        );
     }
 
     @Override

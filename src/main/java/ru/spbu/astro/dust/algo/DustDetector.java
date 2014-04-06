@@ -8,7 +8,6 @@ import ru.spbu.astro.dust.model.Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public final class DustDetector {
@@ -27,49 +26,31 @@ public final class DustDetector {
         this(stars, null);
     }
 
-    public DustDetector(final List<Star> stars, final Double r) {
+    public DustDetector(final List<Star> stars, final Double relativeErrorLimit) {
         pixTools = new PixTools();
 
         rings = new ArrayList<>();
         for (int i = 0; i < 12 * N_SIDE * N_SIDE; ++i) {
-            rings.add(new ArrayList<Star>());
+            rings.add(new ArrayList<>());
         }
 
         int count = 0;
         for (Star star : stars) {
-            if (star.getR().value < 0) {
-                continue;
+            if (relativeErrorLimit == null || star.getR().getRelativeError() <= relativeErrorLimit) {
+                count++;
+                rings.get(getPix(star.dir)).add(star);
             }
-            if (r != null && star.getR().value > r) {
-                continue;
-            }
-
-            count++;
-            rings.get(getPix(star.dir)).add(star);
         }
         System.out.println("number of stars: " + count);
 
         slopes = new Value[rings.size()];
-        //slopeErrs = new double[rings.size()];
-        //fullSlopeErrs = new double[rings.size()];
         intercepts = new Value[rings.size()];
-        //interceptErrs = new double[rings.size()];
-        //fullInterceptErrs = new double[rings.size()];
 
         for (int i = 0; i < rings.size(); ++i) {
             SimpleRegression regression = getRegression(getSupportStars(rings.get(i)));
 
-            double a = regression.getSlope();
-            double b = regression.getIntercept();
-
-            slopes[i] = new Value(a, Math.abs(regression.getSlopeStdErr() / a));
-            intercepts[i] = new Value(b, Math.abs(regression.getInterceptStdErr() / b));
-
-            //fullSlopeErrs[i] = Math.abs(regression.getSlopeStdErr() / slopes[i]);
-            //fullInterceptErrs[i] = Math.abs(regression.getInterceptStdErr() / intercepts[i]);
-
-            //slopeErrs[i] = Math.min(fullSlopeErrs[i], 1);
-            //interceptErrs[i] = Math.min(fullInterceptErrs[i], 1);
+            slopes[i] = new Value(regression.getSlope(), regression.getSlopeStdErr());
+            intercepts[i] = new Value(regression.getIntercept(), regression.getInterceptStdErr());
         }
     }
 
@@ -89,15 +70,10 @@ public final class DustDetector {
         final double a = regression.getSlope();
         final double b = regression.getIntercept();
 
-        Collections.sort(temp, new Comparator<Star>() {
-            @Override
-            public int compare(Star star1, Star star2) {
-                return Double.compare(
-                        Math.abs(a * star1.getR().value + b - star1.getExtinction().value),
-                        Math.abs(a * star2.getR().value + b - star2.getExtinction().value)
-                );
-            }
-        });
+        Collections.sort(temp, (star1, star2) -> Double.compare(
+                Math.abs(a * star1.getR().value + b - star1.getExtinction().value),
+                Math.abs(a * star2.getR().value + b - star2.getExtinction().value)
+        ));
 
         return temp.subList(0, temp.size() - (int)(EJECTION * temp.size()));
     }

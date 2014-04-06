@@ -192,9 +192,6 @@ public class SpectralType {
                 }
             }
         }
-        if (!luminosityClasses.isEmpty()) {
-            s += " ";
-        }
         for (int i = 0; i < luminosityClasses.size(); ++i) {
             s += luminosityClasses.get(i).value;
             if (luminosityClasses.get(i).doubt) {
@@ -238,7 +235,7 @@ public class SpectralType {
         return new Value(bv, Collections.max(bvs) - bv);
     }
 
-    private Double toBV(final String type, final String luminosityClass) {
+    private static Double toBV(final String type, final String luminosityClass) {
         Map<String, Integer> start = new HashMap<>();
         start.put("O", -10);
         start.put("B", 0);
@@ -286,7 +283,7 @@ public class SpectralType {
 
         final String[] titles = fin.nextLine().trim().split("\\s+");
         for (int i = 2; i < titles.length; ++i) {
-            lumin2bvs.put(titles[i], new ArrayList<Point2D.Double>());
+            lumin2bvs.put(titles[i], new ArrayList<>());
         }
 
         while (fin.hasNextLine()) {

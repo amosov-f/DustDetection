@@ -1,7 +1,6 @@
 package ru.spbu.astro.dust.algo;
 
 import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -19,7 +18,10 @@ import java.util.List;
 public final class LuminosityClassifier {
 
     private static final double LEARN_SHARE = 0.8;
-    private static final List<String> luminosityClasses = Arrays.asList("III", "IV", "V");
+    private static final double RELATIVE_ERROR_LIMIT = 0.10;
+
+
+    private static final List<String> luminosityClasses = Arrays.asList("III", "V");
     private final Classifier classifier;
 
     public LuminosityClassifier(final Catalogue catalogue) {
@@ -27,7 +29,7 @@ public final class LuminosityClassifier {
         final List<Star> testStars = new ArrayList<>();
 
         for (final Star s : catalogue.getStars()) {
-            if (s.parallax.value > 10) {
+            if (s.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
                 final String luminosityClass = s.spectralType.getLuminosityClass();
                 if (luminosityClass != null && luminosityClasses.contains(luminosityClass)) {
                     if (Math.random() < LEARN_SHARE) {
@@ -59,13 +61,19 @@ public final class LuminosityClassifier {
     }
 
     public String getLuminosityClass(final Star s) {
-        //System.out.println(s.getId());
-
         if (s.spectralType.getLuminosityClass() != null) {
             return s.spectralType.getLuminosityClass();
         }
+
         try {
-            return luminosityClasses.get((int) classifier.classifyInstance(toInstances("predicted", Arrays.asList(s)).get(0)));
+            int indexUp = (int) classifier.classifyInstance(toInstances("predicted", Arrays.asList(s), -2).get(0));
+            int indexDown = (int) classifier.classifyInstance(toInstances("predicted", Arrays.asList(s), 2).get(0));
+
+            if (indexUp == indexDown) {
+                return luminosityClasses.get(indexUp);
+            }
+            return null;
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -79,19 +87,27 @@ public final class LuminosityClassifier {
     }
 
     private static Instance toInstance(final Star s) {
+        return toInstance(s, 0);
+    }
+
+    private static Instance toInstance(final Star s, int shift) {
         Instance instance = new DenseInstance(attributes.size());
         instance.setValue(attributes.get(0), s.bvColor.value);
-        instance.setValue(attributes.get(1), s.getAbsoluteMagnitude());
+        instance.setValue(attributes.get(1), s.getAbsoluteMagnitude().value + shift * s.getAbsoluteMagnitude().error);
         instance.setValue(attributes.get(2), luminosityClasses.indexOf(s.spectralType.getLuminosityClass()));
         return instance;
     }
 
     private static Instances toInstances(final String name, final List<Star> stars) {
+        return toInstances(name, stars, 0);
+    }
+
+    private static Instances toInstances(final String name, final List<Star> stars, int shift) {
         Instances instances = new Instances(name, attributes, stars.size());
         instances.setClassIndex(2);
 
         for (final Star s : stars) {
-            instances.add(toInstance(s));
+            instances.add(toInstance(s, shift));
         }
 
         return instances;

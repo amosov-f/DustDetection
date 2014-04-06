@@ -36,14 +36,14 @@ public class MissObservingEngine {
 
         final Map<String, Integer> missSpectTypeCount = new HashMap<>();
         for (Star star : missStars) {
-            CatalogueReadingEngine.Star primitiveStar = id2star.get(star.getId());
+            CatalogueReadingEngine.Star primitiveStar = id2star.get(star.id);
             fout10.println(primitiveStar.name.substring(4));
 
             String spectTypePrefix = primitiveStar.spectType.substring(0, Math.min(prefixLength, primitiveStar.spectType.length()));
             if (primitiveStar.spectType.contains("III")) {
-                fout7.println(star.getId() + " " + spectTypePrefix + "III");
+                fout7.println(star.id + " " + spectTypePrefix + "III");
             } else if (primitiveStar.spectType.contains("V") && !primitiveStar.spectType.contains("IV")) {
-                fout7.println(star.getId() + " " + spectTypePrefix + "V");
+                fout7.println(star.id + " " + spectTypePrefix + "V");
             }
 
 
