@@ -6,20 +6,20 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.math.plot.Plot2DPanel;
 import ru.spbu.astro.dust.algo.DustDetector;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class PixPlot extends Plot2DPanel {
+public class PixPlot {
 
     private final DustDetector dustDetector;
     private ChartFrame frame;
@@ -43,29 +43,40 @@ public class PixPlot extends Plot2DPanel {
         final List<Star> supportStars = dustDetector.getSupportStars(dir);
         final List<Star> missStars = dustDetector.getMissStars(dir);
 
-        XYIntervalSeriesCollection dataset1 = new XYIntervalSeriesCollection();
-        dataset1.addSeries(createXYIntegervalSeries(supportStars, "Звезды, по которым строится тренд"));
-        dataset1.addSeries(createXYIntegervalSeries(missStars, "Выбросы"));
+        XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection();
+        starsDataset.addSeries(createXYIntegervalSeries(supportStars, "Звезды, по которым строится тренд"));
+        starsDataset.addSeries(createXYIntegervalSeries(missStars, "Выбросы"));
 
-        XYErrorRenderer renderer = new XYErrorRenderer();
-
-        XYPlot plot = new XYPlot(dataset1, new NumberAxis("r"), new NumberAxis("ext"), renderer);
+        XYPlot plot = new XYPlot(starsDataset, new NumberAxis("r"), new NumberAxis("extinction"), new XYErrorRenderer());
 
         double a = dustDetector.getSlope(dir).value;
         double b = dustDetector.getIntercept(dir).value;
 
         final List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
-        Collections.sort(stars);
 
-        XYSeries lineSeries = new XYSeries("Тренд");
-        lineSeries.add(0, b);
+
+        double r = 0;
         for (final Star s : stars) {
-            double r = s.getR().value;
-            lineSeries.add(r, a * r + b);
+            if (r < s.getR().value + s.getR().error) {
+                r = s.getR().value + s.getR().error;
+            }
         }
-        plot.setDataset(1, new XYSeriesCollection(lineSeries));
-        plot.setRenderer(1, new SamplingXYLineRenderer());
+
+        XYSeries trendSeries = new XYSeries("Тренд");
+        trendSeries.add(0, b);
+        trendSeries.add(r, a * r + b);
+
+
+        plot.setDataset(1, new XYSeriesCollection(trendSeries));
+
+        XYItemRenderer renderer = new SamplingXYLineRenderer();
+        renderer.setSeriesStroke(0, new BasicStroke(3));
+        //renderer.setSeriesPaint(0, new Color(165, 42, 42));
+        plot.setRenderer(1, renderer);
+
+
+        plot.setRangeZeroBaselineVisible(true);
 
         JFreeChart chart = new JFreeChart(
                 "Покраснение в направлении " + dir,

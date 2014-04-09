@@ -25,6 +25,10 @@ public final class LuminosityClassifier {
     private final Classifier classifier;
 
     public LuminosityClassifier(final Catalogue catalogue) {
+        this(catalogue, Mode.DEFAULT);
+    }
+
+    public LuminosityClassifier(final Catalogue catalogue, final Mode mode) {
         final List<Star> learnStars = new ArrayList<>();
         final List<Star> testStars = new ArrayList<>();
 
@@ -32,21 +36,29 @@ public final class LuminosityClassifier {
             if (s.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
                 final String luminosityClass = s.spectralType.getLuminosityClass();
                 if (luminosityClass != null && luminosityClasses.contains(luminosityClass)) {
-                    if (Math.random() < LEARN_SHARE) {
-                        learnStars.add(s);
-                    } else {
+                    if (mode == Mode.TEST && Math.random() > LEARN_SHARE) {
                         testStars.add(s);
+                    } else {
+                        learnStars.add(s);
                     }
                 }
             }
         }
 
         Instances learn = toInstances("learn", learnStars);
-        Instances test = toInstances("test", testStars);
-
         classifier = new SMO();
         try {
             classifier.buildClassifier(learn);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        if (mode == Mode.DEFAULT) {
+            return;
+        }
+
+        Instances test = toInstances("test", testStars);
+        try {
 
             Evaluation evaluation = new Evaluation(learn);
             evaluation.evaluateModel(classifier, test);
@@ -66,14 +78,8 @@ public final class LuminosityClassifier {
         }
 
         try {
-            int indexUp = (int) classifier.classifyInstance(toInstances("predicted", Arrays.asList(s), -2).get(0));
-            int indexDown = (int) classifier.classifyInstance(toInstances("predicted", Arrays.asList(s), 2).get(0));
-
-            if (indexUp == indexDown) {
-                return luminosityClasses.get(indexUp);
-            }
-            return null;
-
+            int index = (int) classifier.classifyInstance(toInstances(s).get(0));
+            return luminosityClasses.get(index);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -87,28 +93,29 @@ public final class LuminosityClassifier {
     }
 
     private static Instance toInstance(final Star s) {
-        return toInstance(s, 0);
-    }
-
-    private static Instance toInstance(final Star s, int shift) {
         Instance instance = new DenseInstance(attributes.size());
         instance.setValue(attributes.get(0), s.bvColor.value);
-        instance.setValue(attributes.get(1), s.getAbsoluteMagnitude().value + shift * s.getAbsoluteMagnitude().error);
+        instance.setValue(attributes.get(1), s.getAbsoluteMagnitude().value);
         instance.setValue(attributes.get(2), luminosityClasses.indexOf(s.spectralType.getLuminosityClass()));
         return instance;
     }
 
     private static Instances toInstances(final String name, final List<Star> stars) {
-        return toInstances(name, stars, 0);
-    }
-
-    private static Instances toInstances(final String name, final List<Star> stars, int shift) {
         Instances instances = new Instances(name, attributes, stars.size());
         instances.setClassIndex(2);
 
         for (final Star s : stars) {
-            instances.add(toInstance(s, shift));
+            instances.add(toInstance(s));
         }
+
+        return instances;
+    }
+
+    private static Instances toInstances(final Star s) {
+        Instances instances = new Instances("predicted", attributes, 1);
+        instances.setClassIndex(2);
+
+        instances.add(toInstance(s));
 
         return instances;
     }
@@ -117,6 +124,10 @@ public final class LuminosityClassifier {
         final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         new LuminosityClassifier(catalogue);
+    }
+
+    public enum Mode {
+        DEFAULT, TEST
     }
 
 }

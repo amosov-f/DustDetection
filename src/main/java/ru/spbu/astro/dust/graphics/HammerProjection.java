@@ -22,6 +22,9 @@ public final class HammerProjection extends JWindow {
 
     public static final int SIZE = 500;
 
+    private static final int REMOVE_LIMIT = 100;
+    private static final int OUTLIERS = 2;
+
     public static enum Mode {
         DEFAULT, VALUES_ONLY
     }
@@ -58,7 +61,9 @@ public final class HammerProjection extends JWindow {
             }
         }
 
-        //removeExtremeValues(values);
+        if (values.size() > REMOVE_LIMIT) {
+            removeExtremeValues(values);
+        }
 
         double minValue = Collections.min(values);
         double maxValue = Collections.max(values);
@@ -204,11 +209,13 @@ public final class HammerProjection extends JWindow {
     }
 
     private static void removeExtremeValues(final Collection<Double> values) {
-        if (values.size() > 2 && Collections.max(values) > 0) {
-            values.remove(Collections.max(values));
-        }
-        if (values.size() > 2 && Collections.min(values) < 0) {
-            values.remove(Collections.min(values));
+        for (int i = 0; i < OUTLIERS; ++i) {
+            if (values.size() > 2 && Collections.max(values) > 0) {
+                values.remove(Collections.max(values));
+            }
+            if (values.size() > 2 && Collections.min(values) < 0) {
+                values.remove(Collections.min(values));
+            }
         }
     }
 

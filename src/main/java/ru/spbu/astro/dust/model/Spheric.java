@@ -41,4 +41,8 @@ public class Spheric implements Comparable {
     public String toString() {
         return String.format("%.2f° г.ш., %.2f° г.д.", rad2deg(b), rad2deg(l));
     }
+
+    public static Spheric valueOf(double[] dir) {
+        return new Spheric(dir[1], Math.PI / 2 - dir[0]);
+    }
 }

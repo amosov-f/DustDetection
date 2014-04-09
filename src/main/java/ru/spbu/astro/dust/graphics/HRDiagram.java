@@ -26,7 +26,7 @@ public final class HRDiagram {
 
     private static final double BV_COLOR_ERROR_LIMIT = Double.MAX_VALUE;
 
-    private static final double ERROR_VIEW_SHARE = 0.1;
+    private static final double ERROR_VIEW_SHARE = 0.2;
 
     public HRDiagram(final Catalogue catalogue) {
         Map<String, List<Star>> class2stars = new HashMap<>();
@@ -112,8 +112,7 @@ public final class HRDiagram {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        Catalogue catalogue;
-        catalogue = new Catalogue("datasets/hipparcos1997.txt");
+        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
 

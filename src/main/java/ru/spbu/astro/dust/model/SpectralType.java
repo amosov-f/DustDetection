@@ -237,13 +237,22 @@ public class SpectralType {
 
     private static Double toBV(final String type, final String luminosityClass) {
         Map<String, Integer> start = new HashMap<>();
-        start.put("O", -10);
+        /*start.put("O", -10);
         start.put("B", 0);
         start.put("A", 10);
         start.put("F", 20);
         start.put("G", 30);
         start.put("K", 40);
-        start.put("M", 48);
+        start.put("M", 48);*/
+        start.put("O", 0);
+        start.put("B", 10);
+        start.put("A", 20);
+        start.put("F", 30);
+        start.put("G", 40);
+        start.put("K", 50);
+        start.put("M", 60);
+
+
 
         if (!lumin2bvs.containsKey(luminosityClass)) {
             return null;
@@ -271,12 +280,24 @@ public class SpectralType {
         return luminosityClasses.get(0).value;
     }
 
+    public String getType() {
+        return types.get(0).value;
+    }
+
+    public double getTypeNumber() {
+        return Double.valueOf(types.get(0).value.substring(1));
+    }
+
+    public String getTypeSymbol() {
+        return types.get(0).value.substring(0, 1);
+    }
+
     private static final Map<String, List<Point2D.Double>> lumin2bvs = new HashMap<>();
 
     static {
         final Scanner fin;
         try {
-            fin = new Scanner(new FileInputStream("datasets/spect2bv.txt"));
+            fin = new Scanner(new FileInputStream("datasets/spect2bv_new.txt"));
         } catch (FileNotFoundException e) {
             throw new ExceptionInInitializerError(e);
         }

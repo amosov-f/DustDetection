@@ -8,43 +8,25 @@ import ru.spbu.astro.dust.graphics.HammerProjection;
 import ru.spbu.astro.dust.graphics.PixPlot;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
-import ru.spbu.astro.dust.model.Star;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 public class DustDetectionEngine {
 
-
-
-    public static List<Star> getStars() throws FileNotFoundException {
+    public static Catalogue getCatalogue() throws FileNotFoundException {
         final Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
-        final Catalogue hipparcos2007 = new Catalogue("datasets/hipparcos2007.txt");
 
-        hipparcos.updateBy(hipparcos2007);
+        hipparcos.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         hipparcos.updateBy(new LuminosityClassifier(hipparcos));
 
-        return hipparcos.getStars();
+        return hipparcos;
     }
 
-    /*private static Spheric[] getDirs() throws FileNotFoundException {
-        final Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
-        final Catalogue hipparcos2007 = new Catalogue("datasets/hipparcos2007.txt");
-
-        hipparcos.updateBy(hipparcos2007);
-
-        final List<Star> stars = hipparcos.getStars();
-        final Spheric[] dirs = new Spheric[stars.size()];
-        for (int i = 0; i < dirs.length; ++i) {
-            dirs[i] = stars.get(i).dir;
-        }
-        return dirs;
-    }*/
 
     public static DustDetector getDustDetector() throws FileNotFoundException {
-        return new DustDetector(getStars(), 0.25);
+        return new DustDetector(getCatalogue(), 0.25);
     }
 
     public static void main(final String[] args) throws FileNotFoundException {
@@ -84,5 +66,6 @@ public class DustDetectionEngine {
         interceptErrsHistogram.addHistogramPlot("min(sigma_b / b, 1)", dustDetector.getInterceptErrs(), 50);
         new FrameView(interceptErrsHistogram);
         */
+
     }
 }

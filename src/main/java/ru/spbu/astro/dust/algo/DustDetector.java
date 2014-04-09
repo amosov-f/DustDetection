@@ -2,13 +2,18 @@ package ru.spbu.astro.dust.algo;
 
 import gov.fnal.eag.healpix.PixTools;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.Value;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class DustDetector {
 
@@ -22,12 +27,11 @@ public final class DustDetector {
 
     private final PixTools pixTools;
 
-    public DustDetector(final List<Star> stars) {
-        this(stars, null);
-    }
+    private final double dr;
 
-    public DustDetector(final List<Star> stars, final Double relativeErrorLimit) {
+    public DustDetector(final Catalogue catalogue, final double dr) {
         pixTools = new PixTools();
+        this.dr = dr;
 
         rings = new ArrayList<>();
         for (int i = 0; i < 12 * N_SIDE * N_SIDE; ++i) {
@@ -35,8 +39,8 @@ public final class DustDetector {
         }
 
         int count = 0;
-        for (Star star : stars) {
-            if (relativeErrorLimit == null || star.getR().getRelativeError() <= relativeErrorLimit) {
+        for (Star star : catalogue.getStars()) {
+            if (star.getR().getRelativeError() <= dr) {
                 count++;
                 rings.get(getPix(star.dir)).add(star);
             }
@@ -128,6 +132,38 @@ public final class DustDetector {
         double phi = dir.getPhi();
 
         return (int) pixTools.ang2pix_ring(N_SIDE, theta, phi);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder s = new StringBuilder();
+        s.append("dr < ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
+        s.append("№\tl\t\t\tb\t\t\ta\t\tsigma_a\tb\t\tsigma_b\tn\n");
+        for (int i = 0; i < rings.size(); ++i) {
+            final Spheric dir = Spheric.valueOf(pixTools.pix2ang_ring(N_SIDE, i));
+            final Value a = slopes[i];
+            final Value b = intercepts[i];
+            int n = rings.get(i).size();
+            s.append(String.format(
+                    "%d\t%f\t%f\t%.2f\t%.2f\t%.3f\t%.3f\t%d\n",
+                    i, dir.l, dir.b, 1000 * a.value, 1000 * a.error, b.value, b.error, n
+            ));
+        }
+        return s.toString();
+    }
+
+    public static void main(final String[] args) throws FileNotFoundException {
+        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+        catalogue.updateBy(new LuminosityClassifier(catalogue));
+
+        final DustDetector dustDetector = new DustDetector(catalogue, 0.25);
+
+        final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
+
+        Locale.setDefault(Locale.US);
+        fout.print(dustDetector.toString());
+        fout.flush();
     }
 
 }
