@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.graphics;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -29,9 +30,50 @@ public class MissObserver {
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
+
+        final Map<String, Integer> missCount = countMap(missStars);
+        final Map<String, Integer> count = countMap(catalogue.getStars());
+
+        for (final String type : count.keySet()) {
+            if (!missCount.containsKey(type)) {
+                missCount.put(type, 0);
+            }
+            dataset.addValue(1.0 * missCount.get(type) / count.get(type), type, count.get(type));
+        }
+
+        JFreeChart chart = ChartFactory.createBarChart(
+                "Гистограмма звезд с отрицательными покраснениями",
+                "B-V",
+                "Count",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                true
+        );
+
+        ChartFrame frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder str = new StringBuilder();
+        str.append("hip\tspect\text\tsigma_ext\n");
+        for (final Star s : missStars) {
+            str.append(String.format(
+                    "%d\t%s\t%.2f\t%.2f\n",
+                    s.id, s.spectralType.toString(), s.getExtinction().value, s.getExtinction().error
+            ));
+        }
+        return str.toString();
+    }
+
+    public static Map<String, Integer> countMap(final List<Star> stars) {
         final Map<String, Integer> count = new HashMap<>();
 
-        for (final Star s : missStars) {
+        for (final Star s : stars) {
             final String sym = s.spectralType.getTypeSymbol();
             double d = s.spectralType.getTypeNumber();
 
@@ -48,37 +90,7 @@ public class MissObserver {
             count.put(key, count.get(key) + 1);
         }
 
-        for (final String type : count.keySet()) {
-            dataset.addValue(count.get(type), type, count.get(type));
-        }
-
-        JFreeChart chart = ChartFactory.createBarChart(
-                "Гистограмма звезд с отрицательными покраснениями",
-                "B-V",
-                "Count",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                true
-        );
-
-        //ChartFrame frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
-        //frame.pack();
-        //frame.setVisible(true);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder str = new StringBuilder();
-        str.append("hip\tspect\text\tsigma_ext\n");
-        for (final Star s : missStars) {
-            str.append(String.format(
-                    "%d\t%s\t%.2f\t%.2f\n",
-                    s.id, s.spectralType.toString(), s.getExtinction().value, s.getExtinction().error
-            ));
-        }
-        return str.toString();
+        return count;
     }
 
     public List<Integer> getMissIds() {

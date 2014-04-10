@@ -285,6 +285,9 @@ public class SpectralType {
     }
 
     public double getTypeNumber() {
+        if (types.get(0).value.length() < 2) {
+            return 5;
+        }
         return Double.valueOf(types.get(0).value.substring(1));
     }
 
