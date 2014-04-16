@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graphics;
+package ru.spbu.astro.dust.graph;
 
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.model.Spheric;

@@ -120,14 +120,14 @@ public final class LuminosityClassifier {
         return instances;
     }
 
+    public enum Mode {
+        DEFAULT, TEST
+    }
+
     public static void main(final String[] args) throws FileNotFoundException {
         final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
-        new LuminosityClassifier(catalogue);
-    }
-
-    public enum Mode {
-        DEFAULT, TEST
+        new LuminosityClassifier(catalogue, Mode.TEST);
     }
 
 }

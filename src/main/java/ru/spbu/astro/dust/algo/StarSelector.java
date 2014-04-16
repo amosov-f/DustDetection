@@ -1,7 +1,7 @@
 package ru.spbu.astro.dust.algo;
 
 import ru.spbu.astro.dust.func.HealpixCounter;
-import ru.spbu.astro.dust.graphics.HammerProjection;
+import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;

@@ -4,8 +4,8 @@ import ru.spbu.astro.dust.algo.DustDetector;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.func.HealpixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
-import ru.spbu.astro.dust.graphics.HammerProjection;
-import ru.spbu.astro.dust.graphics.PixPlot;
+import ru.spbu.astro.dust.graph.HammerProjection;
+import ru.spbu.astro.dust.graph.PixPlot;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 

@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graphics;
+package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
@@ -7,7 +7,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
-import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.algo.StarSelector;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.SpectralType;
@@ -114,7 +113,7 @@ public final class HRDiagram {
     public static void main(String[] args) throws FileNotFoundException {
         Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
-        catalogue.updateBy(new LuminosityClassifier(catalogue));
+        //catalogue.updateBy(new LuminosityClassifier(catalogue));
 
         /*catalogue = new StarSelector(catalogue)
                 .selectByBVColor(1.525, 1.95)

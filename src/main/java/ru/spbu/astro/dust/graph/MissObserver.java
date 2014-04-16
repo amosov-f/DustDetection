@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graphics;
+package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
