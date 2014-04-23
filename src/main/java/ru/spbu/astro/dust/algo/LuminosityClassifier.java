@@ -14,12 +14,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public final class LuminosityClassifier {
 
-    private static final double LEARN_SHARE = 0.8;
     private static final double RELATIVE_ERROR_LIMIT = 0.10;
-
 
     private static final List<String> luminosityClasses = Arrays.asList("III", "V");
     private final Classifier classifier;
@@ -30,17 +29,12 @@ public final class LuminosityClassifier {
 
     public LuminosityClassifier(final Catalogue catalogue, final Mode mode) {
         final List<Star> learnStars = new ArrayList<>();
-        final List<Star> testStars = new ArrayList<>();
 
         for (final Star s : catalogue.getStars()) {
             if (s.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
                 final String luminosityClass = s.spectralType.getLuminosityClass();
-                if (luminosityClass != null && luminosityClasses.contains(luminosityClass)) {
-                    if (mode == Mode.TEST && Math.random() > LEARN_SHARE) {
-                        testStars.add(s);
-                    } else {
-                        learnStars.add(s);
-                    }
+                if (luminosityClasses.contains(luminosityClass)) {
+                    learnStars.add(s);
                 }
             }
         }
@@ -57,19 +51,15 @@ public final class LuminosityClassifier {
             return;
         }
 
-        Instances test = toInstances("test", testStars);
         try {
-
             Evaluation evaluation = new Evaluation(learn);
-            evaluation.evaluateModel(classifier, test);
-            System.out.println(evaluation.toSummaryString());
+            evaluation.crossValidateModel(classifier, learn, 10, new Random());
+
+            System.out.println(evaluation.toClassDetailsString());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println("learn: " + learnStars.size());
-        System.out.println("test: " + testStars.size());
     }
 
     public String getLuminosityClass(final Star s) {

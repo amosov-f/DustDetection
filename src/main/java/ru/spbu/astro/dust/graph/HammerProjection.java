@@ -45,6 +45,8 @@ public final class HammerProjection extends JWindow {
         final Value[][] f = new Value[Math.min(getWidth(), 2 * getHeight())][Math.min(getHeight(), getWidth() / 2)];
 
         final Set<Double> values = new TreeSet<>();
+        final Set<Double> errors = new TreeSet<>();
+
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
@@ -53,10 +55,13 @@ public final class HammerProjection extends JWindow {
                     continue;
                 }
 
-                f[x][y] = new Value(distribution.get(dir).value, Math.min(distribution.get(dir).getRelativeError(), 1));
+                f[x][y] = distribution.get(dir);
 
                 if (!Double.isNaN(f[x][y].value) && !Double.isInfinite(f[x][y].value)) {
                     values.add(f[x][y].value);
+                }
+                if (!Double.isNaN(f[x][y].error) && !Double.isInfinite(f[x][y].error)) {
+                    errors.add(f[x][y].error);
                 }
             }
         }
@@ -64,9 +69,14 @@ public final class HammerProjection extends JWindow {
         if (values.size() > REMOVE_LIMIT) {
             removeExtremeValues(values);
         }
+        if (errors.size() > REMOVE_LIMIT) {
+            removeExtremeValues(errors);
+        }
 
         double minValue = Collections.min(values);
         double maxValue = Collections.max(values);
+
+        double maxError = Collections.max(errors);
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
@@ -75,31 +85,23 @@ public final class HammerProjection extends JWindow {
                     continue;
                 }
 
-                double d = normalize(f[x][y].value, minValue, maxValue);
-
-                //System.out.println(d + " " + f[x][y].value + " " + minValue + " " + maxValue);
+                double value = normalize(f[x][y].value, minValue, maxValue);
+                double error = normalize(f[x][y].error, 0, maxError);
+                //System.out.println(f[x][y].error);
 
                 final Color color;
 
                 if (mode == Mode.VALUES_ONLY) {
-                    if (d >= 0) {
-                        color = new Color((float) d, 0, 0);
+                    if (value >= 0) {
+                        color = new Color((float) value, 0, 0);
                     } else {
-                        color = new Color(0, 0, (float) Math.abs(d));
+                        color = new Color(0, 0, (float) Math.abs(value));
                     }
                 } else {
-                    if (d < 0) {
-                        color = Color.getHSBColor(
-                                240f / 360,
-                                (float) Math.abs(d),
-                                (float) (1.0 - normalize(f[x][y].getRelativeError(), 0, 1))
-                        );
+                    if (value < 0) {
+                        color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
                     } else {
-                        color = Color.getHSBColor(
-                                0,
-                                (float) d,
-                                (float) (1.0 - normalize(f[x][y].getRelativeError(), 0, 1))
-                        );
+                        color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
                     }
                 }
 
@@ -209,12 +211,14 @@ public final class HammerProjection extends JWindow {
     }
 
     private static void removeExtremeValues(final Collection<Double> values) {
-        for (int i = 0; i < OUTLIERS; ++i) {
+        for (int i = 0; i < OUTLIERS;) {
             if (values.size() > 2 && Collections.max(values) > 0) {
                 values.remove(Collections.max(values));
+                i++;
             }
             if (values.size() > 2 && Collections.min(values) < 0) {
                 values.remove(Collections.min(values));
+                i++;
             }
         }
     }

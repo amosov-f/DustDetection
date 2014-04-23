@@ -33,7 +33,7 @@ public class DustDetectionEngine {
 
         final DustDetector dustDetector = getDustDetector();
         SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
-        HammerProjection hammerProjection = new HammerProjection(f, HammerProjection.Mode.VALUES_ONLY);
+        HammerProjection hammerProjection = new HammerProjection(f);
         final PixPlot pixPlot = new PixPlot(dustDetector);
 
         hammerProjection.addMouseListener(new MouseAdapter() {

@@ -329,6 +329,8 @@ public class SpectralType {
 
     public static void main(final String[] args) throws FileNotFoundException {
         final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+
         int count = 0;
         for (String s : catalogue.getColumn("spect_type")) {
             try {
@@ -336,7 +338,7 @@ public class SpectralType {
                 if (spectralType.toBV() != null) {
                     count++;
                 }
-                System.out.println(s + " -> " + spectralType + " ~ " + spectralType.toBV());
+                System.out.println(s + " -> " + spectralType.getLuminosityClass() + " ~ " + spectralType.toBV());
             } catch (IllegalArgumentException e) {
                 System.out.println(s + " -> null");
             }

@@ -43,18 +43,19 @@ public class PixPlot {
         final List<Star> supportStars = dustDetector.getSupportStars(dir);
         final List<Star> missStars = dustDetector.getMissStars(dir);
 
+        final List<Star> stars = new ArrayList<>(supportStars);
+        stars.addAll(missStars);
+
         XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection();
         starsDataset.addSeries(createXYIntegervalSeries(supportStars, "Звезды, по которым строится тренд"));
         starsDataset.addSeries(createXYIntegervalSeries(missStars, "Выбросы"));
 
-        XYPlot plot = new XYPlot(starsDataset, new NumberAxis("r"), new NumberAxis("extinction"), new XYErrorRenderer());
-
-        double a = dustDetector.getSlope(dir).value;
-        double b = dustDetector.getIntercept(dir).value;
-
-        final List<Star> stars = new ArrayList<>(supportStars);
-        stars.addAll(missStars);
-
+        XYPlot plot = new XYPlot(
+                starsDataset,
+                new NumberAxis("Расстояние [пк]"),
+                new NumberAxis("Покраснение [зв.вел.]"),
+                new XYErrorRenderer()
+        );
 
         double r = 0;
         for (final Star s : stars) {
@@ -63,23 +64,23 @@ public class PixPlot {
             }
         }
 
+        double a = dustDetector.getSlope(dir).value;
+        double b = dustDetector.getIntercept(dir).value;
+
         XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(0, b);
         trendSeries.add(r, a * r + b);
-
 
         plot.setDataset(1, new XYSeriesCollection(trendSeries));
 
         XYItemRenderer renderer = new SamplingXYLineRenderer();
         renderer.setSeriesStroke(0, new BasicStroke(3));
-        //renderer.setSeriesPaint(0, new Color(165, 42, 42));
         plot.setRenderer(1, renderer);
-
 
         plot.setRangeZeroBaselineVisible(true);
 
         JFreeChart chart = new JFreeChart(
-                "Покраснение в направлении " + dir,
+                "Покраснение в направлении " + dustDetector.getPixCenter(dustDetector.getPix(dir)),
                 JFreeChart.DEFAULT_TITLE_FONT,
                 plot,
                 true

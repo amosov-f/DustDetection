@@ -134,13 +134,17 @@ public final class DustDetector {
         return (int) pixTools.ang2pix_ring(N_SIDE, theta, phi);
     }
 
+    public Spheric getPixCenter(int pix) {
+        return Spheric.valueOf(pixTools.pix2ang_ring(N_SIDE, (long) pix));
+    }
+
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder();
         s.append("dr < ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
         s.append("№\tl\t\t\tb\t\t\ta\t\tsigma_a\tb\t\tsigma_b\tn\n");
         for (int i = 0; i < rings.size(); ++i) {
-            final Spheric dir = Spheric.valueOf(pixTools.pix2ang_ring(N_SIDE, i));
+            final Spheric dir = getPixCenter(i);
             final Value a = slopes[i];
             final Value b = intercepts[i];
             int n = rings.get(i).size();
