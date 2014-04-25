@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -16,6 +17,8 @@ import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,6 +88,12 @@ public class PixPlot {
                 plot,
                 true
         );
+
+        try {
+            ChartUtilities.saveChartAsPNG(new File("documents/presentation/next.png"), chart, 900, 600);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         frame.getChartPanel().setChart(chart);
     }

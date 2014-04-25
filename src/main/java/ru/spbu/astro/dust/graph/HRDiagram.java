@@ -1,7 +1,7 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
@@ -12,7 +12,8 @@ import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +26,9 @@ public final class HRDiagram {
 
     private static final double BV_COLOR_ERROR_LIMIT = Double.MAX_VALUE;
 
-    private static final double ERROR_VIEW_SHARE = 0.2;
+    private static final double ERROR_VIEW_SHARE = 0.0;
 
-    public HRDiagram(final Catalogue catalogue) {
+    public HRDiagram(final Catalogue catalogue) throws IOException {
         Map<String, List<Star>> class2stars = new HashMap<>();
         for (String luminosityClass : SpectralType.parseLuminosityClasses) {
             class2stars.put(luminosityClass, new ArrayList<>());
@@ -55,8 +56,8 @@ public final class HRDiagram {
 
         JFreeChart chart = ChartFactory.createScatterPlot(
                 String.format("%d (dr < %d%%), ±%.2f mag", starsCount, (int) (100 * PARALLAX_RELATIVE_ERROR_LIMIT), ERROR),
-                "B-V",
-                "M",
+                "B-V [зв. вел.]",
+                "M [зв. вел.]",
                 dataset,
                 PlotOrientation.VERTICAL,
                 true,
@@ -79,9 +80,11 @@ public final class HRDiagram {
 
 
 
-        ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
-        frame.pack();
-        frame.setVisible(true);
+        //ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
+        //frame.pack();
+        //frame.setVisible(true);
+
+        ChartUtilities.saveChartAsPNG(new File("documents/presentation/ml-1.png"), chart, 1200, 800);
     }
 
     private XYIntervalSeries getLuminosityClassSeries(List<Star> stars) {
@@ -110,7 +113,7 @@ public final class HRDiagram {
         return series;
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         //catalogue.updateBy(new LuminosityClassifier(catalogue));
