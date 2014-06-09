@@ -29,7 +29,7 @@ public final class DustDetector {
 
     private final double dr;
 
-    public DustDetector(final Catalogue catalogue, final double dr) {
+    public DustDetector(Catalogue catalogue, double dr) {
         pixTools = new PixTools();
         this.dr = dr;
 
@@ -66,13 +66,13 @@ public final class DustDetector {
         return intercepts;
     }
 
-    private List<Star> getSupportStars(final List<Star> stars) {
-        final List<Star> temp = new ArrayList<>(stars);
+    private List<Star> getSupportStars(List<Star> stars) {
+        List<Star> temp = new ArrayList<>(stars);
 
-        final SimpleRegression regression = getRegression(temp);
+        SimpleRegression regression = getRegression(temp);
 
-        final double a = regression.getSlope();
-        final double b = regression.getIntercept();
+        double a = regression.getSlope();
+        double b = regression.getIntercept();
 
         Collections.sort(temp, (star1, star2) -> Double.compare(
                 Math.abs(a * star1.getR().value + b - star1.getExtinction().value),
@@ -82,17 +82,17 @@ public final class DustDetector {
         return temp.subList(0, temp.size() - (int)(EJECTION * temp.size()));
     }
 
-    public List<Star> getSupportStars(final Spheric dir) {
+    public List<Star> getSupportStars(Spheric dir) {
         return getSupportStars(rings.get(getPix(dir)));
     }
 
-    public List<Star> getMissStars(final List<Star> stars) {
+    public List<Star> getMissStars(List<Star> stars) {
         List<Star> missStars = new ArrayList<>(stars);
         missStars.removeAll(getSupportStars(stars));
         return missStars;
     }
 
-    public List<Star> getMissStars(final Spheric dir) {
+    public List<Star> getMissStars(Spheric dir) {
         int pix = getPix(dir);
 
         List<Star> missStars = new ArrayList<>(rings.get(pix));
@@ -101,24 +101,24 @@ public final class DustDetector {
         return missStars;
     }
 
-    public Value getSlope(final Spheric dir) {
+    public Value getSlope(Spheric dir) {
         return slopes[getPix(dir)];
     }
 
-    public Value getIntercept(final Spheric dir) {
+    public Value getIntercept(Spheric dir) {
         return intercepts[getPix(dir)];
     }
 
     public List<Star> getMissStars() {
-        final List<Star> missStars = new ArrayList<>();
+        List<Star> missStars = new ArrayList<>();
         for (List<Star> ring : rings) {
             missStars.addAll(getMissStars(ring));
         }
         return missStars;
     }
 
-    private static SimpleRegression getRegression(final List<Star> stars) {
-        final SimpleRegression regression = new SimpleRegression();
+    private static SimpleRegression getRegression(List<Star> stars) {
+        SimpleRegression regression = new SimpleRegression();
 
         for (Star star : stars) {
             regression.addData(star.getR().value, star.getExtinction().value);
@@ -140,13 +140,13 @@ public final class DustDetector {
 
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder();
+        StringBuilder s = new StringBuilder();
         s.append("dr < ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
         s.append("№\tl\t\t\tb\t\t\ta\t\tsigma_a\tb\t\tsigma_b\tn\n");
         for (int i = 0; i < rings.size(); ++i) {
-            final Spheric dir = getPixCenter(i);
-            final Value a = slopes[i];
-            final Value b = intercepts[i];
+            Spheric dir = getPixCenter(i);
+            Value a = slopes[i];
+            Value b = intercepts[i];
             int n = rings.get(i).size();
             s.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%.3f\t%.3f\t%d\n",
@@ -156,14 +156,14 @@ public final class DustDetector {
         return s.toString();
     }
 
-    public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+    public static void main(String[] args) throws FileNotFoundException {
+        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
 
-        final DustDetector dustDetector = new DustDetector(catalogue, 0.25);
+        DustDetector dustDetector = new DustDetector(catalogue, 0.25);
 
-        final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
+        PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
 
         Locale.setDefault(Locale.US);
         fout.print(dustDetector.toString());

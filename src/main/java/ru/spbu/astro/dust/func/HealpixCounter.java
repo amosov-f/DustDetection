@@ -10,32 +10,32 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HealpixCounter extends HealpixDistribution {
+public final class HealpixCounter extends HealpixDistribution {
 
-    public HealpixCounter(final Iterable<Spheric> dirs, int nSide) {
+    public HealpixCounter(Iterable<Spheric> dirs, int nSide) {
         super(nSide);
 
         for (int i = 0; i < values.length; ++i) {
             values[i] = new Value(0, 0);
         }
 
-        for (final Spheric dir : dirs) {
+        for (Spheric dir : dirs) {
             int pix = getPix(dir);
             values[pix] = values[pix].add(new Value(1, 0));
         }
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        final Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
+        Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
 
         hipparcos.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
 
-        final List<Spheric> dirs = new ArrayList<>();
-        for (final Star s : hipparcos.getStars()) {
+        List<Spheric> dirs = new ArrayList<>();
+        for (Star s : hipparcos.getStars()) {
             dirs.add(s.dir);
         }
 
-        new HammerProjection(new HealpixCounter(dirs, 18), HammerProjection.Mode.VALUES_ONLY);
+        new HammerProjection(new HealpixCounter(dirs, 18));
     }
 
 }

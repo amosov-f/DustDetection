@@ -13,10 +13,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 
-public class DustDetectionEngine {
+import static ru.spbu.astro.dust.graph.HammerProjection.Mode.WITH_ERRORS;
+
+public final class DustDetectionEngine {
 
     public static Catalogue getCatalogue() throws FileNotFoundException {
-        final Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
+        Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
 
         hipparcos.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         hipparcos.updateBy(new LuminosityClassifier(hipparcos));
@@ -24,22 +26,21 @@ public class DustDetectionEngine {
         return hipparcos;
     }
 
-
     public static DustDetector getDustDetector() throws FileNotFoundException {
         return new DustDetector(getCatalogue(), 0.25);
     }
 
-    public static void main(final String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException {
 
-        final DustDetector dustDetector = getDustDetector();
+        DustDetector dustDetector = getDustDetector();
         SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
-        HammerProjection hammerProjection = new HammerProjection(f);
-        final PixPlot pixPlot = new PixPlot(dustDetector);
+        HammerProjection hammerProjection = new HammerProjection(f, WITH_ERRORS);
+        PixPlot pixPlot = new PixPlot(dustDetector);
 
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                final Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
+                Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
                 pixPlot.plot(dir);
             }
         });

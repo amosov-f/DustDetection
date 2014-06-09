@@ -1,7 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -17,17 +16,15 @@ import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PixPlot {
+public final class PixPlot {
 
     private final DustDetector dustDetector;
     private ChartFrame frame;
 
-    public PixPlot(final DustDetector dustDetector) {
+    public PixPlot(DustDetector dustDetector) {
         this.dustDetector = dustDetector;
 
         frame = new ChartFrame("Покраснение", null);
@@ -38,15 +35,15 @@ public class PixPlot {
         frame.setVisible(true);
     }
 
-    public void plot(final Spheric dir) {
+    public void plot(Spheric dir) {
         if (dir == null) {
             return;
         }
 
-        final List<Star> supportStars = dustDetector.getSupportStars(dir);
-        final List<Star> missStars = dustDetector.getMissStars(dir);
+        List<Star> supportStars = dustDetector.getSupportStars(dir);
+        List<Star> missStars = dustDetector.getMissStars(dir);
 
-        final List<Star> stars = new ArrayList<>(supportStars);
+        List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
 
         XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection();
@@ -61,7 +58,7 @@ public class PixPlot {
         );
 
         double r = 0;
-        for (final Star s : stars) {
+        for (Star s : stars) {
             if (r < s.getR().value + s.getR().error) {
                 r = s.getR().value + s.getR().error;
             }
@@ -89,18 +86,18 @@ public class PixPlot {
                 true
         );
 
-        try {
-            ChartUtilities.saveChartAsPNG(new File("documents/presentation/next.png"), chart, 900, 600);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        //try {
+        //    ChartUtilities.saveChartAsPNG(new File("documents/presentation/next.png"), chart, 900, 600);
+        //} catch (IOException e) {
+        //    throw new RuntimeException(e);
+        //}
 
         frame.getChartPanel().setChart(chart);
     }
 
-    private XYIntervalSeries createXYIntegervalSeries(final List<Star> stars, final String name) {
+    private XYIntervalSeries createXYIntegervalSeries(List<Star> stars, String name) {
         XYIntervalSeries series = new XYIntervalSeries(name);
-        for (final Star s : stars) {
+        for (Star s : stars) {
             series.add(
                     s.getR().value,
                     s.getR().value - s.getR().error,

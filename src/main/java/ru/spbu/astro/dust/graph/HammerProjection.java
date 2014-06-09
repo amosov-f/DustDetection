@@ -26,14 +26,14 @@ public final class HammerProjection extends JWindow {
     private static final int OUTLIERS = 2;
 
     public static enum Mode {
-        DEFAULT, VALUES_ONLY
+        DEFAULT, WITH_ERRORS
     }
 
-    public HammerProjection(final SphericDistribution distribution) {
+    public HammerProjection(SphericDistribution distribution) {
         this(distribution, Mode.DEFAULT);
     }
 
-    public HammerProjection(final SphericDistribution distribution, final Mode mode) {
+    public HammerProjection(SphericDistribution distribution, Mode mode) {
         this.distribution = distribution;
         this.mode = mode;
         setSize(2 * SIZE, SIZE);
@@ -41,16 +41,16 @@ public final class HammerProjection extends JWindow {
     }
 
     @Override
-    public void paint(final Graphics g) {
-        final Value[][] f = new Value[Math.min(getWidth(), 2 * getHeight())][Math.min(getHeight(), getWidth() / 2)];
+    public void paint(Graphics g) {
+        Value[][] f = new Value[Math.min(getWidth(), 2 * getHeight())][Math.min(getHeight(), getWidth() / 2)];
 
-        final Set<Double> values = new TreeSet<>();
-        final Set<Double> errors = new TreeSet<>();
+        Set<Double> values = new TreeSet<>();
+        Set<Double> errors = new TreeSet<>();
 
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
-                final Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
+                Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
                 if (dir == null) {
                     continue;
                 }
@@ -80,29 +80,23 @@ public final class HammerProjection extends JWindow {
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
-                final Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
+                Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
                 if (dir == null) {
                     continue;
                 }
 
                 double value = normalize(f[x][y].value, minValue, maxValue);
-                double error = normalize(f[x][y].error, 0, maxError);
-                //System.out.println(f[x][y].error);
+                double error = 0;
+                if (mode == Mode.WITH_ERRORS) {
+                    error = normalize(f[x][y].error, 0, maxError);
+                }
 
-                final Color color;
+                Color color;
 
-                if (mode == Mode.VALUES_ONLY) {
-                    if (value >= 0) {
-                        color = new Color((float) value, 0, 0);
-                    } else {
-                        color = new Color(0, 0, (float) Math.abs(value));
-                    }
+                if (value >= 0) {
+                    color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
                 } else {
-                    if (value < 0) {
-                        color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
-                    } else {
-                        color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
-                    }
+                    color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
                 }
 
                 g.setColor(color);
@@ -113,28 +107,28 @@ public final class HammerProjection extends JWindow {
         paintCircles(g);
     }
 
-    private void paintCircles(final Graphics g) {
+    private void paintCircles(Graphics g) {
         g.setColor(new Color(148, 167, 187));
         for (double l = 0; l < 2 * Math.PI; l += 2 * Math.PI / MERIDIAN_COUNT) {
             for (double b = -Math.PI / 2; b < Math.PI / 2; b += 0.001) {
-                final Point p = toWindow(shperic2plane(new Spheric(l, b)));
+                Point p = toWindow(shperic2plane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
         }
         for (double b = - Math.PI / 2; b < Math.PI / 2; b += 0.001) {
-            final Point p = toWindow(shperic2plane(new Spheric(Math.PI - 0.00001, b)));
+            Point p = toWindow(shperic2plane(new Spheric(Math.PI - 0.00001, b)));
             g.drawLine(p.x, p.y, p.x, p.y);
         }
 
         for (double b = - Math.PI / 2; b < Math.PI / 2; b += Math.PI / PARALLEL_COUNT) {
             for (double l = 0; l < 2 * Math.PI; l += 0.0001) {
-                final Point p = toWindow(shperic2plane(new Spheric(l, b)));
+                Point p = toWindow(shperic2plane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
         }
     }
 
-    public static Point2D.Double shperic2plane(final Spheric dir) {
+    public static Point2D.Double shperic2plane(Spheric dir) {
         double l = dir.l;
         double b = dir.b;
 
@@ -150,7 +144,7 @@ public final class HammerProjection extends JWindow {
         return new Point2D.Double(x, y);
     }
 
-    public static Spheric plane2spheric(final Point2D.Double p) {
+    public static Spheric plane2spheric(Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 
@@ -174,7 +168,7 @@ public final class HammerProjection extends JWindow {
         return new Spheric(l, b);
     }
 
-    public Point toWindow(final Point2D.Double p) {
+    public Point toWindow(Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 
@@ -184,7 +178,7 @@ public final class HammerProjection extends JWindow {
         return new Point((int) x, (int) y);
     }
 
-    public Point2D.Double fromWindow(final Point p) {
+    public Point2D.Double fromWindow(Point p) {
         double x = 2 * (p.getX() / getHeight() - 1);
         double y = 2 * (getHeight() - p.getY()) / getHeight() - 1;
 
@@ -210,7 +204,7 @@ public final class HammerProjection extends JWindow {
         return x / d;
     }
 
-    private static void removeExtremeValues(final Collection<Double> values) {
+    private static void removeExtremeValues(Collection<Double> values) {
         for (int i = 0; i < OUTLIERS;) {
             if (values.size() > 2 && Collections.max(values) > 0) {
                 values.remove(Collections.max(values));

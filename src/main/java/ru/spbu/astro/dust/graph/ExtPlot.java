@@ -4,7 +4,6 @@ import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYAreaRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
@@ -14,7 +13,7 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.io.IOException;
 
-public class ExtPlot {
+public final class ExtPlot {
 
     private XYSeries[] getSeries() {
         XYSeries series = new XYSeries("Кривая покраснения");
@@ -115,13 +114,16 @@ public class ExtPlot {
 
         XYPlot plot = new XYPlot(
                 new XYSeriesCollection(getSeries()[0]),
-                new NumberAxis("Расстояние [пк]"),
-                new NumberAxis("Покраснение [зв. вел.]"),
+                new NumberAxis("Расстояние"),
+                new NumberAxis("Покраснение"),
                 renderer
         );
 
-        plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
-        plot.setRenderer(1, new XYAreaRenderer());
+        plot.getDomainAxis().setTickLabelsVisible(false);
+        plot.getRangeAxis().setTickLabelsVisible(false);
+
+        //plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
+        //plot.setRenderer(1, new XYAreaRenderer());
 
         JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", plot);
 
@@ -129,7 +131,7 @@ public class ExtPlot {
         frame.setVisible(true);
         frame.pack();
 
-        //ChartUtilities.saveChartAsPNG(new File("documents/presentation/ideal-2.png"), chart, 900, 600);
+        //ChartUtilities.saveChartAsPNG(new File("documents/presentation/ideal-1-no-tick.png"), chart, 900, 600);
     }
 
     public static void main(String[] args) throws IOException {

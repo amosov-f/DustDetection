@@ -10,18 +10,18 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StarSelector {
+public final class StarSelector {
 
     private final Catalogue catalogue;
 
-    public StarSelector(final Catalogue catalogue) {
+    public StarSelector(Catalogue catalogue) {
         this.catalogue = catalogue;
     }
 
     public StarSelector selectByBVColor(double min, double max) {
-        final Catalogue selection = new Catalogue();
+        Catalogue selection = new Catalogue();
 
-        for (final Star s : catalogue.getStars()) {
+        for (Star s : catalogue.getStars()) {
             double bvColor = s.bvColor.value;
 
             if (min <= bvColor && bvColor <= max) {
@@ -34,9 +34,9 @@ public class StarSelector {
     }
 
     public StarSelector selectByAbsoluteMagnitude(double min, double max) {
-        final Catalogue selection = new Catalogue();
+        Catalogue selection = new Catalogue();
 
-        for (final Star s : catalogue.getStars()) {
+        for (Star s : catalogue.getStars()) {
             if (min <= s.getAbsoluteMagnitude().value && s.getAbsoluteMagnitude().value <= max) {
                 selection.add(s);
             }
@@ -46,9 +46,9 @@ public class StarSelector {
     }
 
     public StarSelector selectByBVColorError(double lim) {
-        final Catalogue selection = new Catalogue();
+        Catalogue selection = new Catalogue();
 
-        for (final Star s : catalogue.getStars()) {
+        for (Star s : catalogue.getStars()) {
             if (s.bvColor.getRelativeError() < lim) {
                 selection.add(s);
             }
@@ -58,9 +58,9 @@ public class StarSelector {
     }
 
     public StarSelector selectByParallaxRelativeError(double lim) {
-        final Catalogue selection = new Catalogue();
+        Catalogue selection = new Catalogue();
 
-        for (final Star s : catalogue.getStars()) {
+        for (Star s : catalogue.getStars()) {
             if (s.parallax.getRelativeError() < lim) {
                 selection.add(s);
             }
@@ -70,9 +70,9 @@ public class StarSelector {
     }
 
     public StarSelector selectByExistLuminosityClass() {
-        final Catalogue selection = new Catalogue();
+        Catalogue selection = new Catalogue();
 
-        for (final Star s : catalogue.getStars()) {
+        for (Star s : catalogue.getStars()) {
             if (s.spectralType.getLuminosityClass() != null) {
                 selection.add(s);
             }
@@ -90,23 +90,23 @@ public class StarSelector {
         return catalogue.toString();
     }
 
-    public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+    public static void main(String[] args) throws FileNotFoundException {
+        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
 
-        final Catalogue selection = new StarSelector(catalogue)
+        Catalogue selection = new StarSelector(catalogue)
                 .selectByBVColor(1.525, 1.95)
                 .selectByAbsoluteMagnitude(4.5, 9.5)
                 .catalogue;
 
-        final List<Spheric> dirs = new ArrayList<>();
-        for (final Star s : selection.getStars()) {
+        List<Spheric> dirs = new ArrayList<>();
+        for (Star s : selection.getStars()) {
             dirs.add(s.dir);
         }
 
         System.out.println(selection);
-        new HammerProjection(new HealpixCounter(dirs, 18), HammerProjection.Mode.VALUES_ONLY);
+        new HammerProjection(new HealpixCounter(dirs, 18), HammerProjection.Mode.WITH_ERRORS);
     }
 
 }
