@@ -1,9 +1,11 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYAreaRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
@@ -11,7 +13,10 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.io.File;
 import java.io.IOException;
+
+import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class ExtPlot {
 
@@ -122,16 +127,20 @@ public final class ExtPlot {
         plot.getDomainAxis().setTickLabelsVisible(false);
         plot.getRangeAxis().setTickLabelsVisible(false);
 
-        //plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
-        //plot.setRenderer(1, new XYAreaRenderer());
+        plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
+        plot.setRenderer(1, new XYAreaRenderer());
 
-        JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", plot);
+        JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", DEFAULT_TITLE_FONT, plot, true);
+
+        try {
+            ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         ChartFrame frame = new ChartFrame("Идеальная кривая покраснения", chart);
-        frame.setVisible(true);
         frame.pack();
-
-        //ChartUtilities.saveChartAsPNG(new File("documents/presentation/ideal-1-no-tick.png"), chart, 900, 600);
+        frame.setVisible(true);
     }
 
     public static void main(String[] args) throws IOException {

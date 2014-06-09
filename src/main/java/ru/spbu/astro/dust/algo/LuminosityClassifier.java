@@ -23,16 +23,16 @@ public final class LuminosityClassifier {
     private static final List<String> luminosityClasses = Arrays.asList("III", "V");
     private final Classifier classifier;
 
-    public LuminosityClassifier(final Catalogue catalogue) {
+    public LuminosityClassifier(Catalogue catalogue) {
         this(catalogue, Mode.DEFAULT);
     }
 
-    public LuminosityClassifier(final Catalogue catalogue, final Mode mode) {
-        final List<Star> learnStars = new ArrayList<>();
+    public LuminosityClassifier(Catalogue catalogue, Mode mode) {
+        List<Star> learnStars = new ArrayList<>();
 
-        for (final Star s : catalogue.getStars()) {
+        for (Star s : catalogue.getStars()) {
             if (s.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
-                final String luminosityClass = s.spectralType.getLuminosityClass();
+                String luminosityClass = s.spectralType.getLuminosityClass();
                 if (luminosityClasses.contains(luminosityClass)) {
                     learnStars.add(s);
                 }
@@ -62,7 +62,7 @@ public final class LuminosityClassifier {
         }
     }
 
-    public String getLuminosityClass(final Star s) {
+    public String getLuminosityClass(Star s) {
         if (s.spectralType.getLuminosityClass() != null) {
             return s.spectralType.getLuminosityClass();
         }
@@ -82,7 +82,7 @@ public final class LuminosityClassifier {
         attributes.add(new Attribute("luminosityClasses", luminosityClasses));
     }
 
-    private static Instance toInstance(final Star s) {
+    private static Instance toInstance(Star s) {
         Instance instance = new DenseInstance(attributes.size());
         instance.setValue(attributes.get(0), s.bvColor.value);
         instance.setValue(attributes.get(1), s.getAbsoluteMagnitude().value);
@@ -90,18 +90,18 @@ public final class LuminosityClassifier {
         return instance;
     }
 
-    private static Instances toInstances(final String name, final List<Star> stars) {
+    private static Instances toInstances(String name, List<Star> stars) {
         Instances instances = new Instances(name, attributes, stars.size());
         instances.setClassIndex(2);
 
-        for (final Star s : stars) {
+        for (Star s : stars) {
             instances.add(toInstance(s));
         }
 
         return instances;
     }
 
-    private static Instances toInstances(final Star s) {
+    private static Instances toInstances(Star s) {
         Instances instances = new Instances("predicted", attributes, 1);
         instances.setClassIndex(2);
 
@@ -114,8 +114,8 @@ public final class LuminosityClassifier {
         DEFAULT, TEST
     }
 
-    public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+    public static void main(String[] args) throws FileNotFoundException {
+        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         new LuminosityClassifier(catalogue, Mode.TEST);
     }

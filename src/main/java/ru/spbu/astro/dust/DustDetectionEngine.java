@@ -13,8 +13,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 
-import static ru.spbu.astro.dust.graph.HammerProjection.Mode.WITH_ERRORS;
-
 public final class DustDetectionEngine {
 
     public static Catalogue getCatalogue() throws FileNotFoundException {
@@ -34,7 +32,7 @@ public final class DustDetectionEngine {
 
         DustDetector dustDetector = getDustDetector();
         SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
-        HammerProjection hammerProjection = new HammerProjection(f, WITH_ERRORS);
+        HammerProjection hammerProjection = new HammerProjection(f);
         PixPlot pixPlot = new PixPlot(dustDetector);
 
         hammerProjection.addMouseListener(new MouseAdapter() {

@@ -118,7 +118,7 @@ public final class DustDetector {
     }
 
     private static SimpleRegression getRegression(List<Star> stars) {
-        SimpleRegression regression = new SimpleRegression();
+        SimpleRegression regression = new SimpleRegression(false);
 
         for (Star star : stars) {
             regression.addData(star.getR().value, star.getExtinction().value);

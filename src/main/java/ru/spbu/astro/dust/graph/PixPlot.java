@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -16,8 +17,12 @@ import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class PixPlot {
 
@@ -81,16 +86,16 @@ public final class PixPlot {
 
         JFreeChart chart = new JFreeChart(
                 "Покраснение в направлении " + dustDetector.getPixCenter(dustDetector.getPix(dir)),
-                JFreeChart.DEFAULT_TITLE_FONT,
+                DEFAULT_TITLE_FONT,
                 plot,
                 true
         );
 
-        //try {
-        //    ChartUtilities.saveChartAsPNG(new File("documents/presentation/next.png"), chart, 900, 600);
-        //} catch (IOException e) {
-        //    throw new RuntimeException(e);
-        //}
+        try {
+            ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         frame.getChartPanel().setChart(chart);
     }

@@ -110,7 +110,7 @@
             Пример на звезде HIP 44800
             \begin{itemize}
                 \item У нее в каталоге $(B - V)_{obs} = 0.535^m$
-                \item Класс F7V, поэтому $(B - V)_{int} = 0.493^m$
+                \item Класс F7V, поэтому$^*$ $(B - V)_{int} = 0.493^m$
                 \item Покраснение $0.535^m - 0.493^m = 0.042^m$
                 \item Между нами и звездой пыли на $0.042^m$
             \end{itemize}
@@ -138,53 +138,36 @@
         
         \begin{frame}{Реальная <<кривая>> покраснения}
             \begin{center}
-                \includegraphics[scale=0.35]{real-2.png}
+                \includegraphics[scale=0.35]{real-2-k.png}
             \end{center}             
         \end{frame}
         
         \begin{frame}{<<В среднем>>}
             \begin{center}
-                \includegraphics[scale=0.35]{real-3.png}
+                \includegraphics[scale=0.35]{real-3-k.png}
             \end{center}             
         \end{frame}        
         
         \begin{frame}{Отрицательный тренд}
             \begin{center}
-                \includegraphics[scale=0.35]{real-4.png}
+                \includegraphics[scale=0.35]{real-4-k.png}
             \end{center}             
         \end{frame}
         
     \section{Карты}            
         
-        \begin{frame}{Коэффициент $a$ ~~~~~~~~~~~~~~~ $E = a r + b$}
-            \begin{center}
-                \includegraphics[scale=0.32]{map-a-white.png}
-            \end{center}             
-        \end{frame}
-        
-        \begin{frame}{Коэффициент $a$ с ошибкой}
-            \begin{center}
-                \includegraphics[scale=0.32]{map-a-sigma.png}
-            \end{center}             
-        \end{frame}
-        
-        \begin{frame}{Коэффициент $b$ ~~~~~~~~~~~~~~~ $E = a r + b$}
-            \begin{center}
-                \includegraphics[scale=0.32]{map-b-white.png}
-            \end{center}             
-        \end{frame}
-        
-        \begin{frame}{Коэффициент $k$ ~~~~~~~~~~~~~~~~~~~~~ $E = k r$}
+        \begin{frame}{Коэффициент $k$ ~~~~~~~~~~~~~~~~ $E_{B - V} = k r$}
             \begin{center}
                 \includegraphics[scale=0.32]{map-k.png}
             \end{center}             
         \end{frame}
         
-        \begin{frame}{Коэффициент $a$ ~~~~~~~~~~~~~~~ $E = a r + b$}
+        \begin{frame}{Коэффициент $k$ с ошибкой}
             \begin{center}
-                \includegraphics[scale=0.32]{map-a-white.png}
+                \includegraphics[scale=0.32]{map-k-sigma.png}
             \end{center}             
         \end{frame}
+        
 
     \section{Предварительная обработка}                
         
@@ -213,8 +196,10 @@
     \section{Определение классов светимости}                
         
         \begin{frame}{Обучение классификатора}
+            \begin{center}
+                \includegraphics[scale=0.25]{gr-example.jpg}
+            \end{center}
             \begin{itemize}
-                \item Вспомним диаграмму Герцшпрунга--Рассела
                 \item Факторы: показатель цвета, абсолютная звездная величина
                 \item Класс: класс светимости
                 \item Алгоритм классификации: метод опорных векторов (Support Vector Machines, SVM)
@@ -250,13 +235,13 @@
         
         \begin{frame}{Результат}
             \begin{center}
-                \includegraphics[scale=0.32]{map-a-white.png}
+                \includegraphics[scale=0.32]{map-k.png}
             \end{center}             
         \end{frame}
         
         \begin{frame}{Что дальше?}
             \begin{center}
-                \includegraphics[scale=0.35]{next.png}
+                \includegraphics[scale=0.35]{next-k.png}
             \end{center}             
         \end{frame}    
         
