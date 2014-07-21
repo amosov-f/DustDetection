@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public final class DustDetector {
+public final class DustTrendDetector {
 
     private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
@@ -29,7 +29,7 @@ public final class DustDetector {
 
     private final double dr;
 
-    public DustDetector(Catalogue catalogue, double dr) {
+    public DustTrendDetector(Catalogue catalogue, double dr) {
         pixTools = new PixTools();
         this.dr = dr;
 
@@ -161,12 +161,12 @@ public final class DustDetector {
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
 
-        DustDetector dustDetector = new DustDetector(catalogue, 0.25);
+        DustTrendDetector dustTrendDetector = new DustTrendDetector(catalogue, 0.25);
 
         PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
 
         Locale.setDefault(Locale.US);
-        fout.print(dustDetector.toString());
+        fout.print(dustTrendDetector.toString());
         fout.flush();
     }
 

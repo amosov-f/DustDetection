@@ -1,6 +1,6 @@
 package ru.spbu.astro.dust;
 
-import ru.spbu.astro.dust.algo.DustDetector;
+import ru.spbu.astro.dust.algo.DustTrendDetector;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.func.HealpixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
@@ -24,16 +24,16 @@ public final class DustDetectionEngine {
         return hipparcos;
     }
 
-    public static DustDetector getDustDetector() throws FileNotFoundException {
-        return new DustDetector(getCatalogue(), 0.25);
+    public static DustTrendDetector getDustDetector() throws FileNotFoundException {
+        return new DustTrendDetector(getCatalogue(), 0.25);
     }
 
     public static void main(String[] args) throws FileNotFoundException {
 
-        DustDetector dustDetector = getDustDetector();
-        SphericDistribution f = new HealpixDistribution(dustDetector.getSlopes());
+        DustTrendDetector dustTrendDetector = getDustDetector();
+        SphericDistribution f = new HealpixDistribution(dustTrendDetector.getSlopes());
         HammerProjection hammerProjection = new HammerProjection(f);
-        PixPlot pixPlot = new PixPlot(dustDetector);
+        PixPlot pixPlot = new PixPlot(dustTrendDetector);
 
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override

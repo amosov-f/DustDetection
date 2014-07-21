@@ -12,7 +12,7 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.dust.algo.DustDetector;
+import ru.spbu.astro.dust.algo.DustTrendDetector;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
@@ -26,11 +26,11 @@ import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class PixPlot {
 
-    private final DustDetector dustDetector;
+    private final DustTrendDetector dustTrendDetector;
     private ChartFrame frame;
 
-    public PixPlot(DustDetector dustDetector) {
-        this.dustDetector = dustDetector;
+    public PixPlot(DustTrendDetector dustTrendDetector) {
+        this.dustTrendDetector = dustTrendDetector;
 
         frame = new ChartFrame("Покраснение", null);
 
@@ -45,8 +45,8 @@ public final class PixPlot {
             return;
         }
 
-        List<Star> supportStars = dustDetector.getSupportStars(dir);
-        List<Star> missStars = dustDetector.getMissStars(dir);
+        List<Star> supportStars = dustTrendDetector.getSupportStars(dir);
+        List<Star> missStars = dustTrendDetector.getMissStars(dir);
 
         List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
@@ -69,8 +69,8 @@ public final class PixPlot {
             }
         }
 
-        double a = dustDetector.getSlope(dir).value;
-        double b = dustDetector.getIntercept(dir).value;
+        double a = dustTrendDetector.getSlope(dir).value;
+        double b = dustTrendDetector.getIntercept(dir).value;
 
         XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(0, b);
@@ -85,7 +85,7 @@ public final class PixPlot {
         plot.setRangeZeroBaselineVisible(true);
 
         JFreeChart chart = new JFreeChart(
-                "Покраснение в направлении " + dustDetector.getPixCenter(dustDetector.getPix(dir)),
+                "Покраснение в направлении " + dustTrendDetector.getPixCenter(dustTrendDetector.getPix(dir)),
                 DEFAULT_TITLE_FONT,
                 plot,
                 true

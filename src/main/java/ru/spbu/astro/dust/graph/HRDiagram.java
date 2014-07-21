@@ -7,7 +7,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
-import ru.spbu.astro.dust.algo.StarSelector;
+import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;

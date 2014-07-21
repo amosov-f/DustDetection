@@ -12,16 +12,16 @@ public class Catalogue implements Iterable<Catalogue.Row> {
     public Catalogue() {
     }
 
-    public Catalogue(final String path) throws FileNotFoundException {
-        final Scanner fin = new Scanner(new FileInputStream(path));
-        final String[] titles = fin.nextLine().trim().split("\\|");
+    public Catalogue(String path) throws FileNotFoundException {
+        Scanner fin = new Scanner(new FileInputStream(path));
+        String[] titles = fin.nextLine().trim().split("\\|");
         for (int i = 1; i < titles.length; ++i) {
             titles[i] = titles[i].trim();
         }
 
         while (fin.hasNextLine()) {
             try {
-                final Row row = new Row(fin.nextLine(), titles);
+                Row row = new Row(fin.nextLine(), titles);
                 id2row.put(row.id, row);
             } catch (Exception ignored) {
             }
@@ -30,7 +30,7 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         System.out.println("reading completed");
     }
 
-    public void updateBy(final Catalogue catalogue) {
+    public void updateBy(Catalogue catalogue) {
         id2row.keySet().retainAll(catalogue.id2row.keySet());
         for (Row row : this) {
             row.updateBy(catalogue.id2row.get(row.id));
@@ -38,26 +38,26 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         System.out.println("update completed");
     }
 
-    public void updateBy(final LuminosityClassifier classifier) {
+    public void updateBy(LuminosityClassifier classifier) {
         for (Row row : this) {
-            final Star s = row.toStar();
+            Star s = row.toStar();
             if (s == null) {
                 continue;
             }
-            final String luminosityClass = s.spectralType.getLuminosityClass();
+            String luminosityClass = s.spectralType.getLuminosityClass();
             if (luminosityClass == null) {
                 row.title2value.put(SPECT_TYPE, s.spectralType + classifier.getLuminosityClass(s) + ":");
             }
         }
     }
 
-    public void add(final Star s) {
+    public void add(Star s) {
         id2row.put(s.id, new Row(s));
     }
 
     public List<Star> getStars() {
-        final List<Star> stars = new ArrayList<>();
-        for (final Row s : id2row.values()) {
+        List<Star> stars = new ArrayList<>();
+        for (Row s : id2row.values()) {
             if (s.toStar() != null && s.toStar().spectralType.toBV() != null) {
                 stars.add(s.toStar());
             }
@@ -66,8 +66,8 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         return stars;
     }
 
-    public List<String> getColumn(final String s) {
-        final List<String> column = new ArrayList<>();
+    public List<String> getColumn(String s) {
+        List<String> column = new ArrayList<>();
         for (Row row : id2row.values()) {
             column.add(row.title2value.get(s));
         }
@@ -88,13 +88,13 @@ public class Catalogue implements Iterable<Catalogue.Row> {
             return "Catalogue is empty";
         }
         String s = format("id");
-        for (final Map.Entry<String, String> entry : id2row.firstEntry().getValue().title2value.entrySet()) {
+        for (Map.Entry<String, String> entry : id2row.firstEntry().getValue().title2value.entrySet()) {
             s += format(entry.getKey());
         }
         s += "\n";
-        for (final Row row : id2row.values()) {
+        for (Row row : id2row.values()) {
             s += format(String.valueOf(row.id));
-            for (final Map.Entry<String, String> entry : row.title2value.entrySet()) {
+            for (Map.Entry<String, String> entry : row.title2value.entrySet()) {
                 s += format(entry.getValue());
             }
             s += "\n";
@@ -102,7 +102,7 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         return s;
     }
 
-    private static String format(final String s) {
+    private static String format(String s) {
         String format;
         try {
             {
@@ -135,8 +135,8 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         public final int id;
         private final Map<String, String> title2value = new TreeMap<>();
 
-        private Row(final String row, final String[] titles) throws EmptyFieldException, NegativeParallaxException, MissingIdException {
-            final String[] fields = row.split("\\|");
+        private Row(String row, String[] titles) throws EmptyFieldException, NegativeParallaxException, MissingIdException {
+            String[] fields = row.split("\\|");
 
             int id = -1;
             for (int i = 1; i < titles.length; ++i) {
@@ -151,7 +151,7 @@ public class Catalogue implements Iterable<Catalogue.Row> {
                     continue;
                 }
 
-                final String value;
+                String value;
                 switch (titles[i]) {
                     case PARALLAX:
                         if (new Double(fields[i]) <= 0) {
@@ -178,7 +178,7 @@ public class Catalogue implements Iterable<Catalogue.Row> {
             }
         }
 
-        private Row(final Star s) {
+        private Row(Star s) {
             id = s.id;
             title2value.put(LII, String.valueOf(rad2deg(s.dir.l)));
             title2value.put(BII, String.valueOf(rad2deg(s.dir.b)));
@@ -190,16 +190,16 @@ public class Catalogue implements Iterable<Catalogue.Row> {
             title2value.put(BV_COLOR_ERROR, String.valueOf(s.bvColor.error));
         }
 
-        private void updateBy(final Row row) {
+        private void updateBy(Row row) {
             if (id != row.id) {
                 return;
             }
-            for (final String title : row.title2value.keySet()) {
+            for (String title : row.title2value.keySet()) {
                 title2value.put(title, row.title2value.get(title));
             }
         }
 
-        public String get(final String s) {
+        public String get(String s) {
             return title2value.get(s);
         }
 
@@ -250,11 +250,10 @@ public class Catalogue implements Iterable<Catalogue.Row> {
     private static final String SPECT_TYPE = "spect_type";
     private static final String HIP_NUMBER = "hip_number";
 
-
-
-    public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+    public static void main(String[] args) throws FileNotFoundException {
+        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
     }
+
 }

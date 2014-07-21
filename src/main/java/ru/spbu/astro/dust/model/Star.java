@@ -18,6 +18,18 @@ public class Star implements Comparable {
         this.bvColor = bvColor;
     }
 
+    public double[] getCartesian() {
+        double r = getR().value;
+        double theta = dir.getTheta();
+        double phi = dir.getPhi();
+
+        return new double[]{
+                r * Math.sin(theta) * Math.cos(phi),
+                r * Math.sin(theta) * Math.sin(phi),
+                r * Math.cos(theta)
+        };
+    }
+
     @Override
     public int compareTo(Object o) throws ClassCastException {
         if (o == null || getClass() != o.getClass()) {

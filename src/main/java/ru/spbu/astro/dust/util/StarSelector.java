@@ -1,5 +1,6 @@
-package ru.spbu.astro.dust.algo;
+package ru.spbu.astro.dust.util;
 
+import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.Catalogue;
