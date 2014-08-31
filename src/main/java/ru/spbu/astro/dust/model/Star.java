@@ -1,15 +1,23 @@
 package ru.spbu.astro.dust.model;
 
-public class Star implements Comparable {
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.concurrent.Immutable;
+
+@Immutable
+public final class Star implements Comparable<Star> {
     public final int id;
+    @NotNull
     public final Spheric dir;
+    @NotNull
     public final Value parallax;
     public final double vMag;
+    @NotNull
     public final SpectralType spectralType;
+    @NotNull
     public final Value bvColor;
-    
-    public Star(int id, final Spheric dir, final Value parallax, double vMag, final SpectralType spectralType, final Value bvColor) {
+
+    public Star(int id, @NotNull Spheric dir, @NotNull Value parallax, double vMag, @NotNull SpectralType spectralType, @NotNull Value bvColor) {
         this.id = id;
         this.dir = dir;
         this.parallax = parallax;
@@ -18,6 +26,7 @@ public class Star implements Comparable {
         this.bvColor = bvColor;
     }
 
+    @NotNull
     public double[] getCartesian() {
         double r = getR().value;
         double theta = dir.getTheta();
@@ -31,15 +40,11 @@ public class Star implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) throws ClassCastException {
-        if (o == null || getClass() != o.getClass()) {
-            throw new ClassCastException();
-        }
-        Star other = (Star) o;
-        if (parallax.value > other.parallax.value) {
+    public int compareTo(@NotNull Star s) {
+        if (parallax.value > s.parallax.value) {
             return -1;
         }
-        if (parallax.value < other.parallax.value) {
+        if (parallax.value < s.parallax.value) {
             return 1;
         }
         return 0;

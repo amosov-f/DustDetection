@@ -7,6 +7,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
+import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.SpectralType;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 public final class HRDiagram {
-
     private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.10;
     private static final double ERROR = 2.5 * Math.log10((1 + PARALLAX_RELATIVE_ERROR_LIMIT) / (1 - PARALLAX_RELATIVE_ERROR_LIMIT));
 
@@ -84,7 +84,7 @@ public final class HRDiagram {
         //frame.pack();
         //frame.setVisible(true);
 
-        ChartUtilities.saveChartAsPNG(new File("documents/presentation/ml-1.png"), chart, 1200, 800);
+        ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 1200, 800);
     }
 
     private XYIntervalSeries getLuminosityClassSeries(List<Star> stars) {
@@ -116,7 +116,7 @@ public final class HRDiagram {
     public static void main(String[] args) throws IOException {
         Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
-        //catalogue.updateBy(new LuminosityClassifier(catalogue));
+        //catalogue.updateBy(new LuminosityClassifier(catalogue, LuminosityClassifier.Mode.TEST));
 
         /*catalogue = new StarSelector(catalogue)
                 .selectByBVColor(1.525, 1.95)

@@ -70,11 +70,10 @@ public final class PixPlot {
         }
 
         double a = dustTrendDetector.getSlope(dir).value;
-        double b = dustTrendDetector.getIntercept(dir).value;
 
         XYSeries trendSeries = new XYSeries("Тренд");
-        trendSeries.add(0, b);
-        trendSeries.add(r, a * r + b);
+        trendSeries.add(0, 0);
+        trendSeries.add(r, a * r);
 
         plot.setDataset(1, new XYSeriesCollection(trendSeries));
 

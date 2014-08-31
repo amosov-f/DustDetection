@@ -1,11 +1,13 @@
 package ru.spbu.astro.dust.model;
 
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
-public class Catalogue implements Iterable<Catalogue.Row> {
+public final class Catalogue implements Iterable<Catalogue.Row> {
 
     private final TreeMap<Integer, Row> id2row = new TreeMap<>();
 
@@ -131,12 +133,12 @@ public class Catalogue implements Iterable<Catalogue.Row> {
     }
 
     public class Row {
-
         public final int id;
+        @NotNull
         private final Map<String, String> title2value = new TreeMap<>();
 
-        private Row(String row, String[] titles) throws EmptyFieldException, NegativeParallaxException, MissingIdException {
-            String[] fields = row.split("\\|");
+        private Row(@NotNull final String row, @NotNull final String[] titles) throws EmptyFieldException, NegativeParallaxException, MissingIdException {
+            final String[] fields = row.split("\\|");
 
             int id = -1;
             for (int i = 1; i < titles.length; ++i) {
@@ -222,12 +224,10 @@ public class Catalogue implements Iterable<Catalogue.Row> {
             }
         }
 
-
         @Override
         public String toString() {
             return id + " " + title2value;
         }
-
     }
 
     private class EmptyFieldException extends Exception {
@@ -255,5 +255,4 @@ public class Catalogue implements Iterable<Catalogue.Row> {
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
     }
-
 }

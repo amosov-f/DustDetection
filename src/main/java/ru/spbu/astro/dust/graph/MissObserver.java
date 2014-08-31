@@ -108,7 +108,7 @@ public class MissObserver {
 
         final MissObserver missObserver = new MissObserver(catalogue);
         {
-            final PrintWriter fout = new PrintWriter(new FileOutputStream("results/7.txt"));
+            final PrintWriter fout = new PrintWriter(new FileOutputStream("results/6.txt"));
 
             Locale.setDefault(Locale.US);
             fout.print(missObserver.toString());

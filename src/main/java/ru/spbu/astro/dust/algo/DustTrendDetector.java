@@ -2,6 +2,7 @@ package ru.spbu.astro.dust.algo;
 
 import gov.fnal.eag.healpix.PixTools;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
@@ -16,20 +17,25 @@ import java.util.List;
 import java.util.Locale;
 
 public final class DustTrendDetector {
-
     private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
 
+    private static final boolean INCLUDE_INTERCEPT = false;
+
+    @NotNull
     private final List<List<Star>> rings;
 
+    @NotNull
     private final Value[] slopes;
+    @NotNull
     private final Value[] intercepts;
 
+    @NotNull
     private final PixTools pixTools;
 
     private final double dr;
 
-    public DustTrendDetector(Catalogue catalogue, double dr) {
+    public DustTrendDetector(@NotNull final Catalogue catalogue, final double dr) {
         pixTools = new PixTools();
         this.dr = dr;
 
@@ -58,14 +64,17 @@ public final class DustTrendDetector {
         }
     }
 
+    @NotNull
     public Value[] getSlopes() {
         return slopes;
     }
 
+    @NotNull
     public Value[] getIntercepts() {
         return intercepts;
     }
 
+    @NotNull
     private List<Star> getSupportStars(List<Star> stars) {
         List<Star> temp = new ArrayList<>(stars);
 
@@ -82,16 +91,19 @@ public final class DustTrendDetector {
         return temp.subList(0, temp.size() - (int)(EJECTION * temp.size()));
     }
 
+    @NotNull
     public List<Star> getSupportStars(Spheric dir) {
         return getSupportStars(rings.get(getPix(dir)));
     }
 
+    @NotNull
     public List<Star> getMissStars(List<Star> stars) {
         List<Star> missStars = new ArrayList<>(stars);
         missStars.removeAll(getSupportStars(stars));
         return missStars;
     }
 
+    @NotNull
     public List<Star> getMissStars(Spheric dir) {
         int pix = getPix(dir);
 
@@ -101,35 +113,35 @@ public final class DustTrendDetector {
         return missStars;
     }
 
+    @NotNull
     public Value getSlope(Spheric dir) {
         return slopes[getPix(dir)];
     }
 
+    @NotNull
     public Value getIntercept(Spheric dir) {
         return intercepts[getPix(dir)];
     }
 
     public List<Star> getMissStars() {
-        List<Star> missStars = new ArrayList<>();
-        for (List<Star> ring : rings) {
+        final List<Star> missStars = new ArrayList<>();
+        for (final List<Star> ring : rings) {
             missStars.addAll(getMissStars(ring));
         }
         return missStars;
     }
 
     private static SimpleRegression getRegression(List<Star> stars) {
-        SimpleRegression regression = new SimpleRegression(false);
-
-        for (Star star : stars) {
+        final SimpleRegression regression = new SimpleRegression(INCLUDE_INTERCEPT);
+        for (final Star star : stars) {
             regression.addData(star.getR().value, star.getExtinction().value);
         }
-
         return regression;
     }
 
     public int getPix(Spheric dir) {
-        double theta = dir.getTheta();
-        double phi = dir.getPhi();
+        final double theta = dir.getTheta();
+        final double phi = dir.getPhi();
 
         return (int) pixTools.ang2pix_ring(N_SIDE, theta, phi);
     }
@@ -140,30 +152,29 @@ public final class DustTrendDetector {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder();
+        final StringBuilder s = new StringBuilder();
         s.append("dr < ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
-        s.append("№\tl\t\t\tb\t\t\ta\t\tsigma_a\tb\t\tsigma_b\tn\n");
+        s.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
         for (int i = 0; i < rings.size(); ++i) {
-            Spheric dir = getPixCenter(i);
-            Value a = slopes[i];
-            Value b = intercepts[i];
-            int n = rings.get(i).size();
+            final Spheric dir = getPixCenter(i);
+            final Value k = slopes[i];
+            final int n = rings.get(i).size();
             s.append(String.format(
-                    "%d\t%f\t%f\t%.2f\t%.2f\t%.3f\t%.3f\t%d\n",
-                    i, dir.l, dir.b, 1000 * a.value, 1000 * a.error, b.value, b.error, n
+                    "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
+                    i, dir.l, dir.b, 1000 * k.value, 1000 * k.error, n
             ));
         }
         return s.toString();
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
+        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
 
-        DustTrendDetector dustTrendDetector = new DustTrendDetector(catalogue, 0.25);
+        final DustTrendDetector dustTrendDetector = new DustTrendDetector(catalogue, 0.25);
 
-        PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
+        final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
 
         Locale.setDefault(Locale.US);
         fout.print(dustTrendDetector.toString());

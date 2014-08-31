@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.algo;
 
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Star;
 import weka.classifiers.Classifier;
@@ -17,20 +18,20 @@ import java.util.List;
 import java.util.Random;
 
 public final class LuminosityClassifier {
-
     private static final double RELATIVE_ERROR_LIMIT = 0.10;
-
     private static final List<String> luminosityClasses = Arrays.asList("III", "V");
+
+    @NotNull
     private final Classifier classifier;
 
-    public LuminosityClassifier(Catalogue catalogue) {
+    public LuminosityClassifier(@NotNull final Catalogue catalogue) {
         this(catalogue, Mode.DEFAULT);
     }
 
-    public LuminosityClassifier(Catalogue catalogue, Mode mode) {
-        List<Star> learnStars = new ArrayList<>();
+    public LuminosityClassifier(@NotNull final Catalogue catalogue, @NotNull final Mode mode) {
+        final List<Star> learnStars = new ArrayList<>();
 
-        for (Star s : catalogue.getStars()) {
+        for (final Star s : catalogue.getStars()) {
             if (s.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
                 String luminosityClass = s.spectralType.getLuminosityClass();
                 if (luminosityClasses.contains(luminosityClass)) {
@@ -52,16 +53,18 @@ public final class LuminosityClassifier {
         }
 
         try {
-            Evaluation evaluation = new Evaluation(learn);
-            evaluation.crossValidateModel(classifier, learn, 10, new Random());
+            final Evaluation evaluation = new Evaluation(learn);
+            evaluation.crossValidateModel(classifier, learn, 10, new Random(0));
 
+            System.out.println(evaluation.toSummaryString());
+            System.out.println(evaluation.toMatrixString());
             System.out.println(evaluation.toClassDetailsString());
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    @NotNull
     public String getLuminosityClass(Star s) {
         if (s.spectralType.getLuminosityClass() != null) {
             return s.spectralType.getLuminosityClass();
@@ -110,7 +113,7 @@ public final class LuminosityClassifier {
         return instances;
     }
 
-    public enum Mode {
+    public static enum Mode {
         DEFAULT, TEST
     }
 
