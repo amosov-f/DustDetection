@@ -36,8 +36,8 @@ public final class LuminosityClassifier {
         final List<Star> learnStars = new ArrayList<>();
 
         for (final Star star : catalogue.getStars()) {
-            if (star.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
-                if (LUMINOSITY_CLASSES.contains(star.spectralType.getLuminosityClass())) {
+            if (star.getParallax().getRelativeError() < RELATIVE_ERROR_LIMIT) {
+                if (LUMINOSITY_CLASSES.contains(star.getSpectralType().getLuminosityClass())) {
                     learnStars.add(star);
                 }
             }
@@ -69,8 +69,8 @@ public final class LuminosityClassifier {
 
     @NotNull
     public SpectralType.LuminosityClass getLuminosityClass(Star star) {
-        if (star.spectralType.getLuminosityClass() != null) {
-            return star.spectralType.getLuminosityClass();
+        if (star.getSpectralType().getLuminosityClass() != null) {
+            return star.getSpectralType().getLuminosityClass();
         }
 
         try {
@@ -93,9 +93,9 @@ public final class LuminosityClassifier {
     @NotNull
     private static Instance toInstance(@NotNull final Star star) {
         return new DenseInstance(attributes.size()) {{
-            setValue(attributes.get(0), star.bvColor.value);
+            setValue(attributes.get(0), star.getBVColor().value);
             setValue(attributes.get(1), star.getAbsoluteMagnitude().value);
-            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.spectralType.getLuminosityClass()));
+            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.getSpectralType().getLuminosityClass()));
         }};
     }
 

@@ -48,7 +48,7 @@ public final class DustTrendDetector {
         for (Star star : catalogue.getStars()) {
             if (star.getR().getRelativeError() <= dr) {
                 count++;
-                rings.get(getPix(star.dir)).add(star);
+                rings.get(getPix(star.getDir())).add(star);
             }
         }
         System.out.println("number of stars: " + count);

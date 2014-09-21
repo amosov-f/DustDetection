@@ -8,7 +8,16 @@ import java.util.*;
 
 public final class SpectralType {
     public static enum LuminosityClass {
-        I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII
+        I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII;
+
+        public static boolean containsSymbol(final char c) {
+            for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
+                if (luminosityClass.name().contains(String.valueOf(c))) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public static enum TypeSymbol {
@@ -63,7 +72,7 @@ public final class SpectralType {
             if (isTypeSymbol(c)) {
                 return Type.TYPE;
             }
-            if (LuminosityClassSymbol.contains(c)) {
+            if (LuminosityClass.containsSymbol(c)) {
                 return Type.LUMINOSITY_CLASS;
             }
             return null;
@@ -92,7 +101,7 @@ public final class SpectralType {
             return false;
         }
 
-        public void completeBy(final Component prev) {
+        public void completeBy(@NotNull final Component prev) {
             if (value.isEmpty() || prev.value.isEmpty()) {
                 return;
             }
@@ -104,30 +113,12 @@ public final class SpectralType {
             }
         }
 
-        private static enum LuminosityClassSymbol {
-            I, V, a, b;
-
-            @Nullable
-            private static LuminosityClassSymbol parse(final char c) {
-                try {
-                    return valueOf(String.valueOf(c));
-                } catch (IllegalArgumentException e) {
-                    return null;
-                }
-            }
-
-            public static boolean contains(final char c) {
-                return parse(c) != null;
-            }
-        }
-
-
         private static boolean isTypeSymbol(char c) {
             return TypeSymbol.parse(c) != null || c == '.' || Character.isDigit(c);
         }
 
         private static boolean isComponentSymbol(char c) {
-            return isTypeSymbol(c) || LuminosityClassSymbol.contains(c);
+            return isTypeSymbol(c) || LuminosityClass.containsSymbol(c);
         }
 
         @Override
@@ -321,10 +312,6 @@ public final class SpectralType {
         return LuminosityClass.valueOf(luminosityClasses.get(0).value);
     }
 
-    public String getType() {
-        return types.get(0).value;
-    }
-
     public double getTypeNumber() {
         if (types.get(0).value.length() < 2) {
             return 5;
@@ -337,7 +324,6 @@ public final class SpectralType {
     }
 
     private static final EnumMap<LuminosityClass, List<Point2D.Double>> LUMIN_2_BVS = new EnumMap<>(LuminosityClass.class);
-
     static {
         final Scanner fin = new Scanner(SpectralType.class.getResourceAsStream("/spect2bv/spect2bv_new.txt"));
 
@@ -363,12 +349,12 @@ public final class SpectralType {
         return (p2.y - p1.y) / (p2.x - p1.x) * (x - p1.x) + p1.y;
     }
 
-    public static void main(final String[] args) {
+    public static void main(@NotNull final String[] args) {
         final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
 
         int count = 0;
-        for (String s : catalogue.getColumn(Catalogue.Parameter.SPECT_TYPE)) {
+        for (final String s : catalogue.getColumn(Catalogue.Parameter.SPECT_TYPE)) {
             final SpectralType spectralType = SpectralType.parse(s);
             if (spectralType == null) {
                 System.out.println(s + " -> null");

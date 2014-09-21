@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust;
 
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.algo.DustTrendDetector;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.func.HealpixDistribution;
@@ -14,26 +15,24 @@ import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 
 public final class DustDetectionEngine {
-
     public static Catalogue getCatalogue() throws FileNotFoundException {
         Catalogue hipparcos = new Catalogue("/catalogues/hipparcos1997.txt");
-
         hipparcos.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
         hipparcos.updateBy(new LuminosityClassifier(hipparcos));
 
         return hipparcos;
     }
 
+    @NotNull
     public static DustTrendDetector getDustDetector() throws FileNotFoundException {
         return new DustTrendDetector(getCatalogue(), 0.25);
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-
-        DustTrendDetector dustTrendDetector = getDustDetector();
-        SphericDistribution f = new HealpixDistribution(dustTrendDetector.getSlopes());
-        HammerProjection hammerProjection = new HammerProjection(f);
-        PixPlot pixPlot = new PixPlot(dustTrendDetector);
+    public static void main(@NotNull final String[] args) throws FileNotFoundException {
+        final DustTrendDetector dustTrendDetector = getDustDetector();
+        final SphericDistribution f = new HealpixDistribution(dustTrendDetector.getSlopes());
+        final HammerProjection hammerProjection = new HammerProjection(f);
+        final PixPlot pixPlot = new PixPlot(dustTrendDetector);
 
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override

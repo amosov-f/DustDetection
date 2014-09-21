@@ -1,21 +1,25 @@
 package ru.spbu.astro.dust.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.concurrent.Immutable;
 
+import static java.lang.Math.log10;
+import static java.lang.Math.pow;
+
 @Immutable
 public final class Star implements Comparable<Star> {
-    public final int id;
+    private final int id;
     @NotNull
-    public final Spheric dir;
+    private final Spheric dir;
     @NotNull
-    public final Value parallax;
-    public final double vMag;
+    private final Value parallax;
+    private final double vMag;
     @NotNull
-    public final SpectralType spectralType;
+    private final SpectralType spectralType;
     @NotNull
-    public final Value bvColor;
+    private final Value bvColor;
 
     public Star(int id, @NotNull Spheric dir, @NotNull Value parallax, double vMag, @NotNull SpectralType spectralType, @NotNull Value bvColor) {
         this.id = id;
@@ -50,19 +54,54 @@ public final class Star implements Comparable<Star> {
         return 0;
     }
 
+    @NotNull
     public Value getR() {
-        return new Value(1000 / parallax.value, 1000 * parallax.error / Math.pow(parallax.value, 2));
+        return new Value(1000 / parallax.value, 1000 * parallax.error / pow(parallax.value, 2));
     }
 
+    @Nullable
     public Value getExtinction() {
-        return bvColor.subtract(spectralType.toBV());
+        final Value bv = spectralType.toBV();
+        if (bv == null) {
+            return null;
+        }
+        return bvColor.subtract(bv);
     }
 
+    @NotNull
     public Value getAbsoluteMagnitude() {
         return new Value(
-                vMag + 5 * Math.log10(parallax.value) - 10,
-                2.5 * Math.log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))
+                vMag + 5 * log10(parallax.value) - 10,
+                2.5 * log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))
         );
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    @NotNull
+    public Spheric getDir() {
+        return dir;
+    }
+
+    @NotNull
+    public Value getParallax() {
+        return parallax;
+    }
+
+    public double getVMag() {
+        return vMag;
+    }
+
+    @NotNull
+    public SpectralType getSpectralType() {
+        return spectralType;
+    }
+
+    @NotNull
+    public Value getBVColor() {
+        return bvColor;
     }
 
     @Override

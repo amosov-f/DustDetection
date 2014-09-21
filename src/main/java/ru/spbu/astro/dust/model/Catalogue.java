@@ -49,15 +49,15 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             if (star == null) {
                 continue;
             }
-            final SpectralType.LuminosityClass luminosityClass = star.spectralType.getLuminosityClass();
+            final SpectralType.LuminosityClass luminosityClass = star.getSpectralType().getLuminosityClass();
             if (luminosityClass == null) {
-                row.parameter2value.put(SPECT_TYPE, star.spectralType + classifier.getLuminosityClass(star).name() + ":");
+                row.parameter2value.put(SPECT_TYPE, star.getSpectralType() + classifier.getLuminosityClass(star).name() + ":");
             }
         }
     }
 
     public void add(@NotNull final Star s) {
-        id2row.put(s.id, new Row(s));
+        id2row.put(s.getId(), new Row(s));
     }
 
     @NotNull
@@ -66,7 +66,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         for (final Row row : id2row.values()) {
             final Star star = row.toStar();
             //System.out.println(star.spectralType.toBV());
-            if (star != null && star.spectralType.toBV() != null) {
+            if (star != null && star.getSpectralType().toBV() != null) {
                 stars.add(row.toStar());
             }
         }
@@ -193,15 +193,15 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         }
 
         private Row(Star s) {
-            id = s.id;
-            parameter2value.put(LII, String.valueOf(rad2deg(s.dir.l)));
-            parameter2value.put(BII, String.valueOf(rad2deg(s.dir.b)));
-            parameter2value.put(PARALLAX, String.valueOf(s.parallax.value));
-            parameter2value.put(PARALLAX_ERROR, String.valueOf(s.parallax.error));
-            parameter2value.put(VMAG, String.valueOf(s.vMag));
-            parameter2value.put(SPECT_TYPE, s.spectralType.toString());
-            parameter2value.put(BV_COLOR, String.valueOf(s.bvColor.value));
-            parameter2value.put(BV_COLOR_ERROR, String.valueOf(s.bvColor.error));
+            id = s.getId();
+            parameter2value.put(LII, String.valueOf(rad2deg(s.getDir().l)));
+            parameter2value.put(BII, String.valueOf(rad2deg(s.getDir().b)));
+            parameter2value.put(PARALLAX, String.valueOf(s.getParallax().value));
+            parameter2value.put(PARALLAX_ERROR, String.valueOf(s.getParallax().error));
+            parameter2value.put(VMAG, String.valueOf(s.getVMag()));
+            parameter2value.put(SPECT_TYPE, s.getSpectralType().toString());
+            parameter2value.put(BV_COLOR, String.valueOf(s.getBVColor().value));
+            parameter2value.put(BV_COLOR_ERROR, String.valueOf(s.getBVColor().error));
         }
 
         private void updateBy(@NotNull final Row row) {
@@ -223,18 +223,18 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 return null;
             }
 
-            try {
-                return new Star(
-                        id,
-                        new Spheric(deg2rad(new Double(get(LII))), deg2rad(new Double(get(BII)))),
-                        new Value(new Double(get(PARALLAX)), new Double(get(PARALLAX_ERROR))),
-                        new Double(get(VMAG)),
-                        SpectralType.parse(get(SPECT_TYPE)),
-                        new Value(new Double(get(BV_COLOR)), new Double(get(BV_COLOR_ERROR)))
-                );
-            } catch (Exception e) {
+            final SpectralType spectralType = SpectralType.parse(get(SPECT_TYPE));
+            if (spectralType == null) {
                 return null;
             }
+            return new Star(
+                    id,
+                    new Spheric(deg2rad(new Double(get(LII))), deg2rad(new Double(get(BII)))),
+                    new Value(new Double(get(PARALLAX)), new Double(get(PARALLAX_ERROR))),
+                    new Double(get(VMAG)),
+                    spectralType,
+                    new Value(new Double(get(BV_COLOR)), new Double(get(BV_COLOR_ERROR)))
+            );
         }
 
         @Override

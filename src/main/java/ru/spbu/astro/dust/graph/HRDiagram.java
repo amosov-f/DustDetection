@@ -1,5 +1,7 @@
 package ru.spbu.astro.dust.graph;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
@@ -34,27 +36,26 @@ public final class HRDiagram {
             class2stars.put(luminosityClass, new ArrayList<>());
         }
 
-        Catalogue selection = new StarSelector(catalogue)
+        final Catalogue selection = new StarSelector(catalogue)
                 .selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
                 .selectByBVColorError(BV_COLOR_ERROR_LIMIT)
-                .selectByExistLuminosityClass()
-                .getCatalogue();
+                .selectByExistLuminosityClass().getCatalogue();
 
         int starsCount = 0;
-        for (Star s : selection.getStars()) {
-            class2stars.get(s.spectralType.getLuminosityClass()).add(s);
+        for (final Star star : selection.getStars()) {
+            class2stars.get(star.getSpectralType().getLuminosityClass()).add(star);
             starsCount++;
         }
 
-        XYIntervalSeriesCollection dataset = new XYIntervalSeriesCollection();
+        final XYIntervalSeriesCollection dataset = new XYIntervalSeriesCollection();
         for (final List<Star> stars : class2stars.values()) {
-            XYIntervalSeries series = getLuminosityClassSeries(stars);
+            final XYIntervalSeries series = getLuminosityClassSeries(stars);
             if (series != null) {
                 dataset.addSeries(series);
             }
         }
 
-        JFreeChart chart = ChartFactory.createScatterPlot(
+        final JFreeChart chart = ChartFactory.createScatterPlot(
                 String.format("%d (dr < %d%%), ±%.2f mag", starsCount, (int) (100 * PARALLAX_RELATIVE_ERROR_LIMIT), ERROR),
                 "B-V [зв. вел.]",
                 "M [зв. вел.]",
@@ -78,26 +79,25 @@ public final class HRDiagram {
         chart.getXYPlot().getRangeAxis().setLowerBound(-5);
         chart.getXYPlot().getRangeAxis().setUpperBound(15);
 
-
-
-        ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
+        final ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
         frame.pack();
         frame.setVisible(true);
 
         ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 1200, 800);
     }
 
-    private XYIntervalSeries getLuminosityClassSeries(List<Star> stars) {
+    @Nullable
+    private XYIntervalSeries getLuminosityClassSeries(@NotNull final List<Star> stars) {
         if (stars.isEmpty()) {
             return null;
         }
-        final LuminosityClass luminosityClass = stars.get(0).spectralType.getLuminosityClass();
+        final LuminosityClass luminosityClass = stars.get(0).getSpectralType().getLuminosityClass();
 
-        XYIntervalSeries series = new XYIntervalSeries(luminosityClass);
+        final XYIntervalSeries series = new XYIntervalSeries(luminosityClass);
 
-        for (Star s : stars) {
-            double bv = s.bvColor.value;
-            double dbv = s.bvColor.error;
+        for (final Star s : stars) {
+            double bv = s.getBVColor().value;
+            double dbv = s.getBVColor().error;
             double M = s.getAbsoluteMagnitude().value;
             double dM = s.getAbsoluteMagnitude().error;
 

@@ -32,7 +32,7 @@ public final class HealpixCounter extends HealpixDistribution {
 
         List<Spheric> dirs = new ArrayList<>();
         for (Star s : hipparcos.getStars()) {
-            dirs.add(s.dir);
+            dirs.add(s.getDir());
         }
 
         new HammerProjection(new HealpixCounter(dirs, 18));

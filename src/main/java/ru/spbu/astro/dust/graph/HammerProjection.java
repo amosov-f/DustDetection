@@ -1,5 +1,7 @@
 package ru.spbu.astro.dust.graph;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Value;
@@ -12,9 +14,14 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public final class HammerProjection extends JWindow {
+import static java.lang.Math.atan2;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
 
+public final class HammerProjection extends JWindow {
+    @NotNull
     private final SphericDistribution distribution;
+    @NotNull
     private final Mode mode;
 
     private static final int PARALLEL_COUNT = 10;
@@ -33,7 +40,7 @@ public final class HammerProjection extends JWindow {
         this(distribution, Mode.DEFAULT);
     }
 
-    public HammerProjection(SphericDistribution distribution, Mode mode) {
+    public HammerProjection(@NotNull final SphericDistribution distribution, @NotNull final Mode mode) {
         this.distribution = distribution;
         this.mode = mode;
         setSize(2 * SIZE, SIZE);
@@ -41,16 +48,15 @@ public final class HammerProjection extends JWindow {
     }
 
     @Override
-    public void paint(Graphics g) {
-        Value[][] f = new Value[Math.min(getWidth(), 2 * getHeight())][Math.min(getHeight(), getWidth() / 2)];
+    public void paint(@NotNull final Graphics g) {
+        final Value[][] f = new Value[Math.min(getWidth(), 2 * getHeight())][Math.min(getHeight(), getWidth() / 2)];
 
-        Set<Double> values = new TreeSet<>();
-        Set<Double> errors = new TreeSet<>();
-
+        final Set<Double> values = new TreeSet<>();
+        final Set<Double> errors = new TreeSet<>();
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
-                Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
+                final Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
                 if (dir == null) {
                     continue;
                 }
@@ -80,19 +86,20 @@ public final class HammerProjection extends JWindow {
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
-                Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
+                final Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
                 if (dir == null) {
                     continue;
                 }
 
-                double value = normalize(f[x][y].value, minValue, maxValue);
-                double error = 0;
+                final double value = normalize(f[x][y].value, minValue, maxValue);
+                final double error;
                 if (mode == Mode.WITH_ERRORS) {
                     error = normalize(f[x][y].error, 0, maxError);
+                } else {
+                    error = 0;
                 }
 
-                Color color;
-
+                final Color color;
                 if (value >= 0) {
                     color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
                 } else {
@@ -107,7 +114,7 @@ public final class HammerProjection extends JWindow {
         paintCircles(g);
     }
 
-    private void paintCircles(Graphics g) {
+    private void paintCircles(@NotNull final Graphics g) {
         g.setColor(new Color(148, 167, 187));
         for (double l = 0; l < 2 * Math.PI; l += 2 * Math.PI / MERIDIAN_COUNT) {
             for (double b = -Math.PI / 2; b < Math.PI / 2; b += 0.001) {
@@ -128,37 +135,39 @@ public final class HammerProjection extends JWindow {
         }
     }
 
-    public static Point2D.Double shperic2plane(Spheric dir) {
+    @NotNull
+    public static Point2D.Double shperic2plane(@NotNull final Spheric dir) {
         double l = dir.l;
-        double b = dir.b;
+        final double b = dir.b;
 
         if (l > Math.PI) {
             l -= 2 * Math.PI;
         }
 
-        double denominator = Math.sqrt(1 + Math.cos(b) * Math.cos(l / 2));
+        final double denominator = sqrt(1 + Math.cos(b) * Math.cos(l / 2));
 
-        double x = - 2 * Math.cos(b) * Math.sin(l / 2) / denominator;
-        double y = - Math.sin(b) / denominator;
+        final double x = - 2 * Math.cos(b) * Math.sin(l / 2) / denominator;
+        final double y = - Math.sin(b) / denominator;
 
         return new Point2D.Double(x, y);
     }
 
-    public static Spheric plane2spheric(Point2D.Double p) {
+    @Nullable
+    public static Spheric plane2spheric(@NotNull final Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 
-        if (1 - Math.pow(0.5 * x, 2) - Math.pow(y, 2) < 0) {
+        if (1 - pow(0.5 * x, 2) - pow(y, 2) < 0) {
             return null;
         }
 
-        x *= Math.sqrt(2);
-        y *= Math.sqrt(2);
+        x *= sqrt(2);
+        y *= sqrt(2);
 
-        double z = Math.sqrt(1 - Math.pow(0.25 * x, 2) - Math.pow(0.5 * y, 2));
+        final double z = sqrt(1 - pow(0.25 * x, 2) - pow(0.5 * y, 2));
 
-        double l = 2 * Math.atan2(z * x, (2 * (2 * Math.pow(z, 2) - 1)));
-        double b = Math.asin(z * y);
+        double l = 2 * atan2(z * x, (2 * (2 * pow(z, 2) - 1)));
+        final double b = Math.asin(z * y);
 
         l = -l;
         if (l < 0) {
@@ -168,7 +177,8 @@ public final class HammerProjection extends JWindow {
         return new Spheric(l, b);
     }
 
-    public Point toWindow(Point2D.Double p) {
+    @NotNull
+    public Point toWindow(@NotNull final Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 
@@ -178,7 +188,8 @@ public final class HammerProjection extends JWindow {
         return new Point((int) x, (int) y);
     }
 
-    public Point2D.Double fromWindow(Point p) {
+    @NotNull
+    public Point2D.Double fromWindow(@NotNull final Point p) {
         double x = 2 * (p.getX() / getHeight() - 1);
         double y = 2 * (getHeight() - p.getY()) / getHeight() - 1;
 
@@ -204,7 +215,7 @@ public final class HammerProjection extends JWindow {
         return x / d;
     }
 
-    private static void removeExtremeValues(Collection<Double> values) {
+    private static void removeExtremeValues(@NotNull final Collection<Double> values) {
         for (int i = 0; i < OUTLIERS;) {
             if (values.size() > 2 && Collections.max(values) > 0) {
                 values.remove(Collections.max(values));

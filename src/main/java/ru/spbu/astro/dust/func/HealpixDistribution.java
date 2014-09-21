@@ -1,23 +1,25 @@
 package ru.spbu.astro.dust.func;
 
 import gov.fnal.eag.healpix.PixTools;
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Value;
 
 public class HealpixDistribution implements SphericDistribution {
-
+    @NotNull
     protected final Value[] values;
 
-    public HealpixDistribution(int nSide) {
+    public HealpixDistribution(final int nSide) {
         values = new Value[12 * nSide * nSide];
     }
 
-    public HealpixDistribution(final Value[] values) {
-        this.values = values;
+    public HealpixDistribution(@NotNull final Value[] values) {
+        this.values = values.clone();
     }
 
+    @NotNull
     @Override
-    public Value get(final Spheric dir) {
+    public Value get(@NotNull final Spheric dir) {
         return values[getPix(dir)];
     }
 
