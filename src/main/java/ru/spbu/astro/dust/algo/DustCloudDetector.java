@@ -118,8 +118,8 @@ public final class DustCloudDetector {
     }
 
     public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+        final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
+        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
         catalogue.updateBy(new LuminosityClassifier(catalogue));
 
         final DustCloudDetector detector = new DustCloudDetector(new StarSelector(catalogue).selectByParallaxRelativeError(0.25).getCatalogue());

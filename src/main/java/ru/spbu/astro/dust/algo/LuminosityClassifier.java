@@ -2,6 +2,7 @@ package ru.spbu.astro.dust.algo;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -16,10 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public final class LuminosityClassifier {
     private static final double RELATIVE_ERROR_LIMIT = 0.10;
-    private static final List<String> luminosityClasses = Arrays.asList("III", "V");
+
+    private static final List<SpectralType.LuminosityClass> LUMINOSITY_CLASSES
+            = Arrays.asList(SpectralType.LuminosityClass.III, SpectralType.LuminosityClass.V);
 
     @NotNull
     private final Classifier classifier;
@@ -31,16 +35,15 @@ public final class LuminosityClassifier {
     public LuminosityClassifier(@NotNull final Catalogue catalogue, @NotNull final Mode mode) {
         final List<Star> learnStars = new ArrayList<>();
 
-        for (final Star s : catalogue.getStars()) {
-            if (s.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
-                String luminosityClass = s.spectralType.getLuminosityClass();
-                if (luminosityClasses.contains(luminosityClass)) {
-                    learnStars.add(s);
+        for (final Star star : catalogue.getStars()) {
+            if (star.parallax.getRelativeError() < RELATIVE_ERROR_LIMIT) {
+                if (LUMINOSITY_CLASSES.contains(star.spectralType.getLuminosityClass())) {
+                    learnStars.add(star);
                 }
             }
         }
 
-        Instances learn = toInstances("learn", learnStars);
+        final Instances learn = toInstances("learn", learnStars);
         classifier = new SMO();
         try {
             classifier.buildClassifier(learn);
@@ -65,50 +68,55 @@ public final class LuminosityClassifier {
     }
 
     @NotNull
-    public String getLuminosityClass(Star s) {
-        if (s.spectralType.getLuminosityClass() != null) {
-            return s.spectralType.getLuminosityClass();
+    public SpectralType.LuminosityClass getLuminosityClass(Star star) {
+        if (star.spectralType.getLuminosityClass() != null) {
+            return star.spectralType.getLuminosityClass();
         }
 
         try {
-            int index = (int) classifier.classifyInstance(toInstances(s).get(0));
-            return luminosityClasses.get(index);
+            int index = (int) classifier.classifyInstance(toInstances(star).get(0));
+            return LUMINOSITY_CLASSES.get(index);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static final ArrayList<Attribute> attributes = new ArrayList<>();
-    static {
-        attributes.add(new Attribute("bvColor"));
-        attributes.add(new Attribute("mag"));
-        attributes.add(new Attribute("luminosityClasses", luminosityClasses));
+    private static final ArrayList<Attribute> attributes = new ArrayList<Attribute>() {{
+        add(new Attribute("bv color"));
+        add(new Attribute("mag"));
+        add(new Attribute(
+                "luminosity classes",
+                LUMINOSITY_CLASSES.stream().map(SpectralType.LuminosityClass::name).collect(Collectors.toList())
+        ));
+    }};
+
+    @NotNull
+    private static Instance toInstance(@NotNull final Star star) {
+        return new DenseInstance(attributes.size()) {{
+            setValue(attributes.get(0), star.bvColor.value);
+            setValue(attributes.get(1), star.getAbsoluteMagnitude().value);
+            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.spectralType.getLuminosityClass()));
+        }};
     }
 
-    private static Instance toInstance(Star s) {
-        Instance instance = new DenseInstance(attributes.size());
-        instance.setValue(attributes.get(0), s.bvColor.value);
-        instance.setValue(attributes.get(1), s.getAbsoluteMagnitude().value);
-        instance.setValue(attributes.get(2), luminosityClasses.indexOf(s.spectralType.getLuminosityClass()));
-        return instance;
-    }
-
-    private static Instances toInstances(String name, List<Star> stars) {
-        Instances instances = new Instances(name, attributes, stars.size());
+    @NotNull
+    private static Instances toInstances(@NotNull final String name, @NotNull final List<Star> stars) {
+        final Instances instances = new Instances(name, attributes, stars.size());
         instances.setClassIndex(2);
 
-        for (Star s : stars) {
+        for (final Star s : stars) {
             instances.add(toInstance(s));
         }
 
         return instances;
     }
 
-    private static Instances toInstances(Star s) {
-        Instances instances = new Instances("predicted", attributes, 1);
+    @NotNull
+    private static Instances toInstances(@NotNull final Star star) {
+        final Instances instances = new Instances("predicted", attributes, 1);
         instances.setClassIndex(2);
 
-        instances.add(toInstance(s));
+        instances.add(toInstance(star));
 
         return instances;
     }
@@ -117,10 +125,9 @@ public final class LuminosityClassifier {
         DEFAULT, TEST
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(@NotNull final String[] args) throws FileNotFoundException {
         Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
         catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
         new LuminosityClassifier(catalogue, Mode.TEST);
     }
-
 }

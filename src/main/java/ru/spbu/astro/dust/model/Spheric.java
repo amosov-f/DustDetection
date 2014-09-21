@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.model;
 
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.util.Geom;
 
 public class Spheric implements Comparable {
@@ -7,12 +8,12 @@ public class Spheric implements Comparable {
     public final double l;
     public final double b;
 
-    public Spheric(double l, double b) {
+    public Spheric(final double l, final double b) {
         this.l = l;
         this.b = b;
     }
 
-    public Spheric(double[] p) {
+    public Spheric(@NotNull final double[] p) {
         l = Math.atan2(p[1], p[0]);
         b = Math.asin(p[2] / Geom.abs(p));
     }

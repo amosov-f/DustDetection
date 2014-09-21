@@ -7,6 +7,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 
 import java.io.FileNotFoundException;
@@ -74,7 +75,7 @@ public class MissObserver {
         final Map<String, Integer> count = new HashMap<>();
 
         for (final Star s : stars) {
-            final String sym = s.spectralType.getTypeSymbol();
+            final SpectralType.TypeSymbol sym = s.spectralType.getTypeSymbol();
             double d = s.spectralType.getTypeNumber();
 
             final String key;

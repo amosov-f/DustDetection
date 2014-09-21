@@ -1,24 +1,24 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
-import ru.spbu.astro.dust.algo.LuminosityClassifier;
-import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.util.StarSelector;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
+
+import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass;
 
 public final class HRDiagram {
     private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.10;
@@ -29,8 +29,8 @@ public final class HRDiagram {
     private static final double ERROR_VIEW_SHARE = 0.0;
 
     public HRDiagram(final Catalogue catalogue) throws IOException {
-        Map<String, List<Star>> class2stars = new HashMap<>();
-        for (String luminosityClass : SpectralType.parseLuminosityClasses) {
+        final EnumMap<LuminosityClass, List<Star>> class2stars = new EnumMap<>(LuminosityClass.class);
+        for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
             class2stars.put(luminosityClass, new ArrayList<>());
         }
 
@@ -80,9 +80,9 @@ public final class HRDiagram {
 
 
 
-        //ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
-        //frame.pack();
-        //frame.setVisible(true);
+        ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
+        frame.pack();
+        frame.setVisible(true);
 
         ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 1200, 800);
     }
@@ -91,7 +91,7 @@ public final class HRDiagram {
         if (stars.isEmpty()) {
             return null;
         }
-        String luminosityClass = stars.get(0).spectralType.getLuminosityClass();
+        final LuminosityClass luminosityClass = stars.get(0).spectralType.getLuminosityClass();
 
         XYIntervalSeries series = new XYIntervalSeries(luminosityClass);
 
@@ -114,8 +114,8 @@ public final class HRDiagram {
     }
 
     public static void main(String[] args) throws IOException {
-        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+        Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
+        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
         //catalogue.updateBy(new LuminosityClassifier(catalogue, LuminosityClassifier.Mode.TEST));
 
         /*catalogue = new StarSelector(catalogue)

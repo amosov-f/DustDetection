@@ -12,12 +12,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.3</version>
@@ -44,12 +38,38 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jzy3d</groupId>
+            <artifactId>jzy3d-api</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>gov.fnal.eag.healpix</groupId>
             <artifactId>healpix</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/PixTools.jar</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
     </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>jzy3d-snapshots</id>
+            <name>Jzy3d Snapshots</name>
+            <url>http://maven.jzy3d.org/snapshots</url>
+        </repository>
+        <repository>
+            <id>jzy3d-releases</id>
+            <name>Jzy3d Snapshots</name>
+            <url>http://maven.jzy3d.org/releases</url>
+        </repository>
+    </repositories>
 
 </project>

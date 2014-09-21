@@ -1,44 +1,57 @@
 package ru.spbu.astro.dust.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.geom.Point2D;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.*;
 
-public class SpectralType {
+public final class SpectralType {
+    public static enum LuminosityClass {
+        I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII
+    }
 
-    public static final List<String> parseLuminosityClasses = Arrays.asList(
-            "I", "Ia", "Ib", "Iab", "II", "IIb", "III", "IIIa", "IIIb", "IV", "IVa", "V", "Va", "Vb", "VI", "VII"
-    );
+    public static enum TypeSymbol {
+        O, B, A, F, G, K, M;
 
-    private enum Relation {
+        @Nullable
+        private static TypeSymbol parse(final char c) {
+            try {
+                return valueOf(String.valueOf(c));
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+    }
+
+    private static enum Relation {
         OR, INTERMEDIATE
     }
 
-    private final List<Component> types = new ArrayList<>();
-    private Relation typesRelation = Relation.OR;
+    private final List<Component> types;
+    private Relation typesRelation;
 
-    private final List<Component> luminosityClasses = new ArrayList<>();
+    private final List<Component> luminosityClasses;
     private Relation luminosityClassesRelation = Relation.OR;
 
     private static final char STOP_SYMBOL = '$';
 
-    private static class Component {
-
+    private final static class Component {
         private String value = "";
         private boolean doubt = false;
 
-        enum Type {
+        private enum Type {
             TYPE, LUMINOSITY_CLASS
         }
 
         public Component() {
         }
 
-        public Component(final String value) {
-            this.value += value;
+        public Component(final LuminosityClass luminosityClass) {
+            this.value += luminosityClass.name();
         }
 
+        @Nullable
         public Type getType() {
             if (value.isEmpty()) {
                 return null;
@@ -50,7 +63,7 @@ public class SpectralType {
             if (isTypeSymbol(c)) {
                 return Type.TYPE;
             }
-            if (isLuminosityClassSymbol(c)) {
+            if (LuminosityClassSymbol.contains(c)) {
                 return Type.LUMINOSITY_CLASS;
             }
             return null;
@@ -66,7 +79,7 @@ public class SpectralType {
             }
 
             if (getType() == getType(c)) {
-                if (typeSymbols.contains(c)) {
+                if (TypeSymbol.parse(c) != null) {
                     return false;
                 }
                 value += c;
@@ -91,19 +104,30 @@ public class SpectralType {
             }
         }
 
-        private static final List<Character> typeSymbols = Arrays.asList('O', 'B', 'A', 'F', 'G', 'K', 'M');
-        private static final List<Character> luminosityClassSymbols = Arrays.asList('I', 'V', 'a', 'b');
+        private static enum LuminosityClassSymbol {
+            I, V, a, b;
 
-        private static boolean isTypeSymbol(char c) {
-            return typeSymbols.contains(c) || c == '.' || Character.isDigit(c);
+            @Nullable
+            private static LuminosityClassSymbol parse(final char c) {
+                try {
+                    return valueOf(String.valueOf(c));
+                } catch (IllegalArgumentException e) {
+                    return null;
+                }
+            }
+
+            public static boolean contains(final char c) {
+                return parse(c) != null;
+            }
         }
 
-        private static boolean isLuminosityClassSymbol(char c) {
-            return luminosityClassSymbols.contains(c);
+
+        private static boolean isTypeSymbol(char c) {
+            return TypeSymbol.parse(c) != null || c == '.' || Character.isDigit(c);
         }
 
         private static boolean isComponentSymbol(char c) {
-            return isTypeSymbol(c) || isLuminosityClassSymbol(c);
+            return isTypeSymbol(c) || LuminosityClassSymbol.contains(c);
         }
 
         @Override
@@ -112,23 +136,25 @@ public class SpectralType {
         }
     }
 
-    private static final List<String> exceptionSpectralTypes
-            = Arrays.asList("R", "S", "N", "C", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "WR", "WN", "WC");
+    private static enum ExceptionSpectralType {
+        R, S, N, C, DA, DB, DC, DD, DE, DF, DG, WR, WN, WC
+    }
 
-    public SpectralType(final String str) throws IllegalArgumentException {
-
-        for (String exceptionSpectralType : exceptionSpectralTypes) {
-            if (str.startsWith(exceptionSpectralType)) {
-                throw new IllegalArgumentException();
+    @Nullable
+    public static SpectralType parse(@NotNull final String str) {
+        for (ExceptionSpectralType exceptionSpectralType : ExceptionSpectralType.values()) {
+            if (str.startsWith(exceptionSpectralType.name())) {
+                return null;
             }
         }
 
         if (str.equals(str.toLowerCase())) {
-            throw new IllegalArgumentException();
+            return null;
         }
 
+        final List<Component> luminosityClasses = new ArrayList<>();
         if (str.startsWith("sd")) {
-            luminosityClasses.add(new Component("VI"));
+            luminosityClasses.add(new Component(LuminosityClass.VI));
         }
 
         final String s = str.split(" ")[0]
@@ -139,8 +165,10 @@ public class SpectralType {
                 .replaceAll("[^OBAFGKM\\d\\.IVab/\\-:]", "")
                 + STOP_SYMBOL;
 
-        //System.out.println(s);
 
+        final List<Component> types = new ArrayList<>();
+        Relation typesRelation = Relation.OR;
+        Relation luminosityClassesRelation = Relation.OR;
         Component cur = new Component();
         for (char c : s.toCharArray()) {
             if (cur.add(c)) {
@@ -149,7 +177,6 @@ public class SpectralType {
 
             if (cur.getType() == Component.Type.TYPE) {
                 if (!types.isEmpty()) {
-                    //System.out.println(cur + " " + types.get(types.size() - 1));
                     cur.completeBy(types.get(types.size() - 1));
                 }
                 types.add(cur);
@@ -161,16 +188,29 @@ public class SpectralType {
                 if (!luminosityClasses.isEmpty()) {
                     cur.completeBy(luminosityClasses.get(luminosityClasses.size() - 1));
                 }
-                luminosityClasses.add(cur);
+                try {
+                    LuminosityClass.valueOf(cur.value);
+                    luminosityClasses.add(cur);
+                } catch (IllegalArgumentException ignored) {
+                }
                 if (c == '-') {
                     luminosityClassesRelation = Relation.INTERMEDIATE;
                 }
             }
 
             cur = new Component();
-            //System.out.println("! " + c);
             cur.add(c);
         }
+        return new SpectralType(types, typesRelation, luminosityClasses, luminosityClassesRelation);
+    }
+
+    private SpectralType(@NotNull final List<Component> types, @NotNull final Relation typesRelation,
+                         @NotNull final List<Component> luminosityClasses, @NotNull final Relation luminosityClassesRelation)
+    {
+        this.types = types;
+        this.typesRelation = typesRelation;
+        this.luminosityClasses = luminosityClasses;
+        this.luminosityClassesRelation = luminosityClassesRelation;
     }
 
     @Override
@@ -211,11 +251,12 @@ public class SpectralType {
         return s;
     }
 
+    @Nullable
     public Value toBV() {
         final List<Double> bvs = new ArrayList<>();
-        for (Component type : types) {
-            for (Component luminosityClass : luminosityClasses) {
-                Double bv = toBV(type.value, luminosityClass.value);
+        for (final Component type : types) {
+            for (final Component luminosityClass : luminosityClasses) {
+                final Double bv = toBV(type.value, LuminosityClass.valueOf(luminosityClass.value));
                 if (bv != null) {
                     bvs.add(bv);
                 }
@@ -227,7 +268,7 @@ public class SpectralType {
         }
 
         double bv = 0.0;
-        for (double bvEntry : bvs) {
+        for (final double bvEntry : bvs) {
             bv += bvEntry;
         }
         bv /= bvs.size();
@@ -235,35 +276,34 @@ public class SpectralType {
         return new Value(bv, Collections.max(bvs) - bv);
     }
 
-    private static Double toBV(final String type, final String luminosityClass) {
-        Map<String, Integer> start = new HashMap<>();
-        /*start.put("O", -10);
-        start.put("B", 0);
-        start.put("A", 10);
-        start.put("F", 20);
-        start.put("G", 30);
-        start.put("K", 40);
-        start.put("M", 48);*/
-        start.put("O", 0);
-        start.put("B", 10);
-        start.put("A", 20);
-        start.put("F", 30);
-        start.put("G", 40);
-        start.put("K", 50);
-        start.put("M", 60);
+    private static final EnumMap<TypeSymbol, Integer> START = new EnumMap<TypeSymbol, Integer>(TypeSymbol.class) {{
+        /*.put("O", -10);
+        put("B", 0);
+        put("A", 10);
+        put("F", 20);
+        put("G", 30);
+        put("K", 40);
+        put("M", 48);*/
+        put(TypeSymbol.O, 0);
+        put(TypeSymbol.B, 10);
+        put(TypeSymbol.A, 20);
+        put(TypeSymbol.F, 30);
+        put(TypeSymbol.G, 40);
+        put(TypeSymbol.K, 50);
+        put(TypeSymbol.M, 60);
+    }};
 
-
-
-        if (!lumin2bvs.containsKey(luminosityClass)) {
+    @Nullable
+    private static Double toBV(@NotNull final String type, @NotNull final LuminosityClass luminosityClass) {
+        if (!LUMIN_2_BVS.containsKey(luminosityClass)) {
             return null;
         }
-        List<Point2D.Double> bvs = lumin2bvs.get(luminosityClass);
+        final List<Point2D.Double> bvs = LUMIN_2_BVS.get(luminosityClass);
 
         if (type.length() < 2) {
             return null;
         }
-        //System.out.println(types);
-        double code = start.get(type.substring(0, 1)) + Double.valueOf(type.substring(1, type.length()));
+        final double code = START.get(TypeSymbol.parse(type.charAt(0))) + Double.valueOf(type.substring(1, type.length()));
         for (int i = 0; i < bvs.size() - 1; ++i) {
             if (bvs.get(i).x <= code && code < bvs.get(i + 1).x) {
                 return interpolate(bvs.get(i), bvs.get(i + 1), code);
@@ -273,11 +313,12 @@ public class SpectralType {
         return null;
     }
 
-    public String getLuminosityClass() {
+    @Nullable
+    public LuminosityClass getLuminosityClass() {
         if (luminosityClasses.isEmpty()) {
             return null;
         }
-        return luminosityClasses.get(0).value;
+        return LuminosityClass.valueOf(luminosityClasses.get(0).value);
     }
 
     public String getType() {
@@ -291,57 +332,52 @@ public class SpectralType {
         return Double.valueOf(types.get(0).value.substring(1));
     }
 
-    public String getTypeSymbol() {
-        return types.get(0).value.substring(0, 1);
+    public TypeSymbol getTypeSymbol() {
+        return TypeSymbol.parse(types.get(0).value.charAt(0));
     }
 
-    private static final Map<String, List<Point2D.Double>> lumin2bvs = new HashMap<>();
+    private static final EnumMap<LuminosityClass, List<Point2D.Double>> LUMIN_2_BVS = new EnumMap<>(LuminosityClass.class);
 
     static {
-        final Scanner fin;
-        try {
-            fin = new Scanner(new FileInputStream("datasets/spect2bv_new.txt"));
-        } catch (FileNotFoundException e) {
-            throw new ExceptionInInitializerError(e);
-        }
+        final Scanner fin = new Scanner(SpectralType.class.getResourceAsStream("/spect2bv/spect2bv_new.txt"));
 
         final String[] titles = fin.nextLine().trim().split("\\s+");
         for (int i = 2; i < titles.length; ++i) {
-            lumin2bvs.put(titles[i], new ArrayList<>());
+            LUMIN_2_BVS.put(LuminosityClass.valueOf(titles[i]), new ArrayList<>());
         }
 
         while (fin.hasNextLine()) {
-            String[] fields = fin.nextLine().trim().split("\\s+");
+            String[] fields = fin.nextLine().trim().split("\t");
             double code = Double.valueOf(fields[1]);
             for (int i = 2; i < titles.length; ++i) {
                 if (!fields[i].equals("-")) {
                     double bv = Double.valueOf(fields[i]);
-                    lumin2bvs.get(titles[i]).add(new Point2D.Double(code, bv));
+                    LUMIN_2_BVS.get(LuminosityClass.valueOf(titles[i])).add(new Point2D.Double(code, bv));
                 }
             }
         }
         System.out.println("spect2bv loaded");
     }
 
-    private static double interpolate(final Point2D.Double p1, final Point2D.Double p2, double x) {
+    private static double interpolate(@NotNull final Point2D.Double p1, @NotNull final Point2D.Double p2, final double x) {
         return (p2.y - p1.y) / (p2.x - p1.x) * (x - p1.x) + p1.y;
     }
 
-    public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+    public static void main(final String[] args) {
+        final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
+        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
 
         int count = 0;
-        for (String s : catalogue.getColumn("spect_type")) {
-            try {
-                final SpectralType spectralType = new SpectralType(s);
-                if (spectralType.toBV() != null) {
-                    count++;
-                }
-                System.out.println(s + " -> " + spectralType.getLuminosityClass() + " ~ " + spectralType.toBV());
-            } catch (IllegalArgumentException e) {
+        for (String s : catalogue.getColumn(Catalogue.Parameter.SPECT_TYPE)) {
+            final SpectralType spectralType = SpectralType.parse(s);
+            if (spectralType == null) {
                 System.out.println(s + " -> null");
+                continue;
             }
+            if (spectralType.toBV() != null) {
+                count++;
+            }
+            System.out.println(s + " -> " + spectralType.getLuminosityClass() + " ~ " + spectralType.toBV());
         }
         System.out.println(count);
     }

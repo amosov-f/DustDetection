@@ -16,9 +16,9 @@ import java.io.FileNotFoundException;
 public final class DustDetectionEngine {
 
     public static Catalogue getCatalogue() throws FileNotFoundException {
-        Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
+        Catalogue hipparcos = new Catalogue("/catalogues/hipparcos1997.txt");
 
-        hipparcos.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
+        hipparcos.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
         hipparcos.updateBy(new LuminosityClassifier(hipparcos));
 
         return hipparcos;
