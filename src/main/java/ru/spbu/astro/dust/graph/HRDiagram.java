@@ -113,17 +113,13 @@ public final class HRDiagram {
         return series;
     }
 
-    public static void main(String[] args) throws IOException {
-        Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
-        //catalogue.updateBy(new LuminosityClassifier(catalogue, LuminosityClassifier.Mode.TEST));
-
+    public static void main(@NotNull final String[] args) throws IOException {
         /*catalogue = new StarSelector(catalogue)
                 .selectByBVColor(1.525, 1.95)
                 .selectByAbsoluteMagnitude(4.5, 9.5)
                 .getCatalogue();*/
 
-        new HRDiagram(catalogue);
+        new HRDiagram(Catalogue.HIPPARCOS_2007);
     }
 
 }

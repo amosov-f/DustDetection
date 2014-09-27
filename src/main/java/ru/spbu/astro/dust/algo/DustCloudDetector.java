@@ -4,9 +4,7 @@ import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
-import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.Spheric;
-import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.*;
 import ru.spbu.astro.dust.util.StarSelector;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.*;
@@ -31,20 +29,25 @@ public final class DustCloudDetector {
     private final List<double[]> dust = new ArrayList<>();
 
     public DustCloudDetector(@NotNull final Catalogue catalogue) {
-        final ArrayList<Attribute> attributes = new ArrayList<>();
-        attributes.add(new Attribute("x"));
-        attributes.add(new Attribute("y"));
-        attributes.add(new Attribute("z"));
-        attributes.add(new Attribute("ext"));
+        final ArrayList<Attribute> attributes = new ArrayList<Attribute>() {{
+            add(new Attribute("x"));
+            add(new Attribute("y"));
+            add(new Attribute("z"));
+            add(new Attribute("ext"));
+        }};
 
         final List<Star> stars = catalogue.getStars();
 
         final Instances instances = new Instances("knn", attributes, stars.size());
         instances.setClassIndex(3);
 
-        for (final Star s : stars) {
-            final Instance instance = toInstance(s.getCartesian());
-            instance.setValue(3, s.getExtinction().value);
+        for (final Star star : stars) {
+            final Instance instance = toInstance(star.getCartesian());
+            final Value ext = star.getExtinction();
+            if (ext == null) {
+                continue;
+            }
+            instance.setValue(3, ext.value);
 
             instances.add(instance);
         }
@@ -118,11 +121,9 @@ public final class DustCloudDetector {
     }
 
     public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
-        catalogue.updateBy(new LuminosityClassifier(catalogue));
-
-        final DustCloudDetector detector = new DustCloudDetector(new StarSelector(catalogue).selectByParallaxRelativeError(0.25).getCatalogue());
+        final DustCloudDetector detector = new DustCloudDetector(
+                new StarSelector(Catalogue.HIPPARCOS_UPDATED).selectByParallaxRelativeError(0.25).getCatalogue()
+        );
 
         final PrintWriter fout = new PrintWriter("src/main/resources/resources/clouds.txt");
 

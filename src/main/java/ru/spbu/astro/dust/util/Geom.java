@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static java.lang.Math.sqrt;
 
-public class Geom {
+public final class Geom {
     public static double dotProduct(@NotNull final double[] a, @NotNull final double[] b) {
         if (a.length != b.length) {
             throw new IllegalArgumentException("Arrays size may be equal!");

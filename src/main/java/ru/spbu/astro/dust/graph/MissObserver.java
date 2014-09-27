@@ -6,7 +6,6 @@ import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
@@ -110,9 +109,7 @@ public class MissObserver {
     }
 
     public static void main(final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
-        catalogue.updateBy(new LuminosityClassifier(catalogue));
+        final Catalogue catalogue = Catalogue.HIPPARCOS_UPDATED;
 
         final MissObserver missObserver = new MissObserver(catalogue);
         {

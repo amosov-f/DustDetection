@@ -3,10 +3,13 @@ package ru.spbu.astro.dust.model;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-@Immutable
 public final class Value {
     public final double value;
     public final double error;
+
+    public Value(final double value) {
+        this(value, 0);
+    }
 
     public Value(final double value, final double error) {
         this.value = value;

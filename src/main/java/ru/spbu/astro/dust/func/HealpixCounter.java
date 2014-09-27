@@ -6,7 +6,6 @@ import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.Value;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +24,11 @@ public final class HealpixCounter extends HealpixDistribution {
         }
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        Catalogue hipparcos = new Catalogue("datasets/hipparcos1997.txt");
+    public static void main(String[] args) {
+        final Catalogue catalogue = Catalogue.HIPPARCOS_2007;
 
-        hipparcos.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
-
-        List<Spheric> dirs = new ArrayList<>();
-        for (Star s : hipparcos.getStars()) {
+        final List<Spheric> dirs = new ArrayList<>();
+        for (Star s : catalogue.getStars()) {
             dirs.add(s.getDir());
         }
 

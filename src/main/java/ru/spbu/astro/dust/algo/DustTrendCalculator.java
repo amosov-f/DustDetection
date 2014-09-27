@@ -3,10 +3,7 @@ package ru.spbu.astro.dust.algo;
 import gov.fnal.eag.healpix.PixTools;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.Spheric;
-import ru.spbu.astro.dust.model.Star;
-import ru.spbu.astro.dust.model.Value;
+import ru.spbu.astro.dust.model.*;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,11 +13,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public final class DustTrendDetector {
+public final class DustTrendCalculator {
     private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
 
-    private static final boolean INCLUDE_INTERCEPT = false;
+    private final boolean includeIntercept;
 
     @NotNull
     private final List<List<Star>> rings;
@@ -35,18 +32,20 @@ public final class DustTrendDetector {
 
     private final double dr;
 
-    public DustTrendDetector(@NotNull final Catalogue catalogue, final double dr) {
+    public DustTrendCalculator(@NotNull final Catalogue catalogue, final double dr, final double r1, final double r2) {
+        includeIntercept = r1 != 0;
+
         pixTools = new PixTools();
         this.dr = dr;
 
         rings = new ArrayList<>();
-        for (int i = 0; i < 12 * N_SIDE * N_SIDE; ++i) {
+        for (int i = 0; i < 12 * N_SIDE * N_SIDE; i++) {
             rings.add(new ArrayList<>());
         }
 
         int count = 0;
         for (Star star : catalogue.getStars()) {
-            if (star.getR().getRelativeError() <= dr) {
+            if (r1 <= star.getR().value && star.getR().value <= r2 && star.getR().getRelativeError() <= dr) {
                 count++;
                 rings.get(getPix(star.getDir())).add(star);
             }
@@ -62,6 +61,14 @@ public final class DustTrendDetector {
             slopes[i] = new Value(regression.getSlope(), regression.getSlopeStdErr());
             intercepts[i] = new Value(regression.getIntercept(), regression.getInterceptStdErr());
         }
+    }
+
+    public DustTrendCalculator(@NotNull final Catalogue catalogue, final double dr) {
+        this(catalogue, dr, 0, Double.MAX_VALUE);
+    }
+
+    public DustTrendCalculator(@NotNull final Catalogue catalogue, final double r1, final double r2) {
+        this(catalogue, Double.MAX_VALUE, r1, r2);
     }
 
     @NotNull
@@ -92,7 +99,7 @@ public final class DustTrendDetector {
     }
 
     @NotNull
-    public List<Star> getSupportStars(Spheric dir) {
+    public List<Star> getSupportStars(@NotNull final Spheric dir) {
         return getSupportStars(rings.get(getPix(dir)));
     }
 
@@ -104,7 +111,7 @@ public final class DustTrendDetector {
     }
 
     @NotNull
-    public List<Star> getMissStars(Spheric dir) {
+    public List<Star> getMissStars(@NotNull final Spheric dir) {
         int pix = getPix(dir);
 
         List<Star> missStars = new ArrayList<>(rings.get(pix));
@@ -131,22 +138,21 @@ public final class DustTrendDetector {
         return missStars;
     }
 
-    private static SimpleRegression getRegression(List<Star> stars) {
-        final SimpleRegression regression = new SimpleRegression(INCLUDE_INTERCEPT);
+    @NotNull
+    private SimpleRegression getRegression(@NotNull final List<Star> stars) {
+        final SimpleRegression regression = new SimpleRegression(includeIntercept);
         for (final Star star : stars) {
             regression.addData(star.getR().value, star.getExtinction().value);
         }
         return regression;
     }
 
-    public int getPix(Spheric dir) {
-        final double theta = dir.getTheta();
-        final double phi = dir.getPhi();
-
-        return (int) pixTools.ang2pix_ring(N_SIDE, theta, phi);
+    public int getPix(@NotNull final Spheric dir) {
+        return (int) pixTools.ang2pix_ring(N_SIDE, dir.getTheta(), dir.getPhi());
     }
 
-    public Spheric getPixCenter(int pix) {
+    @NotNull
+    public Spheric getPixCenter(final int pix) {
         return Spheric.valueOf(pixTools.pix2ang_ring(N_SIDE, (long) pix));
     }
 
@@ -167,17 +173,15 @@ public final class DustTrendDetector {
         return s.toString();
     }
 
-    public static void main(String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
-        catalogue.updateBy(new LuminosityClassifier(catalogue));
+    public static void main(@NotNull final String[] args) throws FileNotFoundException {
+        final Catalogue catalogue = Catalogue.HIPPARCOS_UPDATED;
 
-        final DustTrendDetector dustTrendDetector = new DustTrendDetector(catalogue, 0.25);
+        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue, 0.25);
 
         final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
 
         Locale.setDefault(Locale.US);
-        fout.print(dustTrendDetector.toString());
+        fout.print(dustTrendCalculator.toString());
         fout.flush();
     }
 

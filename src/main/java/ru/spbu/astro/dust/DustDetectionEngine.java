@@ -1,8 +1,7 @@
 package ru.spbu.astro.dust;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.algo.DustTrendDetector;
-import ru.spbu.astro.dust.algo.LuminosityClassifier;
+import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.dust.func.HealpixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.graph.HammerProjection;
@@ -15,55 +14,18 @@ import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 
 public final class DustDetectionEngine {
-    public static Catalogue getCatalogue() throws FileNotFoundException {
-        Catalogue hipparcos = new Catalogue("/catalogues/hipparcos1997.txt");
-        hipparcos.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
-        hipparcos.updateBy(new LuminosityClassifier(hipparcos));
-
-        return hipparcos;
-    }
-
-    @NotNull
-    public static DustTrendDetector getDustDetector() throws FileNotFoundException {
-        return new DustTrendDetector(getCatalogue(), 0.25);
-    }
-
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        final DustTrendDetector dustTrendDetector = getDustDetector();
-        final SphericDistribution f = new HealpixDistribution(dustTrendDetector.getSlopes());
+        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(Catalogue.HIPPARCOS_UPDATED, 0.25);
+        final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);
-        final PixPlot pixPlot = new PixPlot(dustTrendDetector);
+        final PixPlot pixPlot = new PixPlot(dustTrendCalculator);
 
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
+                final Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
                 pixPlot.plot(dir);
             }
         });
-
-        //new FrameView(pixPlot);
-        /*
-        Plot2DPanel slopeHistogram = new Plot2DPanel("SOUTH");
-        slopeHistogram.addHistogramPlot("a", dustDetector.getSlopes(), 50);
-        new FrameView(slopeHistogram);
-
-        Plot2DPanel interceptHistogram = new Plot2DPanel("SOUTH");
-        interceptHistogram.addHistogramPlot("b", dustDetector.getIntercepts(), 50);
-        new FrameView(interceptHistogram);
-
-        Plot2DPanel fullSlopeErrsHistogram = new Plot2DPanel("SOUTH");
-        fullSlopeErrsHistogram.addHistogramPlot("sigma_a / a", dustDetector.getFullSlopeErrs(), 50);
-        new FrameView(fullSlopeErrsHistogram);
-
-        Plot2DPanel slopeErrsHistogram = new Plot2DPanel("SOUTH");
-        slopeErrsHistogram.addHistogramPlot("min(sigma_a / a, 1)", dustDetector.getSlopeErrs(), 50);
-        new FrameView(slopeErrsHistogram);
-
-        Plot2DPanel interceptErrsHistogram = new Plot2DPanel("SOUTH");
-        interceptErrsHistogram.addHistogramPlot("min(sigma_b / b, 1)", dustDetector.getInterceptErrs(), 50);
-        new FrameView(interceptErrsHistogram);
-        */
-
     }
 }

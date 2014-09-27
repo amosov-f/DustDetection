@@ -3,12 +3,8 @@ package ru.spbu.astro.dust.model;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.concurrent.Immutable;
+import static java.lang.Math.*;
 
-import static java.lang.Math.log10;
-import static java.lang.Math.pow;
-
-@Immutable
 public final class Star implements Comparable<Star> {
     private final int id;
     @NotNull
@@ -21,7 +17,9 @@ public final class Star implements Comparable<Star> {
     @NotNull
     private final Value bvColor;
 
-    public Star(int id, @NotNull Spheric dir, @NotNull Value parallax, double vMag, @NotNull SpectralType spectralType, @NotNull Value bvColor) {
+    public Star(final int id, @NotNull final Spheric dir, @NotNull final Value parallax, final double vMag,
+                @NotNull final SpectralType spectralType, @NotNull final Value bvColor)
+    {
         this.id = id;
         this.dir = dir;
         this.parallax = parallax;
@@ -36,19 +34,15 @@ public final class Star implements Comparable<Star> {
         double theta = dir.getTheta();
         double phi = dir.getPhi();
 
-        return new double[]{
-                r * Math.sin(theta) * Math.cos(phi),
-                r * Math.sin(theta) * Math.sin(phi),
-                r * Math.cos(theta)
-        };
+        return new double[]{r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta)};
     }
 
     @Override
-    public int compareTo(@NotNull Star s) {
-        if (parallax.value > s.parallax.value) {
+    public int compareTo(@NotNull Star star) {
+        if (parallax.value > star.parallax.value) {
             return -1;
         }
-        if (parallax.value < s.parallax.value) {
+        if (parallax.value < star.parallax.value) {
             return 1;
         }
         return 0;
@@ -105,7 +99,7 @@ public final class Star implements Comparable<Star> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable final Object o) {
         if (this == o) {
             return true;
         }
@@ -118,6 +112,7 @@ public final class Star implements Comparable<Star> {
         return id == star.id;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.format(

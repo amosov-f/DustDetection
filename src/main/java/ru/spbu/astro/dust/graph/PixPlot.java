@@ -12,7 +12,7 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.dust.algo.DustTrendDetector;
+import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
@@ -26,11 +26,11 @@ import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class PixPlot {
 
-    private final DustTrendDetector dustTrendDetector;
+    private final DustTrendCalculator dustTrendCalculator;
     private ChartFrame frame;
 
-    public PixPlot(DustTrendDetector dustTrendDetector) {
-        this.dustTrendDetector = dustTrendDetector;
+    public PixPlot(DustTrendCalculator dustTrendCalculator) {
+        this.dustTrendCalculator = dustTrendCalculator;
 
         frame = new ChartFrame("Покраснение", null);
 
@@ -45,8 +45,8 @@ public final class PixPlot {
             return;
         }
 
-        List<Star> supportStars = dustTrendDetector.getSupportStars(dir);
-        List<Star> missStars = dustTrendDetector.getMissStars(dir);
+        List<Star> supportStars = dustTrendCalculator.getSupportStars(dir);
+        List<Star> missStars = dustTrendCalculator.getMissStars(dir);
 
         List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
@@ -69,7 +69,7 @@ public final class PixPlot {
             }
         }
 
-        double a = dustTrendDetector.getSlope(dir).value;
+        double a = dustTrendCalculator.getSlope(dir).value;
 
         XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(0, 0);
@@ -84,7 +84,7 @@ public final class PixPlot {
         plot.setRangeZeroBaselineVisible(true);
 
         JFreeChart chart = new JFreeChart(
-                "Покраснение в направлении " + dustTrendDetector.getPixCenter(dustTrendDetector.getPix(dir)),
+                "Покраснение в направлении " + dustTrendCalculator.getPixCenter(dustTrendCalculator.getPix(dir)),
                 DEFAULT_TITLE_FONT,
                 plot,
                 true

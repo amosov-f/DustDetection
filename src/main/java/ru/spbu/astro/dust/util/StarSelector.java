@@ -1,14 +1,12 @@
 package ru.spbu.astro.dust.util;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,9 +86,7 @@ public final class StarSelector {
     }
 
     public static void main(String[] args) {
-        final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
-        catalogue.updateBy(new LuminosityClassifier(catalogue));
+        final Catalogue catalogue = Catalogue.HIPPARCOS_2007;
 
         final Catalogue selection = new StarSelector(catalogue)
                 .selectByBVColor(1.525, 1.95)

@@ -333,8 +333,8 @@ public final class SpectralType {
         }
 
         while (fin.hasNextLine()) {
-            String[] fields = fin.nextLine().trim().split("\t");
-            double code = Double.valueOf(fields[1]);
+            final String[] fields = fin.nextLine().trim().split("\t");
+            final double code = Double.valueOf(fields[1]);
             for (int i = 2; i < titles.length; ++i) {
                 if (!fields[i].equals("-")) {
                     double bv = Double.valueOf(fields[i]);
@@ -347,24 +347,5 @@ public final class SpectralType {
 
     private static double interpolate(@NotNull final Point2D.Double p1, @NotNull final Point2D.Double p2, final double x) {
         return (p2.y - p1.y) / (p2.x - p1.x) * (x - p1.x) + p1.y;
-    }
-
-    public static void main(@NotNull final String[] args) {
-        final Catalogue catalogue = new Catalogue("/catalogues/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("/catalogues/hipparcos2007.txt"));
-
-        int count = 0;
-        for (final String s : catalogue.getColumn(Catalogue.Parameter.SPECT_TYPE)) {
-            final SpectralType spectralType = SpectralType.parse(s);
-            if (spectralType == null) {
-                System.out.println(s + " -> null");
-                continue;
-            }
-            if (spectralType.toBV() != null) {
-                count++;
-            }
-            System.out.println(s + " -> " + spectralType.getLuminosityClass() + " ~ " + spectralType.toBV());
-        }
-        System.out.println(count);
     }
 }

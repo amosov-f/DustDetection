@@ -126,8 +126,6 @@ public final class LuminosityClassifier {
     }
 
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        Catalogue catalogue = new Catalogue("datasets/hipparcos1997.txt");
-        catalogue.updateBy(new Catalogue("datasets/hipparcos2007.txt"));
-        new LuminosityClassifier(catalogue, Mode.TEST);
+        new LuminosityClassifier(Catalogue.HIPPARCOS_2007, Mode.TEST);
     }
 }

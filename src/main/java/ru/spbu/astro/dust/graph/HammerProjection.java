@@ -14,9 +14,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static java.lang.Math.atan2;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 public final class HammerProjection extends JWindow {
     @NotNull
@@ -27,7 +25,7 @@ public final class HammerProjection extends JWindow {
     private static final int PARALLEL_COUNT = 10;
     private static final int MERIDIAN_COUNT = 24;
 
-    public static final int SIZE = 500;
+    private static final int SIZE = 500;
 
     private static final int REMOVE_LIMIT = 100;
     private static final int OUTLIERS = 2;
@@ -45,6 +43,24 @@ public final class HammerProjection extends JWindow {
         this.mode = mode;
         setSize(2 * SIZE, SIZE);
         setVisible(true);
+    }
+
+    private double minValue;
+    private double maxValue;
+
+    public HammerProjection(@NotNull final SphericDistribution distribution, final double minValue, final double maxValue) {
+        this(distribution);
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        System.out.println("!!!");
+    }
+
+    public double getMinValue() {
+        return minValue;
+    }
+
+    public double getMaxValue() {
+        return maxValue;
     }
 
     @Override
@@ -79,8 +95,15 @@ public final class HammerProjection extends JWindow {
             removeExtremeValues(errors);
         }
 
-        double minValue = Collections.min(values);
-        double maxValue = Collections.max(values);
+
+        System.out.println("1 " + minValue + " " + maxValue);
+        if (minValue == 0) {
+            minValue = Collections.min(values);
+        }
+        if (maxValue == 0) {
+            maxValue = Collections.max(values);
+        }
+        System.out.println("2 " + minValue + " " + maxValue);
 
         double maxError = Collections.max(errors);
 

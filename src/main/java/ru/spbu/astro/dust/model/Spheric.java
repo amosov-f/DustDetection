@@ -1,10 +1,14 @@
 package ru.spbu.astro.dust.model;
 
 import org.jetbrains.annotations.NotNull;
+import ru.spbu.astro.dust.util.Converter;
 import ru.spbu.astro.dust.util.Geom;
 
-public class Spheric implements Comparable {
+import static java.lang.Math.acos;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
+public final class Spheric implements Comparable<Spheric> {
     public final double l;
     public final double b;
 
@@ -26,31 +30,34 @@ public class Spheric implements Comparable {
         return l;
     }
 
+    public double distanceTo(@NotNull final Spheric dir) {
+        final double theta1 = getTheta();
+        final double theta2 = dir.getTheta();
+        final double phi1 = getPhi();
+        final double phi2 = dir.getPhi();
+
+        return acos(cos(theta1) * cos(theta2) + sin(theta1) * sin(theta2) * cos(phi2 - phi1));
+    }
+
     @Override
-    public int compareTo(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            throw new ClassCastException();
-        }
-        Spheric other = (Spheric)o;
-        if (l < other.l) {
+    public int compareTo(@NotNull Spheric dir) {
+        if (l < dir.l) {
             return -1;
         }
-        if (l > other.l) {
+        if (l > dir.l) {
             return 1;
         }
         return 0;
     }
 
-    private static double rad2deg(double rad) {
-        return rad / Math.PI * 180;
-    }
-
+    @NotNull
     @Override
     public String toString() {
-        return String.format("%.2f° г.ш., %.2f° г.д.", rad2deg(b), rad2deg(l));
+        return String.format("%.2f° г.ш., %.2f° г.д.", Converter.rad2deg(b), Converter.rad2deg(l));
     }
 
-    public static Spheric valueOf(double[] dir) {
+    @NotNull
+    public static Spheric valueOf(@NotNull final double[] dir) {
         return new Spheric(dir[1], Math.PI / 2 - dir[0]);
     }
 }

@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
+import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -19,7 +20,7 @@ import java.io.IOException;
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class ExtPlot {
-
+    @NotNull
     private XYSeries[] getSeries() {
         XYSeries series = new XYSeries("Кривая покраснения");
         XYSeries dustSeries = new XYSeries("Пылевые облака");
@@ -112,12 +113,11 @@ public final class ExtPlot {
     }
 
     public ExtPlot() throws IOException {
-
-        XYItemRenderer renderer = new XYSplineRenderer();
+        final XYItemRenderer renderer = new XYSplineRenderer();
         renderer.setSeriesShape(0, new Ellipse2D.Double(0, 0, 0, 0));
         renderer.setSeriesStroke(0, new BasicStroke(3));
 
-        XYPlot plot = new XYPlot(
+        final XYPlot plot = new XYPlot(
                 new XYSeriesCollection(getSeries()[0]),
                 new NumberAxis("Расстояние"),
                 new NumberAxis("Покраснение"),
@@ -130,7 +130,7 @@ public final class ExtPlot {
         plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
         plot.setRenderer(1, new XYAreaRenderer());
 
-        JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", DEFAULT_TITLE_FONT, plot, true);
+        final JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", DEFAULT_TITLE_FONT, plot, true);
 
         try {
             ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);
@@ -138,13 +138,12 @@ public final class ExtPlot {
             throw new RuntimeException(e);
         }
 
-        ChartFrame frame = new ChartFrame("Идеальная кривая покраснения", chart);
+        final ChartFrame frame = new ChartFrame("Идеальная кривая покраснения", chart);
         frame.pack();
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(@NotNull final String[] args) throws IOException {
         new ExtPlot();
     }
-
 }
