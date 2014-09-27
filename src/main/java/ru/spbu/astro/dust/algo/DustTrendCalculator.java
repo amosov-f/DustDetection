@@ -5,7 +5,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.model.*;
-import ru.spbu.astro.dust.util.HealpixTools;
+import ru.spbu.astro.dust.util.HEALPixTools;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -42,7 +42,7 @@ public final class DustTrendCalculator {
         this.dr = dr;
 
         rings = new ArrayList<>();
-        for (int i = 0; i < HealpixTools.pixNumber(N_SIDE); i++) {
+        for (int i = 0; i < HEALPixTools.pixNumber(N_SIDE); i++) {
             rings.add(new ArrayList<>());
         }
 
