@@ -2,7 +2,7 @@ package ru.spbu.astro.dust.graph;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
-import ru.spbu.astro.dust.func.HealpixDistribution;
+import ru.spbu.astro.dust.func.HEALPixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.model.Catalogue;
 
@@ -29,12 +29,12 @@ public class DeepObserver extends JFrame {
     private final HammerProjection hammerProjection;
 
     public DeepObserver(@NotNull final Catalogue catalogue, final double dr) {
-        hammerProjection = new HammerProjection(new HealpixDistribution(new DustTrendCalculator(catalogue, 0, 100).getSlopes()));
+        hammerProjection = new HammerProjection(new HEALPixDistribution(new DustTrendCalculator(catalogue, 0, 100).getSlopes()));
 
 
         this.dr = dr;
         for (int i = 0; i < 5; i++) {
-            distributions.add(new HealpixDistribution(new DustTrendCalculator(catalogue, dr * i, dr * (i + 1)).getSlopes()));
+            distributions.add(new HEALPixDistribution(new DustTrendCalculator(catalogue, dr * i, dr * (i + 1)).getSlopes()));
         }
 
         addKeyListener(new KeyAdapter() {
