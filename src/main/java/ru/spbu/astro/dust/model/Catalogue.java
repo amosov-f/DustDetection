@@ -179,12 +179,12 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             values = new LinkedHashMap<Parameter, String>() {{
                 put(LII, String.valueOf(Converter.rad2deg(star.getDir().l)));
                 put(BII, String.valueOf(Converter.rad2deg(star.getDir().b)));
-                put(PARALLAX, String.valueOf(star.getParallax().value));
-                put(PARALLAX_ERROR, String.valueOf(star.getParallax().error));
+                put(PARALLAX, String.valueOf(star.getParallax().getValue()));
+                put(PARALLAX_ERROR, String.valueOf(star.getParallax().getError()));
                 put(VMAG, String.valueOf(star.getVMag()));
                 put(SPECT_TYPE, star.getSpectralType().toString());
-                put(BV_COLOR, String.valueOf(star.getBVColor().value));
-                put(BV_COLOR_ERROR, String.valueOf(star.getBVColor().error));
+                put(BV_COLOR, String.valueOf(star.getBVColor().getValue()));
+                put(BV_COLOR_ERROR, String.valueOf(star.getBVColor().getError()));
             }};
         }
 

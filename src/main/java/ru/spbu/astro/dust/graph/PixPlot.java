@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
+import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -15,6 +16,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.Value;
 
 import java.awt.*;
 import java.io.File;
@@ -25,11 +27,12 @@ import java.util.List;
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class PixPlot {
-
+    @NotNull
     private final DustTrendCalculator dustTrendCalculator;
+    @NotNull
     private ChartFrame frame;
 
-    public PixPlot(DustTrendCalculator dustTrendCalculator) {
+    public PixPlot(@NotNull final DustTrendCalculator dustTrendCalculator) {
         this.dustTrendCalculator = dustTrendCalculator;
 
         frame = new ChartFrame("Покраснение", null);
@@ -40,22 +43,27 @@ public final class PixPlot {
         frame.setVisible(true);
     }
 
-    public void plot(Spheric dir) {
-        if (dir == null) {
+    public void plot(@NotNull final Spheric dir) {
+        final List<Star> supportStars = dustTrendCalculator.getSupportStars(dir);
+        final List<Star> missStars = dustTrendCalculator.getMissStars(dir);
+        if (supportStars == null || missStars == null) {
             return;
         }
 
-        List<Star> supportStars = dustTrendCalculator.getSupportStars(dir);
-        List<Star> missStars = dustTrendCalculator.getMissStars(dir);
+        final Value slope = dustTrendCalculator.getSlope(dir);
+        if (slope == null) {
+            return;
+        }
 
-        List<Star> stars = new ArrayList<>(supportStars);
+        final List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
 
-        XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection();
-        starsDataset.addSeries(createXYIntegervalSeries(supportStars, "Звезды, по которым строится тренд"));
-        starsDataset.addSeries(createXYIntegervalSeries(missStars, "Выбросы"));
+        final XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection() {{
+            addSeries(createXYIntegervalSeries(supportStars, "Звезды, по которым строится тренд"));
+            addSeries(createXYIntegervalSeries(missStars, "Выбросы"));
+        }};
 
-        XYPlot plot = new XYPlot(
+        final XYPlot plot = new XYPlot(
                 starsDataset,
                 new NumberAxis("Расстояние [пк]"),
                 new NumberAxis("Покраснение [зв.вел.]"),
@@ -63,27 +71,27 @@ public final class PixPlot {
         );
 
         double r = 0;
-        for (Star s : stars) {
-            if (r < s.getR().value + s.getR().error) {
-                r = s.getR().value + s.getR().error;
+        for (final Star star : stars) {
+            if (r < star.getR().getValue() + star.getR().getError()) {
+                r = star.getR().getValue() + star.getR().getError();
             }
         }
 
-        double a = dustTrendCalculator.getSlope(dir).value;
+        final double a = slope.getValue();
 
-        XYSeries trendSeries = new XYSeries("Тренд");
+        final XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(0, 0);
         trendSeries.add(r, a * r);
 
         plot.setDataset(1, new XYSeriesCollection(trendSeries));
 
-        XYItemRenderer renderer = new SamplingXYLineRenderer();
+        final XYItemRenderer renderer = new SamplingXYLineRenderer();
         renderer.setSeriesStroke(0, new BasicStroke(3));
         plot.setRenderer(1, renderer);
 
         plot.setRangeZeroBaselineVisible(true);
 
-        JFreeChart chart = new JFreeChart(
+        final JFreeChart chart = new JFreeChart(
                 "Покраснение в направлении " + dustTrendCalculator.getPixCenter(dustTrendCalculator.getPix(dir)),
                 DEFAULT_TITLE_FONT,
                 plot,
@@ -103,12 +111,12 @@ public final class PixPlot {
         XYIntervalSeries series = new XYIntervalSeries(name);
         for (Star s : stars) {
             series.add(
-                    s.getR().value,
-                    s.getR().value - s.getR().error,
-                    s.getR().value + s.getR().error,
-                    s.getExtinction().value,
-                    s.getExtinction().value - s.getExtinction().error,
-                    s.getExtinction().value + s.getExtinction().error
+                    s.getR().getValue(),
+                    s.getR().getValue() - s.getR().getError(),
+                    s.getR().getValue() + s.getR().getError(),
+                    s.getExtinction().getValue(),
+                    s.getExtinction().getValue() - s.getExtinction().getError(),
+                    s.getExtinction().getValue() + s.getExtinction().getError()
             );
         }
         return series;

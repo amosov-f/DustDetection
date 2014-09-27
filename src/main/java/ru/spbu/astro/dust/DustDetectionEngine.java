@@ -24,7 +24,9 @@ public final class DustDetectionEngine {
             @Override
             public void mouseClicked(MouseEvent e) {
                 final Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
-                pixPlot.plot(dir);
+                if (dir != null) {
+                    pixPlot.plot(dir);
+                }
             }
         });
     }

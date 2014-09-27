@@ -3,7 +3,9 @@ package ru.spbu.astro.dust.algo;
 import gov.fnal.eag.healpix.PixTools;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.model.*;
+import ru.spbu.astro.dust.util.HealpixTools;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -16,6 +18,7 @@ import java.util.Locale;
 public final class DustTrendCalculator {
     private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
+    private static final int MIN_FOR_TREND = 10;
 
     private final boolean includeIntercept;
 
@@ -39,13 +42,13 @@ public final class DustTrendCalculator {
         this.dr = dr;
 
         rings = new ArrayList<>();
-        for (int i = 0; i < 12 * N_SIDE * N_SIDE; i++) {
+        for (int i = 0; i < HealpixTools.pixNumber(N_SIDE); i++) {
             rings.add(new ArrayList<>());
         }
 
         int count = 0;
         for (Star star : catalogue.getStars()) {
-            if (r1 <= star.getR().value && star.getR().value <= r2 && star.getR().getRelativeError() <= dr) {
+            if (r1 <= star.getR().getValue() && star.getR().getValue() <= r2 && star.getR().getRelativeError() <= dr) {
                 count++;
                 rings.get(getPix(star.getDir())).add(star);
             }
@@ -55,11 +58,15 @@ public final class DustTrendCalculator {
         slopes = new Value[rings.size()];
         intercepts = new Value[rings.size()];
 
-        for (int i = 0; i < rings.size(); ++i) {
-            SimpleRegression regression = getRegression(getSupportStars(rings.get(i)));
-
-            slopes[i] = new Value(regression.getSlope(), regression.getSlopeStdErr());
-            intercepts[i] = new Value(regression.getIntercept(), regression.getInterceptStdErr());
+        for (int pix = 0; pix < rings.size(); ++pix) {
+            final List<Star> supportStars = getSupportStars(rings.get(pix));
+            if (supportStars != null) {
+                final SimpleRegression regression = getRegression(supportStars);
+                if (regression != null) {
+                    slopes[pix] = new Value(regression.getSlope(), regression.getSlopeStdErr());
+                    intercepts[pix] = new Value(regression.getIntercept(), regression.getInterceptStdErr());
+                }
+            }
         }
     }
 
@@ -81,51 +88,53 @@ public final class DustTrendCalculator {
         return intercepts;
     }
 
-    @NotNull
-    private List<Star> getSupportStars(List<Star> stars) {
-        List<Star> temp = new ArrayList<>(stars);
+    @Nullable
+    private List<Star> getSupportStars(@NotNull final List<Star> stars) {
+        final List<Star> temp = new ArrayList<>(stars);
 
-        SimpleRegression regression = getRegression(temp);
+        final SimpleRegression regression = getRegression(temp);
+        if (regression == null) {
+            return null;
+        }
 
         double a = regression.getSlope();
         double b = regression.getIntercept();
 
         Collections.sort(temp, (star1, star2) -> Double.compare(
-                Math.abs(a * star1.getR().value + b - star1.getExtinction().value),
-                Math.abs(a * star2.getR().value + b - star2.getExtinction().value)
+                Math.abs(a * star1.getR().getValue() + b - star1.getExtinction().getValue()),
+                Math.abs(a * star2.getR().getValue() + b - star2.getExtinction().getValue())
         ));
 
         return temp.subList(0, temp.size() - (int)(EJECTION * temp.size()));
     }
 
-    @NotNull
+    @Nullable
     public List<Star> getSupportStars(@NotNull final Spheric dir) {
         return getSupportStars(rings.get(getPix(dir)));
     }
 
-    @NotNull
-    public List<Star> getMissStars(List<Star> stars) {
+    @Nullable
+    public List<Star> getMissStars(@NotNull List<Star> stars) {
+        final List<Star> supportStars = getSupportStars(stars);
+        if (supportStars == null) {
+            return null;
+        }
         List<Star> missStars = new ArrayList<>(stars);
-        missStars.removeAll(getSupportStars(stars));
+        missStars.removeAll(supportStars);
         return missStars;
     }
 
-    @NotNull
+    @Nullable
     public List<Star> getMissStars(@NotNull final Spheric dir) {
-        int pix = getPix(dir);
-
-        List<Star> missStars = new ArrayList<>(rings.get(pix));
-        missStars.removeAll(getSupportStars(dir));
-
-        return missStars;
+        return getMissStars(rings.get(getPix(dir)));
     }
 
-    @NotNull
+    @Nullable
     public Value getSlope(Spheric dir) {
         return slopes[getPix(dir)];
     }
 
-    @NotNull
+    @Nullable
     public Value getIntercept(Spheric dir) {
         return intercepts[getPix(dir)];
     }
@@ -133,16 +142,22 @@ public final class DustTrendCalculator {
     public List<Star> getMissStars() {
         final List<Star> missStars = new ArrayList<>();
         for (final List<Star> ring : rings) {
-            missStars.addAll(getMissStars(ring));
+            final List<Star> stars = getMissStars(ring);
+            if (stars != null) {
+                missStars.addAll(stars);
+            }
         }
         return missStars;
     }
 
-    @NotNull
+    @Nullable
     private SimpleRegression getRegression(@NotNull final List<Star> stars) {
+        if (stars.size() < MIN_FOR_TREND) {
+            return null;
+        }
         final SimpleRegression regression = new SimpleRegression(includeIntercept);
         for (final Star star : stars) {
-            regression.addData(star.getR().value, star.getExtinction().value);
+            regression.addData(star.getR().getValue(), star.getExtinction().getValue());
         }
         return regression;
     }
@@ -167,7 +182,7 @@ public final class DustTrendCalculator {
             final int n = rings.get(i).size();
             s.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
-                    i, dir.l, dir.b, 1000 * k.value, 1000 * k.error, n
+                    i, dir.l, dir.b, 1000 * k.getValue(), 1000 * k.getError(), n
             ));
         }
         return s.toString();

@@ -22,7 +22,7 @@ public final class StarSelector {
     public StarSelector selectByBVColor(final double min, final double max) {
         final Catalogue selection = new Catalogue();
         for (final Star star : catalogue.getStars()) {
-            final double bvColor = star.getBVColor().value;
+            final double bvColor = star.getBVColor().getValue();
             if (min <= bvColor && bvColor <= max) {
                 selection.add(star);
             }
@@ -34,7 +34,7 @@ public final class StarSelector {
     public StarSelector selectByAbsoluteMagnitude(final double min, final double max) {
         final Catalogue selection = new Catalogue();
         for (final Star star : catalogue.getStars()) {
-            if (min <= star.getAbsoluteMagnitude().value && star.getAbsoluteMagnitude().value <= max) {
+            if (min <= star.getAbsoluteMagnitude().getValue() && star.getAbsoluteMagnitude().getValue() <= max) {
                 selection.add(star);
             }
         }

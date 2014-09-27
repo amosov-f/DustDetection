@@ -95,11 +95,11 @@ public final class HRDiagram {
 
         final XYIntervalSeries series = new XYIntervalSeries(luminosityClass);
 
-        for (final Star s : stars) {
-            double bv = s.getBVColor().value;
-            double dbv = s.getBVColor().error;
-            double M = s.getAbsoluteMagnitude().value;
-            double dM = s.getAbsoluteMagnitude().error;
+        for (final Star star : stars) {
+            double bv = star.getBVColor().getValue();
+            double dbv = star.getBVColor().getError();
+            double M = star.getAbsoluteMagnitude().getValue();
+            double dM = star.getAbsoluteMagnitude().getError();
 
             if (Math.random() < ERROR_VIEW_SHARE) {
                 series.add(bv, bv - dbv, bv + dbv, M, M - dM, M + dM);

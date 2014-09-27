@@ -47,7 +47,7 @@ public final class DustCloudDetector {
             if (ext == null) {
                 continue;
             }
-            instance.setValue(3, ext.value);
+            instance.setValue(3, ext.getValue());
 
             instances.add(instance);
         }

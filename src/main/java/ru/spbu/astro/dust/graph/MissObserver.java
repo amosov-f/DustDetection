@@ -24,7 +24,7 @@ public class MissObserver {
         for (final Star star : catalogue.getStars()) {
             final Value ext = star.getExtinction();
             if (ext != null) {
-                if (ext.value + 3 * ext.error < 0) {
+                if (ext.getValue() + 3 * ext.getError() < 0) {
                     missStars.add(star);
                 }
             }
@@ -68,8 +68,8 @@ public class MissObserver {
                 continue;
             }
             str.append(String.format(
-                            "%d\t%s\t%.2f\t%.2f\n",
-                            star.getId(), star.getSpectralType().toString(), ext.value, star.getExtinction().error
+                    "%d\t%s\t%.2f\t%.2f\n",
+                    star.getId(), star.getSpectralType().toString(), ext.getValue(), star.getExtinction().getError()
             ));
         }
         return str.toString();

@@ -2,11 +2,12 @@ package ru.spbu.astro.dust.func;
 
 import gov.fnal.eag.healpix.PixTools;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ru.spbu.astro.dust.util.HealpixTools;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Value;
 
 import static java.lang.Math.round;
-import static java.lang.Math.sqrt;
 
 public class HealpixDistribution implements SphericDistribution {
     @NotNull
@@ -20,18 +21,14 @@ public class HealpixDistribution implements SphericDistribution {
         this.values = values.clone();
     }
 
-    @NotNull
+    @Nullable
     @Override
     public Value get(@NotNull final Spheric dir) {
         return values[getPix(dir)];
     }
 
     public int getPix(@NotNull final Spheric dir) {
-        return (int) new PixTools().ang2pix_ring(getNSide(), dir.getTheta(), dir.getPhi());
-    }
-
-    public int getNSide() {
-        return (int) round(sqrt(values.length / 12.0));
+        return (int) new PixTools().ang2pix_ring(HealpixTools.sideNumber(values.length), dir.getTheta(), dir.getPhi());
     }
 
 }

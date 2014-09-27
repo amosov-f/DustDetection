@@ -30,7 +30,7 @@ public final class Star implements Comparable<Star> {
 
     @NotNull
     public double[] getCartesian() {
-        double r = getR().value;
+        double r = getR().getValue();
         double theta = dir.getTheta();
         double phi = dir.getPhi();
 
@@ -39,33 +39,25 @@ public final class Star implements Comparable<Star> {
 
     @Override
     public int compareTo(@NotNull Star star) {
-        if (parallax.value > star.parallax.value) {
-            return -1;
-        }
-        if (parallax.value < star.parallax.value) {
-            return 1;
-        }
-        return 0;
+        return star.getParallax().compareTo(getParallax());
     }
 
     @NotNull
     public Value getR() {
-        return new Value(1000 / parallax.value, 1000 * parallax.error / pow(parallax.value, 2));
+        return new Value(1000 / parallax.getValue(), 1000 * parallax.getError() / pow(parallax.getValue(), 2));
     }
 
-    @Nullable
+    @NotNull
     public Value getExtinction() {
         final Value bv = spectralType.toBV();
-        if (bv == null) {
-            return null;
-        }
+        assert bv != null;
         return bvColor.subtract(bv);
     }
 
     @NotNull
     public Value getAbsoluteMagnitude() {
         return new Value(
-                vMag + 5 * log10(parallax.value) - 10,
+                vMag + 5 * log10(parallax.getValue()) - 10,
                 2.5 * log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))
         );
     }
@@ -117,7 +109,7 @@ public final class Star implements Comparable<Star> {
     public String toString() {
         return String.format(
                 "(%d: l = %.3f, b = %.3f, pi = %.3f, dpi = %.3f)",
-                id, dir.l, dir.b, parallax.value, parallax.error
+                id, dir.l, dir.b, parallax.getValue(), parallax.getError()
         );
     }
 }

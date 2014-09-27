@@ -1,11 +1,10 @@
 package ru.spbu.astro.dust.model;
 
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.jetbrains.annotations.NotNull;
 
-public final class Value {
-    public final double value;
-    public final double error;
+public final class Value implements Comparable<Value> {
+    private final double value;
+    private final double error;
 
     public Value(final double value) {
         this(value, 0);
@@ -16,18 +15,26 @@ public final class Value {
         this.error = error;
     }
 
+    public double getValue() {
+        return value;
+    }
+
+    public double getError() {
+        return error;
+    }
+
     public double getRelativeError() {
-        return Math.abs(error / value);
+        return Math.abs(getError() / getValue());
     }
 
     @NotNull
     public Value add(@NotNull final Value value) {
-        return new Value(this.value + value.value, Math.sqrt(Math.pow(error, 2) + Math.pow(value.error, 2)));
+        return new Value(getValue() + value.getValue(), Math.sqrt(Math.pow(getError(), 2) + Math.pow(value.getError(), 2)));
     }
 
     @NotNull
     public Value negate() {
-        return new Value(-value, error);
+        return new Value(-getValue(), getError());
     }
 
     @NotNull
@@ -35,9 +42,14 @@ public final class Value {
         return add(other.negate());
     }
 
+    @Override
+    public int compareTo(@NotNull final Value value) {
+        return new Double(getValue()).compareTo(value.getValue());
+    }
+
     @NotNull
     @Override
     public String toString() {
-        return String.format("%.3f ± %d%%", value, (int) Math.abs(100 * error / value));
+        return String.format("%.3f ± %d%%", getValue(), (int) Math.abs(100 * getError() / getValue()));
     }
 }

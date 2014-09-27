@@ -93,8 +93,8 @@ public final class LuminosityClassifier {
     @NotNull
     private static Instance toInstance(@NotNull final Star star) {
         return new DenseInstance(attributes.size()) {{
-            setValue(attributes.get(0), star.getBVColor().value);
-            setValue(attributes.get(1), star.getAbsoluteMagnitude().value);
+            setValue(attributes.get(0), star.getBVColor().getValue());
+            setValue(attributes.get(1), star.getAbsoluteMagnitude().getValue());
             setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.getSpectralType().getLuminosityClass()));
         }};
     }

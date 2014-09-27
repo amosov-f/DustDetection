@@ -79,11 +79,13 @@ public final class HammerProjection extends JWindow {
 
                 f[x][y] = distribution.get(dir);
 
-                if (!Double.isNaN(f[x][y].value) && !Double.isInfinite(f[x][y].value)) {
-                    values.add(f[x][y].value);
-                }
-                if (!Double.isNaN(f[x][y].error) && !Double.isInfinite(f[x][y].error)) {
-                    errors.add(f[x][y].error);
+                if (f[x][y] != null) {
+                    if (!Double.isNaN(f[x][y].getValue()) && !Double.isInfinite(f[x][y].getValue())) {
+                        values.add(f[x][y].getValue());
+                    }
+                    if (!Double.isNaN(f[x][y].getError()) && !Double.isInfinite(f[x][y].getError())) {
+                        errors.add(f[x][y].getError());
+                    }
                 }
             }
         }
@@ -114,19 +116,23 @@ public final class HammerProjection extends JWindow {
                     continue;
                 }
 
-                final double value = normalize(f[x][y].value, minValue, maxValue);
-                final double error;
-                if (mode == Mode.WITH_ERRORS) {
-                    error = normalize(f[x][y].error, 0, maxError);
-                } else {
-                    error = 0;
-                }
-
                 final Color color;
-                if (value >= 0) {
-                    color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
+                if (f[x][y] == null) {
+                    color = Color.BLACK;
                 } else {
-                    color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
+                    final double value = normalize(f[x][y].getValue(), minValue, maxValue);
+                    final double error;
+                    if (mode == Mode.WITH_ERRORS) {
+                        error = normalize(f[x][y].getError(), 0, maxError);
+                    } else {
+                        error = 0;
+                    }
+
+                    if (value >= 0) {
+                        color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
+                    } else {
+                        color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
+                    }
                 }
 
                 g.setColor(color);

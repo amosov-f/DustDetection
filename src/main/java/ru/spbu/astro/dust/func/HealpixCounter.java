@@ -1,17 +1,18 @@
 package ru.spbu.astro.dust.func;
 
+import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.Value;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class HealpixCounter extends HealpixDistribution {
 
-    public HealpixCounter(Iterable<Spheric> dirs, int nSide) {
+    public HealpixCounter(@NotNull final Iterable<Spheric> dirs, final int nSide) {
         super(nSide);
 
         for (int i = 0; i < values.length; ++i) {
@@ -24,13 +25,10 @@ public final class HealpixCounter extends HealpixDistribution {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(@NotNull final String[] args) {
         final Catalogue catalogue = Catalogue.HIPPARCOS_2007;
 
-        final List<Spheric> dirs = new ArrayList<>();
-        for (Star s : catalogue.getStars()) {
-            dirs.add(s.getDir());
-        }
+        final List<Spheric> dirs = catalogue.getStars().stream().map(Star::getDir).collect(Collectors.toList());
 
         new HammerProjection(new HealpixCounter(dirs, 18));
     }
