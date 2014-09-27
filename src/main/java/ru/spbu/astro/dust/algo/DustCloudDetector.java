@@ -2,7 +2,7 @@ package ru.spbu.astro.dust.algo;
 
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.func.HEALPixCounter;
+import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.*;
 import ru.spbu.astro.dust.util.StarSelector;
@@ -135,6 +135,6 @@ public final class DustCloudDetector {
             fout.flush();
         }
 
-        new HammerProjection(new HEALPixCounter(dirs, 18));
+        new HammerProjection(new HealpixCounter(dirs, 18));
     }
 }

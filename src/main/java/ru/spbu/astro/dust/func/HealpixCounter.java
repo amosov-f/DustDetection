@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class HealpixCounter extends HealpixDistribution {
-
     public HealpixCounter(@NotNull final Iterable<Spheric> dirs, final int nSide) {
         super(nSide);
 
@@ -32,5 +31,4 @@ public final class HealpixCounter extends HealpixDistribution {
 
         new HammerProjection(new HealpixCounter(dirs, 18));
     }
-
 }
