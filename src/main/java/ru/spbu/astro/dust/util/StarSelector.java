@@ -1,7 +1,7 @@
 package ru.spbu.astro.dust.util;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.func.HealpixCounter;
+import ru.spbu.astro.dust.func.HEALPixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
@@ -99,7 +99,7 @@ public final class StarSelector {
         }
 
         System.out.println(selection);
-        new HammerProjection(new HealpixCounter(dirs, 18), HammerProjection.Mode.WITH_ERRORS);
+        new HammerProjection(new HEALPixCounter(dirs, 18), HammerProjection.Mode.WITH_ERRORS);
     }
 
 }
