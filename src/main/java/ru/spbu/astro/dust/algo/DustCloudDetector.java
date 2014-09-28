@@ -2,9 +2,12 @@ package ru.spbu.astro.dust.algo;
 
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.func.HEALPixCounter;
+import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
-import ru.spbu.astro.dust.model.*;
+import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Spheric;
+import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.Value;
 import ru.spbu.astro.dust.util.StarSelector;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.*;
@@ -135,6 +138,6 @@ public final class DustCloudDetector {
             fout.flush();
         }
 
-        new HammerProjection(new HEALPixCounter(dirs, 18));
+        new HammerProjection(new HealpixCounter(dirs, 18));
     }
 }

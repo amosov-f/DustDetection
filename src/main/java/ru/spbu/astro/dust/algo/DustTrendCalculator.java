@@ -4,8 +4,11 @@ import gov.fnal.eag.healpix.PixTools;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.dust.model.*;
-import ru.spbu.astro.dust.util.HEALPixTools;
+import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Spheric;
+import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.Value;
+import ru.spbu.astro.dust.util.HealpixTools;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,7 +21,7 @@ import java.util.Locale;
 public final class DustTrendCalculator {
     private static final int N_SIDE = 18;
     private static final double EJECTION = 0.1;
-    private static final int MIN_FOR_TREND = 10;
+    private static final int MIN_FOR_TREND = 3;
 
     private final boolean includeIntercept;
 
@@ -42,7 +45,7 @@ public final class DustTrendCalculator {
         this.dr = dr;
 
         rings = new ArrayList<>();
-        for (int i = 0; i < HEALPixTools.pixNumber(N_SIDE); i++) {
+        for (int i = 0; i < HealpixTools.pixNumber(N_SIDE); i++) {
             rings.add(new ArrayList<>());
         }
 

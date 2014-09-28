@@ -23,10 +23,8 @@ public class MissObserver {
     public MissObserver(@NotNull final Catalogue catalogue) {
         for (final Star star : catalogue.getStars()) {
             final Value ext = star.getExtinction();
-            if (ext != null) {
-                if (ext.getValue() + 3 * ext.getError() < 0) {
-                    missStars.add(star);
-                }
+            if (ext.getValue() + 3 * ext.getError() < 0) {
+                missStars.add(star);
             }
         }
 
@@ -64,9 +62,6 @@ public class MissObserver {
         str.append("hip\tspect\text\tsigma_ext\n");
         for (final Star star : missStars) {
             final Value ext = star.getExtinction();
-            if (ext == null) {
-                continue;
-            }
             str.append(String.format(
                     "%d\t%s\t%.2f\t%.2f\n",
                     star.getId(), star.getSpectralType().toString(), ext.getValue(), star.getExtinction().getError()

@@ -2,7 +2,7 @@ package ru.spbu.astro.dust;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
-import ru.spbu.astro.dust.func.HEALPixDistribution;
+import ru.spbu.astro.dust.func.HealpixDistribution;
 import ru.spbu.astro.dust.func.SphericDistribution;
 import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.graph.PixPlot;
@@ -16,7 +16,7 @@ import java.io.FileNotFoundException;
 public final class DustDetectionEngine {
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(Catalogue.HIPPARCOS_UPDATED, 0.25);
-        final SphericDistribution f = new HEALPixDistribution(dustTrendCalculator.getSlopes());
+        final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);
         final PixPlot pixPlot = new PixPlot(dustTrendCalculator);
 
