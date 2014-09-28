@@ -22,6 +22,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
@@ -51,9 +52,16 @@ public final class PixPlot {
         }
 
         final Value slope = dustTrendCalculator.getSlope(dir);
+        final Value intercept = dustTrendCalculator.getIntercept(dir);
         if (slope == null) {
             return;
         }
+        if (intercept == null) {
+            return;
+        }
+
+        final double a = slope.getValue();
+        final double b = intercept.getValue();
 
         final List<Star> stars = new ArrayList<>(supportStars);
         stars.addAll(missStars);
@@ -70,18 +78,12 @@ public final class PixPlot {
                 new XYErrorRenderer()
         );
 
-        double r = 0;
-        for (final Star star : stars) {
-            if (r < star.getR().getValue() + star.getR().getError()) {
-                r = star.getR().getValue() + star.getR().getError();
-            }
-        }
-
-        final double a = slope.getValue();
+        final double r1 = b != 0 ? Collections.min(stars).getR().getValue() : 0;
+        final double r2 = Collections.max(stars).getR().getValue();
 
         final XYSeries trendSeries = new XYSeries("Тренд");
-        trendSeries.add(0, 0);
-        trendSeries.add(r, a * r);
+        trendSeries.add(r1, a * r1 + b);
+        trendSeries.add(r2, a * r2 + b);
 
         plot.setDataset(1, new XYSeriesCollection(trendSeries));
 

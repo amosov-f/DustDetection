@@ -34,7 +34,7 @@ public final class HammerProjection extends JWindow {
         DEFAULT, WITH_ERRORS
     }
 
-    public HammerProjection(SphericDistribution distribution) {
+    public HammerProjection(@NotNull final SphericDistribution distribution) {
         this(distribution, Mode.DEFAULT);
     }
 
@@ -42,25 +42,6 @@ public final class HammerProjection extends JWindow {
         this.distribution = distribution;
         this.mode = mode;
         setSize(2 * SIZE, SIZE);
-        setVisible(true);
-    }
-
-    private double minValue;
-    private double maxValue;
-
-    public HammerProjection(@NotNull final SphericDistribution distribution, final double minValue, final double maxValue) {
-        this(distribution);
-        this.minValue = minValue;
-        this.maxValue = maxValue;
-        System.out.println("!!!");
-    }
-
-    public double getMinValue() {
-        return minValue;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
     }
 
     @Override
@@ -90,22 +71,19 @@ public final class HammerProjection extends JWindow {
             }
         }
 
-        if (values.size() > REMOVE_LIMIT) {
+        /*if (values.size() > REMOVE_LIMIT) {
             removeExtremeValues(values);
         }
         if (errors.size() > REMOVE_LIMIT) {
             removeExtremeValues(errors);
-        }
+        }*/
 
-
-        System.out.println("1 " + minValue + " " + maxValue);
-        if (minValue == 0) {
-            minValue = Collections.min(values);
-        }
-        if (maxValue == 0) {
-            maxValue = Collections.max(values);
-        }
-        System.out.println("2 " + minValue + " " + maxValue);
+        //if (minValue == 0) {
+        final double minValue = Collections.min(values);
+        //}
+        //if (maxValue == 0) {
+        final double maxValue = Collections.max(values);
+        //}
 
         double maxError = Collections.max(errors);
 
@@ -129,6 +107,7 @@ public final class HammerProjection extends JWindow {
                     }
 
                     if (value >= 0) {
+
                         color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
                     } else {
                         color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
@@ -240,8 +219,7 @@ public final class HammerProjection extends JWindow {
         }
 
         double d = Math.max(Math.abs(min), Math.abs(max));
-
-        return x / d;
+        return d == 0 ? 0 : x / d;
     }
 
     private static void removeExtremeValues(@NotNull final Collection<Double> values) {

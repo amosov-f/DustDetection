@@ -36,27 +36,24 @@ public final class DustTrendCalculator {
     @NotNull
     private final PixTools pixTools;
 
-    private final double dr;
+    public DustTrendCalculator(@NotNull final List<Star> stars) {
+        this(stars, true);
+    }
 
-    public DustTrendCalculator(@NotNull final Catalogue catalogue, final double dr, final double r1, final double r2) {
-        includeIntercept = r1 != 0;
+    public DustTrendCalculator(@NotNull final List<Star> stars, final boolean includeIntercept) {
+        System.out.println("number of stars: " + stars.size());
+        this.includeIntercept = includeIntercept;
 
         pixTools = new PixTools();
-        this.dr = dr;
 
         rings = new ArrayList<>();
         for (int i = 0; i < HealpixTools.pixNumber(N_SIDE); i++) {
             rings.add(new ArrayList<>());
         }
 
-        int count = 0;
-        for (Star star : catalogue.getStars()) {
-            if (r1 <= star.getR().getValue() && star.getR().getValue() <= r2 && star.getR().getRelativeError() <= dr) {
-                count++;
-                rings.get(getPix(star.getDir())).add(star);
-            }
+        for (final Star star : stars) {
+            rings.get(getPix(star.getDir())).add(star);
         }
-        System.out.println("number of stars: " + count);
 
         slopes = new Value[rings.size()];
         intercepts = new Value[rings.size()];
@@ -71,14 +68,6 @@ public final class DustTrendCalculator {
                 }
             }
         }
-    }
-
-    public DustTrendCalculator(@NotNull final Catalogue catalogue, final double dr) {
-        this(catalogue, dr, 0, Double.MAX_VALUE);
-    }
-
-    public DustTrendCalculator(@NotNull final Catalogue catalogue, final double r1, final double r2) {
-        this(catalogue, Double.MAX_VALUE, r1, r2);
     }
 
     @NotNull
@@ -176,8 +165,15 @@ public final class DustTrendCalculator {
 
     @Override
     public String toString() {
+        double dr = 0;
+        for (final List<Star> ring : rings) {
+            for (final Star star : ring) {
+                dr = Math.max(dr, star.getR().getRelativeError());
+            }
+        }
+
         final StringBuilder s = new StringBuilder();
-        s.append("dr < ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
+        s.append("dr <= ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
         s.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
         for (int i = 0; i < rings.size(); ++i) {
             final Spheric dir = getPixCenter(i);
@@ -194,7 +190,7 @@ public final class DustTrendCalculator {
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         final Catalogue catalogue = Catalogue.HIPPARCOS_UPDATED;
 
-        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue, 0.25);
+        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue.getStars());
 
         final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
 

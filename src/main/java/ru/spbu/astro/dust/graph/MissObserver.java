@@ -12,9 +12,10 @@ import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.Value;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MissObserver {
 
@@ -107,7 +108,7 @@ public class MissObserver {
         final Catalogue catalogue = Catalogue.HIPPARCOS_UPDATED;
 
         final MissObserver missObserver = new MissObserver(catalogue);
-        {
+        /*{
             final PrintWriter fout = new PrintWriter(new FileOutputStream("results/6.txt"));
 
             Locale.setDefault(Locale.US);
@@ -120,7 +121,7 @@ public class MissObserver {
                 fout.println(id);
             }
             fout.flush();
-        }
+        }*/
     }
 
 }

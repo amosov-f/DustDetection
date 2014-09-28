@@ -31,15 +31,13 @@ public final class DustCloudDetector {
     @NotNull
     private final List<double[]> dust = new ArrayList<>();
 
-    public DustCloudDetector(@NotNull final Catalogue catalogue) {
+    public DustCloudDetector(@NotNull final List<Star> stars) {
         final ArrayList<Attribute> attributes = new ArrayList<Attribute>() {{
             add(new Attribute("x"));
             add(new Attribute("y"));
             add(new Attribute("z"));
             add(new Attribute("ext"));
         }};
-
-        final List<Star> stars = catalogue.getStars();
 
         final Instances instances = new Instances("knn", attributes, stars.size());
         instances.setClassIndex(3);
@@ -123,7 +121,7 @@ public final class DustCloudDetector {
 
     public static void main(final String[] args) throws FileNotFoundException {
         final DustCloudDetector detector = new DustCloudDetector(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED).selectByParallaxRelativeError(0.25).getCatalogue()
+                new StarSelector(Catalogue.HIPPARCOS_UPDATED).selectByParallaxRelativeError(0.25).getStars()
         );
 
         final PrintWriter fout = new PrintWriter("src/main/resources/resources/clouds.txt");

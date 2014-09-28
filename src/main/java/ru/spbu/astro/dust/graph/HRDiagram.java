@@ -36,13 +36,13 @@ public final class HRDiagram {
             class2stars.put(luminosityClass, new ArrayList<>());
         }
 
-        final Catalogue selection = new StarSelector(catalogue)
+        final List<Star> selection = new StarSelector(catalogue)
                 .selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
                 .selectByBVColorError(BV_COLOR_ERROR_LIMIT)
-                .selectByExistLuminosityClass().getCatalogue();
+                .selectByExistLuminosityClass().getStars();
 
         int starsCount = 0;
-        for (final Star star : selection.getStars()) {
+        for (final Star star : selection) {
             class2stars.get(star.getSpectralType().getLuminosityClass()).add(star);
             starsCount++;
         }
