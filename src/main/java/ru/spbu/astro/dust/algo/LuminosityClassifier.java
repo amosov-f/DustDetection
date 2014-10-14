@@ -34,7 +34,6 @@ public final class LuminosityClassifier {
 
     public LuminosityClassifier(@NotNull final Catalogue catalogue, @NotNull final Mode mode) {
         final List<Star> learnStars = new ArrayList<>();
-
         for (final Star star : catalogue.getStars()) {
             if (star.getParallax().getRelativeError() < RELATIVE_ERROR_LIMIT) {
                 if (LUMINOSITY_CLASSES.contains(star.getSpectralType().getLuminosityClass())) {
@@ -42,8 +41,8 @@ public final class LuminosityClassifier {
                 }
             }
         }
-
         final Instances learn = toInstances("learn", learnStars);
+
         classifier = new SMO();
         try {
             classifier.buildClassifier(learn);
