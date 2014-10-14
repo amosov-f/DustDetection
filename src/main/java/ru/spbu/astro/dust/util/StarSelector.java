@@ -6,6 +6,7 @@ import ru.spbu.astro.dust.graph.HammerProjection;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.Value;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public final class StarSelector {
         this(catalogue.getStars());
     }
 
-    private StarSelector(@NotNull final List<Star> stars) {
+    public StarSelector(@NotNull final List<Star> stars) {
         this.stars = stars;
     }
 
@@ -86,6 +87,18 @@ public final class StarSelector {
         final List<Star> selection = new ArrayList<>();
         for (Star star : stars) {
             if (star.getSpectralType().getLuminosityClass() != null) {
+                selection.add(star);
+            }
+        }
+        return new StarSelector(selection);
+    }
+
+    @NotNull
+    public StarSelector selectByNegativeExtinction() {
+        final List<Star> selection = new ArrayList<>();
+        for (final Star star : stars) {
+            final Value ext = star.getExtinction();
+            if (ext.getValue() + 3 * ext.getError() < 0) {
                 selection.add(star);
             }
         }

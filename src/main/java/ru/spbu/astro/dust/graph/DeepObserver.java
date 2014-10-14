@@ -77,7 +77,7 @@ public class DeepObserver extends JFrame {
 
         final PixPlot pixPlot = new PixPlot(calculators.get(deep));
 
-        hammerProjection = new HammerProjection(new HealpixBinaryDistribution(calculators.get(deep).getSlopes(), 0.005));
+        hammerProjection = new HammerProjection(new HealpixBinaryDistribution(calculators.get(deep).getSlopes(), 0.002));
         hammerProjection.setVisible(true);
 
         hammerProjection.addMouseListener(new MouseAdapter() {

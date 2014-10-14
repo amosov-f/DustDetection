@@ -24,11 +24,12 @@ public final class HealpixCounter extends HealpixDistribution {
         }
     }
 
+    public HealpixCounter(@NotNull final List<Star> stars, final int nSide) {
+        this(stars.stream().map(Star::getDir).collect(Collectors.toList()), nSide);
+    }
+
     public static void main(@NotNull final String[] args) {
         final Catalogue catalogue = Catalogue.HIPPARCOS_2007;
-
-        final List<Spheric> dirs = catalogue.getStars().stream().map(Star::getDir).collect(Collectors.toList());
-
-        new HammerProjection(new HealpixCounter(dirs, 18));
+        new HammerProjection(new HealpixCounter(catalogue.getStars(), 18));
     }
 }

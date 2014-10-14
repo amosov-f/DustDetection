@@ -7,6 +7,8 @@ import java.awt.geom.Point2D;
 import java.util.*;
 
 public final class SpectralType {
+    private static final Map<String, SpectralType> cache = new HashMap<>();
+
     public static enum LuminosityClass {
         I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII;
 
@@ -133,66 +135,70 @@ public final class SpectralType {
 
     @Nullable
     public static SpectralType parse(@NotNull final String str) {
-        for (ExceptionSpectralType exceptionSpectralType : ExceptionSpectralType.values()) {
-            if (str.startsWith(exceptionSpectralType.name())) {
+        if (!cache.containsKey(str)) {
+            for (ExceptionSpectralType exceptionSpectralType : ExceptionSpectralType.values()) {
+                if (str.startsWith(exceptionSpectralType.name())) {
+                    return null;
+                }
+            }
+
+            if (str.equals(str.toLowerCase())) {
                 return null;
             }
-        }
 
-        if (str.equals(str.toLowerCase())) {
-            return null;
-        }
-
-        final List<Component> luminosityClasses = new ArrayList<>();
-        if (str.startsWith("sd")) {
-            luminosityClasses.add(new Component(LuminosityClass.VI));
-        }
-
-        final String s = str.split(" ")[0]
-                .replaceAll("va", "")           //magic
-                .replaceAll("CN.*", "")          //magic
-                .replaceAll("\\+.*", "")          //magic
-                .replaceAll("\\.+$", "")           //magic
-                .replaceAll("[^OBAFGKM\\d\\.IVab/\\-:]", "")
-                + STOP_SYMBOL;
-
-
-        final List<Component> types = new ArrayList<>();
-        Relation typesRelation = Relation.OR;
-        Relation luminosityClassesRelation = Relation.OR;
-        Component cur = new Component();
-        for (char c : s.toCharArray()) {
-            if (cur.add(c)) {
-                continue;
+            final List<Component> luminosityClasses = new ArrayList<>();
+            if (str.startsWith("sd")) {
+                luminosityClasses.add(new Component(LuminosityClass.VI));
             }
 
-            if (cur.getType() == Component.Type.TYPE) {
-                if (!types.isEmpty()) {
-                    cur.completeBy(types.get(types.size() - 1));
+            final String s = str.split(" ")[0]
+                    .replaceAll("va", "")           //magic
+                    .replaceAll("CN.*", "")          //magic
+                    .replaceAll("\\+.*", "")          //magic
+                    .replaceAll("\\.+$", "")           //magic
+                    .replaceAll("[^OBAFGKM\\d\\.IVab/\\-:]", "")
+                    + STOP_SYMBOL;
+
+
+            final List<Component> types = new ArrayList<>();
+            Relation typesRelation = Relation.OR;
+            Relation luminosityClassesRelation = Relation.OR;
+            Component cur = new Component();
+            for (char c : s.toCharArray()) {
+                if (cur.add(c)) {
+                    continue;
                 }
-                types.add(cur);
-                if (c == '-') {
-                    typesRelation = Relation.INTERMEDIATE;
+
+                if (cur.getType() == Component.Type.TYPE) {
+                    if (!types.isEmpty()) {
+                        cur.completeBy(types.get(types.size() - 1));
+                    }
+                    types.add(cur);
+                    if (c == '-') {
+                        typesRelation = Relation.INTERMEDIATE;
+                    }
                 }
-            }
-            if (cur.getType() == Component.Type.LUMINOSITY_CLASS) {
-                if (!luminosityClasses.isEmpty()) {
-                    cur.completeBy(luminosityClasses.get(luminosityClasses.size() - 1));
+                if (cur.getType() == Component.Type.LUMINOSITY_CLASS) {
+                    if (!luminosityClasses.isEmpty()) {
+                        cur.completeBy(luminosityClasses.get(luminosityClasses.size() - 1));
+                    }
+                    try {
+                        LuminosityClass.valueOf(cur.value);
+                        luminosityClasses.add(cur);
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                    if (c == '-') {
+                        luminosityClassesRelation = Relation.INTERMEDIATE;
+                    }
                 }
-                try {
-                    LuminosityClass.valueOf(cur.value);
-                    luminosityClasses.add(cur);
-                } catch (IllegalArgumentException ignored) {
-                }
-                if (c == '-') {
-                    luminosityClassesRelation = Relation.INTERMEDIATE;
-                }
+
+                cur = new Component();
+                cur.add(c);
             }
 
-            cur = new Component();
-            cur.add(c);
+            cache.put(str, new SpectralType(types, typesRelation, luminosityClasses, luminosityClassesRelation));
         }
-        return new SpectralType(types, typesRelation, luminosityClasses, luminosityClassesRelation);
+        return cache.get(str);
     }
 
     private SpectralType(@NotNull final List<Component> types, @NotNull final Relation typesRelation,

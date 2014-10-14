@@ -2,6 +2,8 @@ package ru.spbu.astro.dust.model;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigInteger;
+
 public final class Value implements Comparable<Value> {
     private final double value;
     private final double error;
