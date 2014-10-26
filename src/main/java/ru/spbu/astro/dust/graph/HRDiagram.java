@@ -11,6 +11,7 @@ import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.util.StarSelector;
 
@@ -23,33 +24,31 @@ import java.util.List;
 import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass;
 
 public final class HRDiagram {
-    private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.10;
+    private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.20;
     private static final double ERROR = 2.5 * Math.log10((1 + PARALLAX_RELATIVE_ERROR_LIMIT) / (1 - PARALLAX_RELATIVE_ERROR_LIMIT));
 
     private static final double BV_COLOR_ERROR_LIMIT = Double.MAX_VALUE;
 
-    private static final double ERROR_VIEW_SHARE = 0.0;
+    private static final double ERROR_VIEW_SHARE = 1.0;
 
-    public HRDiagram(final Catalogue catalogue) throws IOException {
+    public HRDiagram(@NotNull final List<Star> stars) throws IOException {
         final EnumMap<LuminosityClass, List<Star>> class2stars = new EnumMap<>(LuminosityClass.class);
         for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
             class2stars.put(luminosityClass, new ArrayList<>());
         }
 
-        final List<Star> selection = new StarSelector(catalogue)
-                .selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
-                .selectByBVColorError(BV_COLOR_ERROR_LIMIT)
-                .selectByExistLuminosityClass().getStars();
+        /*final List<Star> selection = new StarSelector(stars)
+                .getStars();*/
 
         int starsCount = 0;
-        for (final Star star : selection) {
+        for (final Star star : stars) {
             class2stars.get(star.getSpectralType().getLuminosityClass()).add(star);
             starsCount++;
         }
 
         final XYIntervalSeriesCollection dataset = new XYIntervalSeriesCollection();
-        for (final List<Star> stars : class2stars.values()) {
-            final XYIntervalSeries series = getLuminosityClassSeries(stars);
+        for (final List<Star> classStars : class2stars.values()) {
+            final XYIntervalSeries series = getLuminosityClassSeries(classStars);
             if (series != null) {
                 dataset.addSeries(series);
             }
@@ -119,7 +118,12 @@ public final class HRDiagram {
                 .selectByAbsoluteMagnitude(4.5, 9.5)
                 .getCatalogue();*/
 
-        new HRDiagram(Catalogue.HIPPARCOS_2007);
+        new HRDiagram(new StarSelector(Catalogue.HIPPARCOS_UPDATED)
+                .selectByNegativeExtinction()
+                //.selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
+                //.selectByBVColorError(BV_COLOR_ERROR_LIMIT)
+                //.selectBySpectralType(SpectralType.TypeSymbol.M, 5, 9)
+                .getStars());
     }
 
 }

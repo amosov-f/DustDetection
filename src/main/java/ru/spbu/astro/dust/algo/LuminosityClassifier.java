@@ -68,9 +68,9 @@ public final class LuminosityClassifier {
 
     @NotNull
     public SpectralType.LuminosityClass getLuminosityClass(Star star) {
-        if (star.getSpectralType().getLuminosityClass() != null) {
-            return star.getSpectralType().getLuminosityClass();
-        }
+        //if (star.getSpectralType().getLuminosityClass() != null) {
+        //    return star.getSpectralType().getLuminosityClass();
+        //}
 
         try {
             int index = (int) classifier.classifyInstance(toInstances(star).get(0));

@@ -3,10 +3,7 @@ package ru.spbu.astro.dust.util;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
-import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.Spheric;
-import ru.spbu.astro.dust.model.Star;
-import ru.spbu.astro.dust.model.Value;
+import ru.spbu.astro.dust.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +96,29 @@ public final class StarSelector {
         for (final Star star : stars) {
             final Value ext = star.getExtinction();
             if (ext.getValue() + 3 * ext.getError() < 0) {
+                selection.add(star);
+            }
+        }
+        return new StarSelector(selection);
+    }
+
+    @NotNull
+    public StarSelector selectByLuminosityClass(@NotNull final SpectralType.LuminosityClass luminosityClass) {
+        final List<Star> selection = new ArrayList<>();
+        for (final Star star : stars) {
+            if (star.getSpectralType().getLuminosityClass() == luminosityClass) {
+                selection.add(star);
+            }
+        }
+        return new StarSelector(selection);
+    }
+
+    @NotNull
+    public StarSelector selectBySpectralType(@NotNull SpectralType.TypeSymbol typeSymbol, final double min, final double max) {
+        final List<Star> selection = new ArrayList<>();
+        for (final Star star : stars) {
+            final SpectralType spectralType = star.getSpectralType();
+            if (spectralType.getTypeSymbol() == typeSymbol && min <= spectralType.getTypeNumber() && spectralType.getTypeNumber() <= max) {
                 selection.add(star);
             }
         }

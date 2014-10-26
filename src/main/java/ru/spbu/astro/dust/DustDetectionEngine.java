@@ -23,6 +23,7 @@ public final class DustDetectionEngine {
         final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);
         final PixPlot pixPlot = new PixPlot(dustTrendCalculator);
+        hammerProjection.setVisible(true);
 
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override

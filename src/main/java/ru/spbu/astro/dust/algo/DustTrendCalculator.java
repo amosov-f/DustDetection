@@ -37,7 +37,7 @@ public final class DustTrendCalculator {
     private final PixTools pixTools;
 
     public DustTrendCalculator(@NotNull final List<Star> stars) {
-        this(stars, true);
+        this(stars, false);
     }
 
     public DustTrendCalculator(@NotNull final List<Star> stars, final boolean includeIntercept) {

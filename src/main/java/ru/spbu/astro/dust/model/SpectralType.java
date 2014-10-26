@@ -2,8 +2,8 @@ package ru.spbu.astro.dust.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbu.astro.dust.model.table.SpectTable;
 
-import java.awt.geom.Point2D;
 import java.util.*;
 
 public final class SpectralType {
@@ -11,6 +11,8 @@ public final class SpectralType {
 
     public static enum LuminosityClass {
         I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII;
+
+        public static final List<LuminosityClass> USED = Arrays.asList(III);
 
         public static boolean containsSymbol(final char c) {
             for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
@@ -26,7 +28,7 @@ public final class SpectralType {
         O, B, A, F, G, K, M;
 
         @Nullable
-        private static TypeSymbol parse(final char c) {
+        public static TypeSymbol parse(final char c) {
             try {
                 return valueOf(String.valueOf(c));
             } catch (IllegalArgumentException e) {
@@ -132,6 +134,8 @@ public final class SpectralType {
     private static enum ExceptionSpectralType {
         R, S, N, C, DA, DB, DC, DD, DE, DF, DG, WR, WN, WC
     }
+
+    private static SpectTable spectTable = SpectTable.COMBINED;
 
     @Nullable
     public static SpectralType parse(@NotNull final String str) {
@@ -253,7 +257,7 @@ public final class SpectralType {
         final List<Double> bvs = new ArrayList<>();
         for (final Component type : types) {
             for (final Component luminosityClass : luminosityClasses) {
-                final Double bv = toBV(type.value, LuminosityClass.valueOf(luminosityClass.value));
+                final Double bv = spectTable.getBV(type.value, LuminosityClass.valueOf(luminosityClass.value));
                 if (bv != null) {
                     bvs.add(bv);
                 }
@@ -273,43 +277,6 @@ public final class SpectralType {
         return new Value(bv, Collections.max(bvs) - bv);
     }
 
-    private static final EnumMap<TypeSymbol, Integer> START = new EnumMap<TypeSymbol, Integer>(TypeSymbol.class) {{
-        /*.put("O", -10);
-        put("B", 0);
-        put("A", 10);
-        put("F", 20);
-        put("G", 30);
-        put("K", 40);
-        put("M", 48);*/
-        put(TypeSymbol.O, 0);
-        put(TypeSymbol.B, 10);
-        put(TypeSymbol.A, 20);
-        put(TypeSymbol.F, 30);
-        put(TypeSymbol.G, 40);
-        put(TypeSymbol.K, 50);
-        put(TypeSymbol.M, 60);
-    }};
-
-    @Nullable
-    private static Double toBV(@NotNull final String type, @NotNull final LuminosityClass luminosityClass) {
-        if (!LUMIN_2_BVS.containsKey(luminosityClass)) {
-            return null;
-        }
-        final List<Point2D.Double> bvs = LUMIN_2_BVS.get(luminosityClass);
-
-        if (type.length() < 2) {
-            return null;
-        }
-        final double code = START.get(TypeSymbol.parse(type.charAt(0))) + Double.valueOf(type.substring(1, type.length()));
-        for (int i = 0; i < bvs.size() - 1; ++i) {
-            if (bvs.get(i).x <= code && code < bvs.get(i + 1).x) {
-                return interpolate(bvs.get(i), bvs.get(i + 1), code);
-            }
-        }
-
-        return null;
-    }
-
     @Nullable
     public LuminosityClass getLuminosityClass() {
         if (luminosityClasses.isEmpty()) {
@@ -327,31 +294,5 @@ public final class SpectralType {
 
     public TypeSymbol getTypeSymbol() {
         return TypeSymbol.parse(types.get(0).value.charAt(0));
-    }
-
-    private static final EnumMap<LuminosityClass, List<Point2D.Double>> LUMIN_2_BVS = new EnumMap<>(LuminosityClass.class);
-    static {
-        final Scanner fin = new Scanner(SpectralType.class.getResourceAsStream("/spect2bv/spect2bv_new.txt"));
-
-        final String[] titles = fin.nextLine().trim().split("\\s+");
-        for (int i = 2; i < titles.length; ++i) {
-            LUMIN_2_BVS.put(LuminosityClass.valueOf(titles[i]), new ArrayList<>());
-        }
-
-        while (fin.hasNextLine()) {
-            final String[] fields = fin.nextLine().trim().split("\t");
-            final double code = Double.valueOf(fields[1]);
-            for (int i = 2; i < titles.length; ++i) {
-                if (!fields[i].equals("-")) {
-                    double bv = Double.valueOf(fields[i]);
-                    LUMIN_2_BVS.get(LuminosityClass.valueOf(titles[i])).add(new Point2D.Double(code, bv));
-                }
-            }
-        }
-        System.out.println("spect2bv loaded");
-    }
-
-    private static double interpolate(@NotNull final Point2D.Double p1, @NotNull final Point2D.Double p2, final double x) {
-        return (p2.y - p1.y) / (p2.x - p1.x) * (x - p1.x) + p1.y;
     }
 }
