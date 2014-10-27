@@ -12,7 +12,7 @@ public final class SpectralType {
     public static enum LuminosityClass {
         I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII;
 
-        public static final List<LuminosityClass> USED = Arrays.asList(III);
+        public static final List<LuminosityClass> USED = Arrays.asList(V);
 
         public static boolean containsSymbol(final char c) {
             for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
@@ -278,11 +278,21 @@ public final class SpectralType {
     }
 
     @Nullable
-    public LuminosityClass getLuminosityClass() {
+    public LuminosityClass getLumin() {
         if (luminosityClasses.isEmpty()) {
             return null;
         }
         return LuminosityClass.valueOf(luminosityClasses.get(0).value);
+    }
+
+    @NotNull
+    public String getSpect() {
+        return (getTypeSymbol() + "" + getTypeNumber()).replaceAll("\\.0", "");
+    }
+
+    @NotNull
+    public String getIntSpect() {
+        return getTypeSymbol() + "" + (int) getTypeNumber();
     }
 
     public double getTypeNumber() {

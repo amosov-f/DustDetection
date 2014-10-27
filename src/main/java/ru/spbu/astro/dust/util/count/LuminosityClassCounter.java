@@ -22,7 +22,7 @@ public final class LuminosityClassCounter extends Counter<String> {
             counts.put(luminosityClass.name(), 0);
         }
         for (final Star star : stars) {
-            final SpectralType.LuminosityClass luminosityClass = star.getSpectralType().getLuminosityClass();
+            final SpectralType.LuminosityClass luminosityClass = star.getSpectralType().getLumin();
             if (luminosityClass != null) {
                 counts.put(luminosityClass.name(), counts.get(luminosityClass.name()) + 1);
             }

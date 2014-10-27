@@ -9,6 +9,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import ru.spbu.astro.dust.algo.SpectTableCalculator;
 import ru.spbu.astro.dust.model.table.SpectTable;
 
 import java.util.Arrays;
@@ -66,8 +67,9 @@ public final class SpectTablePlot {
     public static void main(@NotNull final String[] args) {
         new SpectTablePlot(Arrays.asList(
                 SpectTable.TSVETKOV,
-                SpectTable.STRIGEST,
-                SpectTable.COMBINED
+                SpectTableCalculator.calculate(0.5),
+                SpectTable.MAX,
+                SpectTableCalculator.calculate(0.03)
         ));
     }
 }

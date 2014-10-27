@@ -20,7 +20,7 @@ import java.util.Locale;
 
 public final class DustTrendCalculator {
     private static final int N_SIDE = 18;
-    private static final double EJECTION = 0.1;
+    private static final double EJECTION = 0.0;
     private static final int MIN_FOR_TREND = 3;
 
     private final boolean includeIntercept;
@@ -97,7 +97,7 @@ public final class DustTrendCalculator {
                 Math.abs(a * star2.getR().getValue() + b - star2.getExtinction().getValue())
         ));
 
-        return temp.subList(0, temp.size() - (int)(EJECTION * temp.size()));
+        return temp.subList(0, temp.size() - (int) (EJECTION * temp.size()));
     }
 
     @Nullable

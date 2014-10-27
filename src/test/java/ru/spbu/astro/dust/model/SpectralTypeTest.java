@@ -9,7 +9,7 @@ public class SpectralTypeTest {
     public void testParsing1() throws Exception {
         final SpectralType spectralType = SpectralType.parse("K5III");
         assert spectralType != null;
-        assertEquals(SpectralType.LuminosityClass.III, spectralType.getLuminosityClass());
+        assertEquals(SpectralType.LuminosityClass.III, spectralType.getLumin());
     }
 
     @Test

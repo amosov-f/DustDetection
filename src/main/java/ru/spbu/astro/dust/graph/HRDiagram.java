@@ -11,7 +11,6 @@ import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.util.StarSelector;
 
@@ -42,7 +41,7 @@ public final class HRDiagram {
 
         int starsCount = 0;
         for (final Star star : stars) {
-            class2stars.get(star.getSpectralType().getLuminosityClass()).add(star);
+            class2stars.get(star.getSpectralType().getLumin()).add(star);
             starsCount++;
         }
 
@@ -90,7 +89,7 @@ public final class HRDiagram {
         if (stars.isEmpty()) {
             return null;
         }
-        final LuminosityClass luminosityClass = stars.get(0).getSpectralType().getLuminosityClass();
+        final LuminosityClass luminosityClass = stars.get(0).getSpectralType().getLumin();
 
         final XYIntervalSeries series = new XYIntervalSeries(luminosityClass);
 

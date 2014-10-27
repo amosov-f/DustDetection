@@ -2,6 +2,7 @@ package ru.spbu.astro.dust.model.table;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbu.astro.dust.algo.SpectTableCalculator;
 import ru.spbu.astro.dust.model.SpectralType;
 
 import java.awt.geom.Point2D;
@@ -19,12 +20,13 @@ public final class SpectTable {
     public static final SpectTable TSVETKOV = SpectTable.read("Tsvetkov", SpectTable.class.getResourceAsStream("/spect2bv/spect2bv_new.txt"));
     public static final SpectTable STRIGEST = SpectTable.read("Strigest", SpectTable.class.getResourceAsStream("/spect2bv/spect2bv.txt"));
     public static final SpectTable COMBINED = new IIIM2SpectTableCombinator().combine(TSVETKOV, STRIGEST);
+    public static final SpectTable MAX = SpectTableCalculator.calculate(0.1);
 
     @NotNull
     private final String name;
 
     @NotNull
-    final EnumMap<LuminosityClass, List<Point2D.Double>> table;
+    public final EnumMap<LuminosityClass, List<Point2D.Double>> table;
 
     public SpectTable(@NotNull final String name) {
         this.name = name;
@@ -99,7 +101,7 @@ public final class SpectTable {
         return null;
     }
 
-    static double code(@NotNull final String spectType) {
+    public static double code(@NotNull final String spectType) {
         return 10 * Arrays.asList(SpectralType.TypeSymbol.values()).indexOf(SpectralType.TypeSymbol.parse(spectType.charAt(0))) + Double.valueOf(spectType.substring(1));
     }
 

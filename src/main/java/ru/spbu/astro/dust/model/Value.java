@@ -29,6 +29,10 @@ public final class Value implements Comparable<Value> {
         return Math.abs(getError() / getValue());
     }
 
+    public double getMax() {
+        return value + 3 * error;
+    }
+
     @NotNull
     public Value add(@NotNull final Value value) {
         return new Value(getValue() + value.getValue(), Math.sqrt(Math.pow(getError(), 2) + Math.pow(value.getError(), 2)));

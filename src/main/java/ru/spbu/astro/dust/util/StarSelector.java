@@ -83,7 +83,7 @@ public final class StarSelector {
     public StarSelector selectByExistLuminosityClass() {
         final List<Star> selection = new ArrayList<>();
         for (Star star : stars) {
-            if (star.getSpectralType().getLuminosityClass() != null) {
+            if (star.getSpectralType().getLumin() != null) {
                 selection.add(star);
             }
         }
@@ -92,25 +92,16 @@ public final class StarSelector {
 
     @NotNull
     public StarSelector selectByNegativeExtinction() {
-        final List<Star> selection = new ArrayList<>();
-        for (final Star star : stars) {
-            final Value ext = star.getExtinction();
-            if (ext.getValue() + 3 * ext.getError() < 0) {
-                selection.add(star);
-            }
-        }
-        return new StarSelector(selection);
+        return new StarSelector(stars.stream()
+                .filter(star -> star.getExtinction().getMax() < 0)
+                .collect(Collectors.toList()));
     }
 
     @NotNull
     public StarSelector selectByLuminosityClass(@NotNull final SpectralType.LuminosityClass luminosityClass) {
-        final List<Star> selection = new ArrayList<>();
-        for (final Star star : stars) {
-            if (star.getSpectralType().getLuminosityClass() == luminosityClass) {
-                selection.add(star);
-            }
-        }
-        return new StarSelector(selection);
+        return new StarSelector(stars.stream()
+                .filter(star -> star.getSpectralType().getLumin() == luminosityClass)
+                .collect(Collectors.toList()));
     }
 
     @NotNull

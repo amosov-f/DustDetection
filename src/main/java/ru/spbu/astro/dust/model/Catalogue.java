@@ -69,7 +69,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 continue;
             }
             final Row updatedRow = new Row(row);
-            final SpectralType.LuminosityClass luminosityClass = star.getSpectralType().getLuminosityClass();
+            final SpectralType.LuminosityClass luminosityClass = star.getSpectralType().getLumin();
             if (luminosityClass == null) {
                 updatedRow.values.put(SPECT_TYPE, star.getSpectralType() + classifier.getLuminosityClass(star).name() + ":");
             }

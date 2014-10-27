@@ -14,7 +14,7 @@ import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass.V;
 public class MissHistogramTest {
     @Test
     public void histSpectType() throws InterruptedException {
-        new MissHistogram(Catalogue.HIPPARCOS_UPDATED.getStars(), new SpectralClassCounter());
+        new MissHistogram(Catalogue.HIPPARCOS_UPDATED.getStars(), new SpectralClassCounter(2));
         Thread.sleep(Long.MAX_VALUE);
     }
 
@@ -24,7 +24,7 @@ public class MissHistogramTest {
                 new StarSelector(Catalogue.HIPPARCOS_UPDATED)
                         .selectByLuminosityClass(V)
                         .getStars(),
-                new SpectralClassCounter()
+                new SpectralClassCounter(3)
         );
         Thread.sleep(Long.MAX_VALUE);
     }
@@ -35,7 +35,7 @@ public class MissHistogramTest {
                 new StarSelector(Catalogue.HIPPARCOS_UPDATED)
                         .selectByLuminosityClass(III)
                         .getStars(),
-                new SpectralClassCounter()
+                new SpectralClassCounter(1)
         );
         Thread.sleep(Long.MAX_VALUE);
     }

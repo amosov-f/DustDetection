@@ -36,7 +36,7 @@ public final class LuminosityClassifier {
         final List<Star> learnStars = new ArrayList<>();
         for (final Star star : catalogue.getStars()) {
             if (star.getParallax().getRelativeError() < RELATIVE_ERROR_LIMIT) {
-                if (LUMINOSITY_CLASSES.contains(star.getSpectralType().getLuminosityClass())) {
+                if (LUMINOSITY_CLASSES.contains(star.getSpectralType().getLumin())) {
                     learnStars.add(star);
                 }
             }
@@ -94,7 +94,7 @@ public final class LuminosityClassifier {
         return new DenseInstance(attributes.size()) {{
             setValue(attributes.get(0), star.getBVColor().getValue());
             setValue(attributes.get(1), star.getAbsoluteMagnitude().getValue());
-            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.getSpectralType().getLuminosityClass()));
+            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.getSpectralType().getLumin()));
         }};
     }
 
