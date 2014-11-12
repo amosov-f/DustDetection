@@ -2,8 +2,8 @@ package ru.spbu.astro.dust.algo;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static ru.spbu.astro.dust.model.spect.LuminosityClass.III;
+import static ru.spbu.astro.dust.model.spect.LuminosityClass.V;
+
 public final class LuminosityClassifier {
     private static final double RELATIVE_ERROR_LIMIT = 0.10;
 
-    private static final List<SpectralType.LuminosityClass> LUMINOSITY_CLASSES
-            = Arrays.asList(SpectralType.LuminosityClass.III, SpectralType.LuminosityClass.V);
+    private static final List<LuminosityClass> LUMINOSITY_CLASSES = Arrays.asList(III, V);
 
     @NotNull
     private final Classifier classifier;
@@ -36,7 +38,7 @@ public final class LuminosityClassifier {
         final List<Star> learnStars = new ArrayList<>();
         for (final Star star : catalogue.getStars()) {
             if (star.getParallax().getRelativeError() < RELATIVE_ERROR_LIMIT) {
-                if (LUMINOSITY_CLASSES.contains(star.getSpectralType().getLumin())) {
+                if (LUMINOSITY_CLASSES.contains(star.getSpectType().getLumin())) {
                     learnStars.add(star);
                 }
             }
@@ -67,7 +69,7 @@ public final class LuminosityClassifier {
     }
 
     @NotNull
-    public SpectralType.LuminosityClass getLuminosityClass(Star star) {
+    public LuminosityClass getLuminosityClass(Star star) {
         //if (star.getSpectralType().getLuminosityClass() != null) {
         //    return star.getSpectralType().getLuminosityClass();
         //}
@@ -85,7 +87,7 @@ public final class LuminosityClassifier {
         add(new Attribute("mag"));
         add(new Attribute(
                 "luminosity classes",
-                LUMINOSITY_CLASSES.stream().map(SpectralType.LuminosityClass::name).collect(Collectors.toList())
+                LUMINOSITY_CLASSES.stream().map(LuminosityClass::name).collect(Collectors.toList())
         ));
     }};
 
@@ -94,7 +96,7 @@ public final class LuminosityClassifier {
         return new DenseInstance(attributes.size()) {{
             setValue(attributes.get(0), star.getBVColor().getValue());
             setValue(attributes.get(1), star.getAbsoluteMagnitude().getValue());
-            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.getSpectralType().getLumin()));
+            setValue(attributes.get(2), LUMINOSITY_CLASSES.indexOf(star.getSpectType().getLumin()));
         }};
     }
 

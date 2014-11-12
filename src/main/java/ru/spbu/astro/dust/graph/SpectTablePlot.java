@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
+import com.google.gwt.thirdparty.guava.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -10,15 +11,15 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import ru.spbu.astro.dust.algo.SpectTableCalculator;
-import ru.spbu.astro.dust.model.table.SpectTable;
+import ru.spbu.astro.dust.model.spect.LuminosityClass;
+import ru.spbu.astro.dust.model.spect.SpectClass;
+import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
-import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass;
 
 /**
  * User: amosov-f
@@ -29,8 +30,7 @@ public final class SpectTablePlot {
     public SpectTablePlot(@NotNull final List<SpectTable> tables) {
         final XYSeriesCollection dataset = new XYSeriesCollection();
 
-        final Set<Double> codes = new TreeSet<>();
-
+        final Set<Integer> codes = new TreeSet<>();
         for (final SpectTable table : tables) {
             for (final LuminosityClass lumin : table.getLumins()) {
                 if (LuminosityClass.USED.contains(lumin)) {
@@ -41,7 +41,7 @@ public final class SpectTablePlot {
                         name = table.getName() + "-" + lumin;
                     }
                     final XYSeries series = new XYSeries(name);
-                    for (final Double code : table.getBVs(lumin).keySet()) {
+                    for (final int code : table.getBVs(lumin).keySet()) {
                         series.add(code, table.getBVs(lumin).get(code));
                         codes.add(code);
                     }
@@ -50,11 +50,14 @@ public final class SpectTablePlot {
             }
         }
 
-        final List<String> spects = codes.stream().map(SpectTable::spect).collect(Collectors.toList());
+        final String[] spects = new String[codes.size()];
+        for (int i = 0; i < spects.length; i++) {
+            spects[i] = SpectClass.valueOf(Iterables.get(codes, i)).toString();
+        }
 
         final XYPlot plot = new XYPlot(
                 dataset,
-                new SymbolAxis("спектральный класс", spects.toArray(new String[spects.size()])),
+                new SymbolAxis("спектральный класс", spects),
                 new NumberAxis("B-V"),
                 new XYSplineRenderer()
         );
@@ -68,7 +71,7 @@ public final class SpectTablePlot {
         new SpectTablePlot(Arrays.asList(
                 SpectTable.TSVETKOV,
                 SpectTableCalculator.calculate(0.5),
-                SpectTable.MAX,
+                //SpectTable.MAX,
                 SpectTableCalculator.calculate(0.03)
         ));
     }

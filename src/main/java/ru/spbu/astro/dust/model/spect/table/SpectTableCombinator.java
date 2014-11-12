@@ -1,8 +1,6 @@
-package ru.spbu.astro.dust.model.table;
+package ru.spbu.astro.dust.model.spect.table;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * User: amosov-f

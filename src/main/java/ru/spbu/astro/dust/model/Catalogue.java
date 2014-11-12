@@ -3,6 +3,8 @@ package ru.spbu.astro.dust.model;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
+import ru.spbu.astro.dust.model.spect.LuminosityClass;
+import ru.spbu.astro.dust.model.spect.SpectType;
 import ru.spbu.astro.dust.util.Converter;
 
 import java.util.*;
@@ -69,9 +71,9 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 continue;
             }
             final Row updatedRow = new Row(row);
-            final SpectralType.LuminosityClass luminosityClass = star.getSpectralType().getLumin();
+            final LuminosityClass luminosityClass = star.getSpectType().getLumin();
             if (luminosityClass == null) {
-                updatedRow.values.put(SPECT_TYPE, star.getSpectralType() + classifier.getLuminosityClass(star).name() + ":");
+                updatedRow.values.put(SPECT_TYPE, star.getSpectType() + classifier.getLuminosityClass(star).name() + ":");
             }
             updatedCatalogue.put(updatedRow);
         }
@@ -87,8 +89,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         final List<Star> stars = new ArrayList<>();
         for (final Row row : id2row.values()) {
             final Star star = row.toStar();
-            //System.out.println(star.spectralType.toBV());
-            if (star != null && star.getSpectralType().toBV() != null) {
+            if (star != null && star.getSpectType().toBV() != null) {
                 stars.add(row.toStar());
             }
         }
@@ -182,7 +183,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 put(PARALLAX, String.valueOf(star.getParallax().getValue()));
                 put(PARALLAX_ERROR, String.valueOf(star.getParallax().getError()));
                 put(VMAG, String.valueOf(star.getVMag()));
-                put(SPECT_TYPE, star.getSpectralType().toString());
+                put(SPECT_TYPE, star.getSpectType().toString());
                 put(BV_COLOR, String.valueOf(star.getBVColor().getValue()));
                 put(BV_COLOR_ERROR, String.valueOf(star.getBVColor().getError()));
             }};
@@ -212,7 +213,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             final Double parallax = get(PARALLAX);
             final Double parallaxError = get(PARALLAX_ERROR);
             final Double vMag = get(VMAG);
-            final SpectralType spectralType = get(SPECT_TYPE);
+            final SpectType spectType = get(SPECT_TYPE);
             final Double bvColor = get(BV_COLOR);
             final Double bvColorError = get(BV_COLOR_ERROR);
             final Integer numberComponents = get(NUMBER_COMPONENTS);
@@ -226,7 +227,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 return null;
             }
             assert vMag != null;
-            if (spectralType == null) {
+            if (spectType == null) {
                 return null;
             }
             if (bvColor == null) {
@@ -243,7 +244,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                     new Spheric(lii, bii),
                     new Value(parallax, parallaxError),
                     vMag,
-                    spectralType,
+                    spectType,
                     new Value(bvColor, bvColorError)
             );
         }
@@ -318,11 +319,11 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 return Integer.valueOf(value);
             }
         };
-        public static final Parameter<SpectralType> SPECT_TYPE = new Parameter<SpectralType>("spect_type") {
+        public static final Parameter<SpectType> SPECT_TYPE = new Parameter<SpectType>("spect_type") {
             @Nullable
             @Override
-            SpectralType parse(@NotNull final String value) {
-                return SpectralType.parse(value);
+            SpectType parse(@NotNull final String value) {
+                return SpectType.parse(value);
             }
         };
         public static final Parameter<Integer> HIP_NUMBER = new Parameter<Integer>("hip_number") {

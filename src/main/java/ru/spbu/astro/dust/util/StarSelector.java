@@ -3,7 +3,12 @@ package ru.spbu.astro.dust.util;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
-import ru.spbu.astro.dust.model.*;
+import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Spheric;
+import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.spect.LuminosityClass;
+import ru.spbu.astro.dust.model.spect.SpectClass.TypeSymbol;
+import ru.spbu.astro.dust.model.spect.SpectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +88,7 @@ public final class StarSelector {
     public StarSelector selectByExistLuminosityClass() {
         final List<Star> selection = new ArrayList<>();
         for (Star star : stars) {
-            if (star.getSpectralType().getLumin() != null) {
+            if (star.getSpectType().getLumin() != null) {
                 selection.add(star);
             }
         }
@@ -98,17 +103,17 @@ public final class StarSelector {
     }
 
     @NotNull
-    public StarSelector selectByLuminosityClass(@NotNull final SpectralType.LuminosityClass luminosityClass) {
+    public StarSelector selectByLuminosityClass(@NotNull final LuminosityClass luminosityClass) {
         return new StarSelector(stars.stream()
-                .filter(star -> star.getSpectralType().getLumin() == luminosityClass)
+                .filter(star -> star.getSpectType().getLumin() == luminosityClass)
                 .collect(Collectors.toList()));
     }
 
     @NotNull
-    public StarSelector selectBySpectralType(@NotNull SpectralType.TypeSymbol typeSymbol, final double min, final double max) {
+    public StarSelector selectBySpectralType(@NotNull TypeSymbol typeSymbol, final double min, final double max) {
         final List<Star> selection = new ArrayList<>();
         for (final Star star : stars) {
-            final SpectralType spectralType = star.getSpectralType();
+            final SpectType spectralType = star.getSpectType();
             if (spectralType.getTypeSymbol() == typeSymbol && min <= spectralType.getTypeNumber() && spectralType.getTypeNumber() <= max) {
                 selection.add(star);
             }

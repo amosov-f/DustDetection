@@ -1,51 +1,24 @@
-package ru.spbu.astro.dust.model;
+package ru.spbu.astro.dust.model.spect;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.dust.model.table.SpectTable;
+import ru.spbu.astro.dust.model.Value;
+import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
 import java.util.*;
 
-public final class SpectralType {
-    private static final Map<String, SpectralType> cache = new HashMap<>();
-
-    public static enum LuminosityClass {
-        I, Ia, Ib, Iab, II, IIb, III, IIIa, IIIb, IV, IVa, V, Va, Vb, VI, VII;
-
-        public static final List<LuminosityClass> USED = Arrays.asList(V);
-
-        public static boolean containsSymbol(final char c) {
-            for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
-                if (luminosityClass.name().contains(String.valueOf(c))) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    public static enum TypeSymbol {
-        O, B, A, F, G, K, M;
-
-        @Nullable
-        public static TypeSymbol parse(final char c) {
-            try {
-                return valueOf(String.valueOf(c));
-            } catch (IllegalArgumentException e) {
-                return null;
-            }
-        }
-    }
+public final class SpectType {
+    private static final Map<String, SpectType> cache = new HashMap<>();
 
     private static enum Relation {
         OR, INTERMEDIATE
     }
 
-    private final List<Component> types;
-    private Relation typesRelation;
+    private final List<Component> spects;
+    private Relation spectsRelation;
 
-    private final List<Component> luminosityClasses;
-    private Relation luminosityClassesRelation = Relation.OR;
+    private final List<Component> lumins;
+    private Relation luminosRelation = Relation.OR;
 
     private static final char STOP_SYMBOL = '$';
 
@@ -92,7 +65,7 @@ public final class SpectralType {
             }
 
             if (getType() == getType(c)) {
-                if (TypeSymbol.parse(c) != null) {
+                if (SpectClass.TypeSymbol.parse(c) != null) {
                     return false;
                 }
                 value += c;
@@ -118,7 +91,7 @@ public final class SpectralType {
         }
 
         private static boolean isTypeSymbol(char c) {
-            return TypeSymbol.parse(c) != null || c == '.' || Character.isDigit(c);
+            return SpectClass.TypeSymbol.parse(c) != null || c == '.' || Character.isDigit(c);
         }
 
         private static boolean isComponentSymbol(char c) {
@@ -135,10 +108,10 @@ public final class SpectralType {
         R, S, N, C, DA, DB, DC, DD, DE, DF, DG, WR, WN, WC
     }
 
-    private static SpectTable spectTable = SpectTable.COMBINED;
+    private static SpectTable spectTable = SpectTable.TSVETKOV;
 
     @Nullable
-    public static SpectralType parse(@NotNull final String str) {
+    public static SpectType parse(@NotNull final String str) {
         if (!cache.containsKey(str)) {
             for (ExceptionSpectralType exceptionSpectralType : ExceptionSpectralType.values()) {
                 if (str.startsWith(exceptionSpectralType.name())) {
@@ -200,30 +173,29 @@ public final class SpectralType {
                 cur.add(c);
             }
 
-            cache.put(str, new SpectralType(types, typesRelation, luminosityClasses, luminosityClassesRelation));
+            cache.put(str, new SpectType(types, typesRelation, luminosityClasses, luminosityClassesRelation));
         }
         return cache.get(str);
     }
 
-    private SpectralType(@NotNull final List<Component> types, @NotNull final Relation typesRelation,
-                         @NotNull final List<Component> luminosityClasses, @NotNull final Relation luminosityClassesRelation)
-    {
-        this.types = types;
-        this.typesRelation = typesRelation;
-        this.luminosityClasses = luminosityClasses;
-        this.luminosityClassesRelation = luminosityClassesRelation;
+    private SpectType(@NotNull final List<Component> spects, @NotNull final Relation spectsRelation,
+                      @NotNull final List<Component> lumins, @NotNull final Relation luminosRelation) {
+        this.spects = spects;
+        this.spectsRelation = spectsRelation;
+        this.lumins = lumins;
+        this.luminosRelation = luminosRelation;
     }
 
     @Override
     public String toString() {
         String s = "";
-        for (int i = 0; i < types.size(); ++i) {
-            s += types.get(i).value;
-            if (types.get(i).doubt) {
+        for (int i = 0; i < spects.size(); ++i) {
+            s += spects.get(i).value;
+            if (spects.get(i).doubt) {
                 s += ":";
             }
-            if (i < types.size() - 1) {
-                switch (typesRelation) {
+            if (i < spects.size() - 1) {
+                switch (spectsRelation) {
                     case INTERMEDIATE:
                         s += "-";
                         break;
@@ -233,13 +205,13 @@ public final class SpectralType {
                 }
             }
         }
-        for (int i = 0; i < luminosityClasses.size(); ++i) {
-            s += luminosityClasses.get(i).value;
-            if (luminosityClasses.get(i).doubt) {
+        for (int i = 0; i < lumins.size(); ++i) {
+            s += lumins.get(i).value;
+            if (lumins.get(i).doubt) {
                 s += ":";
             }
-            if (i < luminosityClasses.size() - 1) {
-                switch (luminosityClassesRelation) {
+            if (i < lumins.size() - 1) {
+                switch (luminosRelation) {
                     case INTERMEDIATE:
                         s += "-";
                         break;
@@ -255,11 +227,17 @@ public final class SpectralType {
     @Nullable
     public Value toBV() {
         final List<Double> bvs = new ArrayList<>();
-        for (final Component type : types) {
-            for (final Component luminosityClass : luminosityClasses) {
-                final Double bv = spectTable.getBV(type.value, LuminosityClass.valueOf(luminosityClass.value));
-                if (bv != null) {
-                    bvs.add(bv);
+        for (final Component spectComponent : spects) {
+            for (final Component luminComponent : lumins) {
+                final SpectClass spect = SpectClass.valueOf(spectComponent.value);
+                final LuminosityClass lumin = LuminosityClass.valueOf(luminComponent.value);
+                System.out.println(spect);
+                System.out.println(lumin);
+                if (spect != null && lumin != null) {
+                    final Double bv = spectTable.getBV(spect, lumin);
+                    if (bv != null) {
+                        bvs.add(bv);
+                    }
                 }
             }
         }
@@ -279,15 +257,15 @@ public final class SpectralType {
 
     @Nullable
     public LuminosityClass getLumin() {
-        if (luminosityClasses.isEmpty()) {
+        if (lumins.isEmpty()) {
             return null;
         }
-        return LuminosityClass.valueOf(luminosityClasses.get(0).value);
+        return LuminosityClass.valueOf(lumins.get(0).value);
     }
 
     @NotNull
-    public String getSpect() {
-        return (getTypeSymbol() + "" + getTypeNumber()).replaceAll("\\.0", "");
+    public SpectClass getSpect() {
+        return SpectClass.valueOf(spects.get(0).value);
     }
 
     @NotNull
@@ -296,13 +274,13 @@ public final class SpectralType {
     }
 
     public double getTypeNumber() {
-        if (types.get(0).value.length() < 2) {
+        if (spects.get(0).value.length() < 2) {
             return 5;
         }
-        return Double.valueOf(types.get(0).value.substring(1));
+        return Double.valueOf(spects.get(0).value.substring(1));
     }
 
-    public TypeSymbol getTypeSymbol() {
-        return TypeSymbol.parse(types.get(0).value.charAt(0));
+    public SpectClass.TypeSymbol getTypeSymbol() {
+        return SpectClass.TypeSymbol.parse(spects.get(0).value.charAt(0));
     }
 }

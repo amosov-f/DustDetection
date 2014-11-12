@@ -12,6 +12,7 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.util.StarSelector;
 
 import java.io.File;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass;
 
 public final class HRDiagram {
     private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.20;
@@ -41,7 +41,7 @@ public final class HRDiagram {
 
         int starsCount = 0;
         for (final Star star : stars) {
-            class2stars.get(star.getSpectralType().getLumin()).add(star);
+            class2stars.get(star.getSpectType().getLumin()).add(star);
             starsCount++;
         }
 
@@ -89,9 +89,9 @@ public final class HRDiagram {
         if (stars.isEmpty()) {
             return null;
         }
-        final LuminosityClass luminosityClass = stars.get(0).getSpectralType().getLumin();
+        final LuminosityClass lumin = stars.get(0).getSpectType().getLumin();
 
-        final XYIntervalSeries series = new XYIntervalSeries(luminosityClass);
+        final XYIntervalSeries series = new XYIntervalSeries(lumin);
 
         for (final Star star : stars) {
             double bv = star.getBVColor().getValue();
@@ -106,7 +106,7 @@ public final class HRDiagram {
             }
         }
 
-        System.out.println("#" + luminosityClass + ": " + stars.size());
+        System.out.println("#" + lumin + ": " + stars.size());
 
         return series;
     }
@@ -119,9 +119,9 @@ public final class HRDiagram {
 
         new HRDiagram(new StarSelector(Catalogue.HIPPARCOS_UPDATED)
                 .selectByNegativeExtinction()
-                //.selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
-                //.selectByBVColorError(BV_COLOR_ERROR_LIMIT)
-                //.selectBySpectralType(SpectralType.TypeSymbol.M, 5, 9)
+                        //.selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
+                        //.selectByBVColorError(BV_COLOR_ERROR_LIMIT)
+                        //.selectBySpectralType(SpectralType.TypeSymbol.M, 5, 9)
                 .getStars());
     }
 

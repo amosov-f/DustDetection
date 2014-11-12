@@ -1,8 +1,8 @@
 package ru.spbu.astro.dust.util.count;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
+import ru.spbu.astro.dust.model.spect.SpectClass.TypeSymbol;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +24,7 @@ public class SpectralClassCounter extends Counter<String> {
     @Override
     public Map<String, Integer> count(@NotNull List<Star> stars) {
         final Map<String, Integer> counts = new LinkedHashMap<>();
-        for (final SpectralType.TypeSymbol typeSymbol : SpectralType.TypeSymbol.values()) {
+        for (final TypeSymbol typeSymbol : TypeSymbol.values()) {
             for (int l = 0; l < 10; l += bin) {
                 final int r = l + 2 * bin > 10 ? 10 : l + bin;
                 if (r == l + 1) {
@@ -36,8 +36,8 @@ public class SpectralClassCounter extends Counter<String> {
             }
         }
         for (final Star star : stars) {
-            final SpectralType.TypeSymbol typeSymbol = star.getSpectralType().getTypeSymbol();
-            final int n = (int) star.getSpectralType().getTypeNumber();
+            final TypeSymbol typeSymbol = star.getSpectType().getTypeSymbol();
+            final int n = (int) star.getSpectType().getTypeNumber();
             int l = n / bin * bin;
             if (l + bin > 10) {
                 l -= bin;

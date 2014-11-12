@@ -3,7 +3,6 @@ package ru.spbu.astro.dust.util.count;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Star;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

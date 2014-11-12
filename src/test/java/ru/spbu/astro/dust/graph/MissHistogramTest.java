@@ -2,14 +2,14 @@ package ru.spbu.astro.dust.graph;
 
 import org.junit.Test;
 import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.SpectralType;
-import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.dust.util.count.DoubleCounter;
 import ru.spbu.astro.dust.util.count.SpectralClassCounter;
 
-import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass.III;
-import static ru.spbu.astro.dust.model.SpectralType.LuminosityClass.V;
+import static ru.spbu.astro.dust.model.spect.LuminosityClass.III;
+import static ru.spbu.astro.dust.model.spect.LuminosityClass.V;
+import static ru.spbu.astro.dust.model.spect.SpectClass.TypeSymbol.M;
+
 
 public class MissHistogramTest {
     @Test
@@ -45,7 +45,7 @@ public class MissHistogramTest {
         new MissHistogram(
                 new StarSelector(Catalogue.HIPPARCOS_UPDATED)
                         .selectByLuminosityClass(III)
-                        .selectBySpectralType(SpectralType.TypeSymbol.M, 5, 9)
+                        .selectBySpectralType(M, 5, 9)
                         .getStars(),
                 new DoubleCounter("Ошибка B-V у звезд III, M5-9", star -> star.getBVColor().getValue(), 0, 2.3, 0.2)
         );
@@ -87,7 +87,7 @@ public class MissHistogramTest {
         new MissHistogram(
                 new StarSelector(Catalogue.HIPPARCOS_UPDATED)
                         .selectByLuminosityClass(III)
-                        .selectBySpectralType(SpectralType.TypeSymbol.M, 5, 9)
+                        .selectBySpectralType(M, 5, 9)
                         .getStars(),
                 new DoubleCounter("Относительная ошибка в расстоянии у звезд III, M5-9", star -> star.getR().getRelativeError(), 0, 1, 0.1)
         );

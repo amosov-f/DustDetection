@@ -4,9 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.util.Converter;
 import ru.spbu.astro.dust.util.Geom;
 
-import static java.lang.Math.acos;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
+import static java.lang.Math.*;
 
 public final class Spheric implements Comparable<Spheric> {
     public final double l;

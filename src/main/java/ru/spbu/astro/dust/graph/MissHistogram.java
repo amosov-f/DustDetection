@@ -7,10 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.Axis;
-import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.CategoryItemLabelGenerator;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
@@ -19,23 +16,16 @@ import org.jfree.chart.renderer.category.StackedBarRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
-import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.SpectralType;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.Value;
 import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.dust.util.count.Counter;
-import ru.spbu.astro.dust.util.count.DoubleCounter;
-import ru.spbu.astro.dust.util.count.LuminosityClassCounter;
-import ru.spbu.astro.dust.util.count.SpectralClassCounter;
 
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 public class MissHistogram {
@@ -117,7 +107,7 @@ public class MissHistogram {
             final Value ext = star.getExtinction();
             str.append(String.format(
                     "%d\t%s\t%.2f\t%.2f\n",
-                    star.getId(), star.getSpectralType().toString(), ext.getValue(), star.getExtinction().getError()
+                    star.getId(), star.getSpectType().toString(), ext.getValue(), star.getExtinction().getError()
             ));
         }
         return str.toString();

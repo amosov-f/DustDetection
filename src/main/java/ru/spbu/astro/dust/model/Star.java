@@ -2,6 +2,7 @@ package ru.spbu.astro.dust.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbu.astro.dust.model.spect.SpectType;
 
 import static java.lang.Math.*;
 
@@ -13,18 +14,17 @@ public final class Star implements Comparable<Star> {
     private final Value parallax;
     private final double vMag;
     @NotNull
-    private final SpectralType spectralType;
+    private final SpectType spectType;
     @NotNull
     private final Value bvColor;
 
     public Star(final int id, @NotNull final Spheric dir, @NotNull final Value parallax, final double vMag,
-                @NotNull final SpectralType spectralType, @NotNull final Value bvColor)
-    {
+                @NotNull final SpectType spectType, @NotNull final Value bvColor) {
         this.id = id;
         this.dir = dir;
         this.parallax = parallax;
         this.vMag = vMag;
-        this.spectralType = spectralType;
+        this.spectType = spectType;
         this.bvColor = bvColor;
     }
 
@@ -49,7 +49,7 @@ public final class Star implements Comparable<Star> {
 
     @NotNull
     public Value getExtinction() {
-        final Value bv = spectralType.toBV();
+        final Value bv = spectType.toBV();
         assert bv != null;
         return bvColor.subtract(bv);
     }
@@ -81,8 +81,8 @@ public final class Star implements Comparable<Star> {
     }
 
     @NotNull
-    public SpectralType getSpectralType() {
-        return spectralType;
+    public SpectType getSpectType() {
+        return spectType;
     }
 
     @NotNull

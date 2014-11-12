@@ -2,9 +2,11 @@ package ru.spbu.astro.dust.util.count;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Star;
-import ru.spbu.astro.dust.model.Value;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 /**
