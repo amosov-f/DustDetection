@@ -36,9 +36,9 @@ public class SpectralClassCounter extends Counter<String> {
             }
         }
         for (final Star star : stars) {
-            final TypeSymbol typeSymbol = star.getSpectType().getTypeSymbol();
-            final int n = (int) star.getSpectType().getTypeNumber();
-            int l = n / bin * bin;
+            final TypeSymbol typeSymbol = star.getSpectType().getSpect().getSymbol();
+            final int code = star.getSpectType().getSpect().getCode();
+            int l = code / bin * bin;
             if (l + bin > 10) {
                 l -= bin;
             }

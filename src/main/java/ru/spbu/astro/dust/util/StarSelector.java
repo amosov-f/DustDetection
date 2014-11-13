@@ -114,7 +114,7 @@ public final class StarSelector {
         final List<Star> selection = new ArrayList<>();
         for (final Star star : stars) {
             final SpectType spectralType = star.getSpectType();
-            if (spectralType.getTypeSymbol() == typeSymbol && min <= spectralType.getTypeNumber() && spectralType.getTypeNumber() <= max) {
+            if (spectralType.getSpect().getSymbol() == typeSymbol && min <= spectralType.getSpect().getNumber().doubleValue() && spectralType.getSpect().getNumber().doubleValue() <= max) {
                 selection.add(star);
             }
         }

@@ -27,27 +27,29 @@ public class SpectClass {
     @NotNull
     private final TypeSymbol symbol;
     @NotNull
-    private final Number number;
+    private final Double number;
 
     @Nullable
-    public static SpectClass valueOf(@NotNull final String str) {
+    public static SpectClass parse(@NotNull final String str) {
         final TypeSymbol symbol = TypeSymbol.parse(str.charAt(0));
-        assert symbol != null;
-        Number number;
+        if (symbol == null) {
+            return null;
+        }
+        final Double number;
         try {
-            number = Integer.valueOf(str.substring(1));
-        } catch (NumberFormatException e) {
             number = Double.valueOf(str.substring(1));
+        } catch (NumberFormatException e) {
+            return null;
         }
         return new SpectClass(symbol, number);
     }
 
     @NotNull
     public static SpectClass valueOf(final int code) {
-        return new SpectClass(TypeSymbol.values()[code / 10], code % 10);
+        return new SpectClass(TypeSymbol.values()[code / 10], (double) (code % 10));
     }
 
-    SpectClass(@NotNull TypeSymbol symbol, @NotNull Number number) {
+    SpectClass(@NotNull TypeSymbol symbol, @NotNull Double number) {
         this.symbol = symbol;
         this.number = number;
     }
@@ -58,7 +60,7 @@ public class SpectClass {
     }
 
     @NotNull
-    public Number getNumber() {
+    public Double getNumber() {
         return number;
     }
 

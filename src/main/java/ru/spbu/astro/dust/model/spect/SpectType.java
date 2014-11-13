@@ -137,8 +137,8 @@ public final class SpectType {
                     + STOP_SYMBOL;
 
 
-            final List<Component> types = new ArrayList<>();
-            Relation typesRelation = Relation.OR;
+            final List<Component> spects = new ArrayList<>();
+            Relation spectsRelation = Relation.OR;
             Relation luminosityClassesRelation = Relation.OR;
             Component cur = new Component();
             for (char c : s.toCharArray()) {
@@ -147,12 +147,12 @@ public final class SpectType {
                 }
 
                 if (cur.getType() == Component.Type.TYPE) {
-                    if (!types.isEmpty()) {
-                        cur.completeBy(types.get(types.size() - 1));
+                    if (!spects.isEmpty()) {
+                        cur.completeBy(spects.get(spects.size() - 1));
                     }
-                    types.add(cur);
+                    spects.add(cur);
                     if (c == '-') {
-                        typesRelation = Relation.INTERMEDIATE;
+                        spectsRelation = Relation.INTERMEDIATE;
                     }
                 }
                 if (cur.getType() == Component.Type.LUMINOSITY_CLASS) {
@@ -172,8 +172,11 @@ public final class SpectType {
                 cur = new Component();
                 cur.add(c);
             }
+            if (SpectClass.parse(spects.get(0).value) == null) {
+                return null;
+            }
 
-            cache.put(str, new SpectType(types, typesRelation, luminosityClasses, luminosityClassesRelation));
+            cache.put(str, new SpectType(spects, spectsRelation, luminosityClasses, luminosityClassesRelation));
         }
         return cache.get(str);
     }
@@ -229,11 +232,9 @@ public final class SpectType {
         final List<Double> bvs = new ArrayList<>();
         for (final Component spectComponent : spects) {
             for (final Component luminComponent : lumins) {
-                final SpectClass spect = SpectClass.valueOf(spectComponent.value);
+                final SpectClass spect = SpectClass.parse(spectComponent.value);
                 final LuminosityClass lumin = LuminosityClass.valueOf(luminComponent.value);
-                System.out.println(spect);
-                System.out.println(lumin);
-                if (spect != null && lumin != null) {
+                if (spect != null) {
                     final Double bv = spectTable.getBV(spect, lumin);
                     if (bv != null) {
                         bvs.add(bv);
@@ -265,22 +266,8 @@ public final class SpectType {
 
     @NotNull
     public SpectClass getSpect() {
-        return SpectClass.valueOf(spects.get(0).value);
-    }
-
-    @NotNull
-    public String getIntSpect() {
-        return getTypeSymbol() + "" + (int) getTypeNumber();
-    }
-
-    public double getTypeNumber() {
-        if (spects.get(0).value.length() < 2) {
-            return 5;
-        }
-        return Double.valueOf(spects.get(0).value.substring(1));
-    }
-
-    public SpectClass.TypeSymbol getTypeSymbol() {
-        return SpectClass.TypeSymbol.parse(spects.get(0).value.charAt(0));
+        final SpectClass spect = SpectClass.parse(spects.get(0).value);
+        assert spect != null;
+        return spect;
     }
 }

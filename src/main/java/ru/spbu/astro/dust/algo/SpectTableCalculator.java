@@ -7,7 +7,6 @@ import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectClass;
 import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
-import java.awt.geom.Point2D;
 import java.util.*;
 
 
@@ -24,6 +23,7 @@ public class SpectTableCalculator {
         for (final Star star : Catalogue.HIPPARCOS_UPDATED.getStars()) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
             final SpectClass spect = star.getSpectType().getSpect();
+
             spect2stars.putIfAbsent(lumin, new HashMap<>());
             spect2stars.get(lumin).putIfAbsent(spect.getCode(), new ArrayList<>());
             spect2stars.get(lumin).get(spect.getCode()).add(star);

@@ -18,7 +18,7 @@ import java.util.*;
 public final class SpectTable {
     public static final SpectTable TSVETKOV = SpectTable.read("Tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
     public static final SpectTable STRIGEST = SpectTable.read("Strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
-    //public static final SpectTable COMBINED = new IIIM2SpectTableCombinator().combine(TSVETKOV, STRIGEST);
+    public static final SpectTable COMBINED = new IIIM2SpectTableCombinator().combine(TSVETKOV, STRIGEST);
     //public static final SpectTable MAX = SpectTableCalculator.calculate(0.1);
 
     @NotNull
@@ -48,7 +48,7 @@ public final class SpectTable {
             for (int i = 1; i < titles.length; i++) {
                 if (!"-".equals(fields[i])) {
                     double bv = Double.valueOf(fields[i]);
-                    table.get(LuminosityClass.valueOf(titles[i])).put(SpectClass.valueOf(fields[0]).getCode(), bv);
+                    table.get(LuminosityClass.valueOf(titles[i])).put(SpectClass.parse(fields[0]).getCode(), bv);
                 }
             }
         }
