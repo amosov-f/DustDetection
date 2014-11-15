@@ -24,7 +24,6 @@ public final class SpectType {
 
     private final static class Component {
         private String value = "";
-        private boolean doubt = false;
 
         private enum Type {
             SPECT, LUMIN
@@ -71,11 +70,7 @@ public final class SpectType {
                 value += c;
                 return true;
             }
-            if (c == ':') {
-                doubt = true;
-                return true;
-            }
-            return false;
+            return c == ':';
         }
 
         public void completeBy(@NotNull final Component prev) {

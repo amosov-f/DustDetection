@@ -181,7 +181,7 @@ public final class DustTrendCalculator {
             final int n = rings.get(i).size();
             s.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
-                    i, dir.l, dir.b, 1000 * k.getValue(), 1000 * k.getError(), n
+                    i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), n
             ));
         }
         return s.toString();

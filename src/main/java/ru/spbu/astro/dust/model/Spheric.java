@@ -1,14 +1,13 @@
 package ru.spbu.astro.dust.model;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.util.Converter;
 import ru.spbu.astro.dust.util.Geom;
 
 import static java.lang.Math.*;
 
 public final class Spheric implements Comparable<Spheric> {
-    public final double l;
-    public final double b;
+    private final double l;
+    private final double b;
 
     public Spheric(final double l, final double b) {
         this.l = l;
@@ -18,6 +17,14 @@ public final class Spheric implements Comparable<Spheric> {
     public Spheric(@NotNull final double[] p) {
         l = Math.atan2(p[1], p[0]);
         b = Math.asin(p[2] / Geom.abs(p));
+    }
+
+    public double getL() {
+        return l;
+    }
+
+    public double getB() {
+        return b;
     }
 
     public double getTheta() {
@@ -51,7 +58,7 @@ public final class Spheric implements Comparable<Spheric> {
     @NotNull
     @Override
     public String toString() {
-        return String.format("%.2f° г.ш., %.2f° г.д.", Converter.rad2deg(b), Converter.rad2deg(l));
+        return String.format("%.2f° г.ш., %.2f° г.д.", Math.toDegrees(b), Math.toDegrees(l));
     }
 
     @NotNull

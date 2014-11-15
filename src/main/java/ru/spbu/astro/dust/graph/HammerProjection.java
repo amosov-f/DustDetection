@@ -145,8 +145,8 @@ public final class HammerProjection extends JWindow {
 
     @NotNull
     public static Point2D.Double shperic2plane(@NotNull final Spheric dir) {
-        double l = dir.l;
-        final double b = dir.b;
+        double l = dir.getL();
+        final double b = dir.getB();
 
         if (l > Math.PI) {
             l -= 2 * Math.PI;

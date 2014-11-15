@@ -109,7 +109,7 @@ public final class Star implements Comparable<Star> {
     public String toString() {
         return String.format(
                 "(%d: l = %.3f, b = %.3f, pi = %.3f, dpi = %.3f)",
-                id, dir.l, dir.b, parallax.getValue(), parallax.getError()
+                id, dir.getL(), dir.getB(), parallax.getValue(), parallax.getError()
         );
     }
 }

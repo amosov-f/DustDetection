@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectType;
-import ru.spbu.astro.dust.util.Converter;
 
 import java.io.InputStream;
 import java.util.*;
@@ -146,8 +145,8 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         private Row(@NotNull final Star star) {
             id = star.getId();
             values = new LinkedHashMap<Parameter, Object>() {{
-                put(LII, Converter.rad2deg(star.getDir().l));
-                put(BII, Converter.rad2deg(star.getDir().b));
+                put(LII, Math.toDegrees(star.getDir().getL()));
+                put(BII, Math.toDegrees(star.getDir().getB()));
                 put(PARALLAX, star.getParallax().getValue());
                 put(PARALLAX_ERROR, star.getParallax().getError());
                 put(VMAG, star.getVMag());
@@ -229,14 +228,14 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             @Nullable
             @Override
             Double parse(@NotNull final String value) {
-                return Converter.deg2rad(Double.parseDouble(value));
+                return Math.toRadians(Double.parseDouble(value));
             }
         };
         public static final Parameter<Double> BII = new Parameter<Double>("bii") {
             @Nullable
             @Override
             Double parse(@NotNull final String value) {
-                return Converter.deg2rad(Double.parseDouble(value));
+                return Math.toRadians(Double.parseDouble(value));
             }
         };
         public static final Parameter<Double> PARALLAX_ERROR = new Parameter<Double>("parallax_error") {

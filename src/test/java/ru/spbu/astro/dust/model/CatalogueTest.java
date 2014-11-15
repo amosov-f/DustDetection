@@ -19,8 +19,8 @@ public class CatalogueTest {
         final Value bv = star.getSpectType().toBV();
         assert bv != null;
         assertEquals(1.584, bv.getValue(), EPS);
-        assertEquals(302.39620338, Math.toDegrees(star.getDir().l), EPS);
-        assertEquals(-26.87679541, Math.toDegrees(star.getDir().b), EPS);
+        assertEquals(302.39620338, Math.toDegrees(star.getDir().getL()), EPS);
+        assertEquals(-26.87679541, Math.toDegrees(star.getDir().getB()), EPS);
         assertEquals(42708, star.getId());
         assertEquals(7.20, star.getVMag(), EPS);
         assertEquals(0.60, star.getParallax().getError(), EPS);
