@@ -14,10 +14,10 @@ public final class SpectType {
         OR, INTERMEDIATE
     }
 
-    private final List<Component> spects;
+    private final List<SpectClass> spects;
     private Relation spectsRelation;
 
-    private final List<Component> lumins;
+    private final List<LuminosityClass> lumins;
     private Relation luminosRelation = Relation.OR;
 
     private static final char STOP_SYMBOL = '$';
@@ -27,7 +27,7 @@ public final class SpectType {
         private boolean doubt = false;
 
         private enum Type {
-            TYPE, LUMINOSITY_CLASS
+            SPECT, LUMIN
         }
 
         public Component() {
@@ -47,10 +47,10 @@ public final class SpectType {
 
         public Type getType(char c) {
             if (isTypeSymbol(c)) {
-                return Type.TYPE;
+                return Type.SPECT;
             }
             if (LuminosityClass.containsSymbol(c)) {
-                return Type.LUMINOSITY_CLASS;
+                return Type.LUMIN;
             }
             return null;
         }
@@ -123,9 +123,11 @@ public final class SpectType {
                 return null;
             }
 
-            final List<Component> luminosityClasses = new ArrayList<>();
+            final List<Component> luminComponents = new ArrayList<>();
+            final List<LuminosityClass> lumins = new ArrayList<>();
             if (str.startsWith("sd")) {
-                luminosityClasses.add(new Component(LuminosityClass.VI));
+                luminComponents.add(new Component(LuminosityClass.VI));
+                lumins.add(LuminosityClass.VI);
             }
 
             final String s = str.split(" ")[0]
@@ -137,7 +139,8 @@ public final class SpectType {
                     + STOP_SYMBOL;
 
 
-            final List<Component> spects = new ArrayList<>();
+            final List<Component> spectComponents = new ArrayList<>();
+            final List<SpectClass> spects = new ArrayList<>();
             Relation spectsRelation = Relation.OR;
             Relation luminosityClassesRelation = Relation.OR;
             Component cur = new Component();
@@ -146,22 +149,26 @@ public final class SpectType {
                     continue;
                 }
 
-                if (cur.getType() == Component.Type.TYPE) {
-                    if (!spects.isEmpty()) {
-                        cur.completeBy(spects.get(spects.size() - 1));
+                if (cur.getType() == Component.Type.SPECT) {
+                    if (!spectComponents.isEmpty()) {
+                        cur.completeBy(spectComponents.get(spectComponents.size() - 1));
                     }
-                    spects.add(cur);
+                    final SpectClass spect = SpectClass.parse(cur.value);
+                    if (spect != null) {
+                        spectComponents.add(cur);
+                        spects.add(spect);
+                    }
                     if (c == '-') {
                         spectsRelation = Relation.INTERMEDIATE;
                     }
                 }
-                if (cur.getType() == Component.Type.LUMINOSITY_CLASS) {
-                    if (!luminosityClasses.isEmpty()) {
-                        cur.completeBy(luminosityClasses.get(luminosityClasses.size() - 1));
+                if (cur.getType() == Component.Type.LUMIN) {
+                    if (!luminComponents.isEmpty()) {
+                        cur.completeBy(luminComponents.get(luminComponents.size() - 1));
                     }
                     try {
-                        LuminosityClass.valueOf(cur.value);
-                        luminosityClasses.add(cur);
+                        luminComponents.add(cur);
+                        lumins.add(LuminosityClass.valueOf(cur.value));
                     } catch (IllegalArgumentException ignored) {
                     }
                     if (c == '-') {
@@ -172,17 +179,17 @@ public final class SpectType {
                 cur = new Component();
                 cur.add(c);
             }
-            if (SpectClass.parse(spects.get(0).value) == null) {
+            if (spectComponents.isEmpty()) {
                 return null;
             }
 
-            cache.put(str, new SpectType(spects, spectsRelation, luminosityClasses, luminosityClassesRelation));
+            cache.put(str, new SpectType(spects, spectsRelation, lumins, luminosityClassesRelation));
         }
         return cache.get(str);
     }
 
-    private SpectType(@NotNull final List<Component> spects, @NotNull final Relation spectsRelation,
-                      @NotNull final List<Component> lumins, @NotNull final Relation luminosRelation) {
+    private SpectType(@NotNull final List<SpectClass> spects, @NotNull final Relation spectsRelation,
+                      @NotNull final List<LuminosityClass> lumins, @NotNull final Relation luminosRelation) {
         this.spects = spects;
         this.spectsRelation = spectsRelation;
         this.lumins = lumins;
@@ -193,10 +200,7 @@ public final class SpectType {
     public String toString() {
         String s = "";
         for (int i = 0; i < spects.size(); ++i) {
-            s += spects.get(i).value;
-            if (spects.get(i).doubt) {
-                s += ":";
-            }
+            s += spects.get(i);
             if (i < spects.size() - 1) {
                 switch (spectsRelation) {
                     case INTERMEDIATE:
@@ -209,10 +213,7 @@ public final class SpectType {
             }
         }
         for (int i = 0; i < lumins.size(); ++i) {
-            s += lumins.get(i).value;
-            if (lumins.get(i).doubt) {
-                s += ":";
-            }
+            s += lumins.get(i);
             if (i < lumins.size() - 1) {
                 switch (luminosRelation) {
                     case INTERMEDIATE:
@@ -230,29 +231,22 @@ public final class SpectType {
     @Nullable
     public Value toBV() {
         final List<Double> bvs = new ArrayList<>();
-        for (final Component spectComponent : spects) {
-            for (final Component luminComponent : lumins) {
-                final SpectClass spect = SpectClass.parse(spectComponent.value);
-                final LuminosityClass lumin = LuminosityClass.valueOf(luminComponent.value);
-                if (spect != null) {
-                    final Double bv = spectTable.getBV(spect, lumin);
-                    if (bv != null) {
-                        bvs.add(bv);
-                    }
+        for (final SpectClass spect : spects) {
+            for (final LuminosityClass lumin : lumins) {
+                final Double bv = spectTable.getBV(spect, lumin);
+                if (bv != null) {
+                    bvs.add(bv);
                 }
             }
         }
-
         if (bvs.isEmpty()) {
             return null;
         }
-
         double bv = 0.0;
         for (final double bvEntry : bvs) {
             bv += bvEntry;
         }
         bv /= bvs.size();
-
         return new Value(bv, Collections.max(bvs) - bv);
     }
 
@@ -261,13 +255,22 @@ public final class SpectType {
         if (lumins.isEmpty()) {
             return null;
         }
-        return LuminosityClass.valueOf(lumins.get(0).value);
+        return lumins.get(0);
+    }
+
+    public void setLumin(@NotNull final LuminosityClass lumin) {
+        assert lumins.isEmpty();
+        lumins.add(lumin);
     }
 
     @NotNull
     public SpectClass getSpect() {
-        final SpectClass spect = SpectClass.parse(spects.get(0).value);
-        assert spect != null;
-        return spect;
+        int sum = 0;
+        int count = 0;
+        for (final SpectClass spect : spects) {
+            sum += spect.getCode();
+            count++;
+        }
+        return SpectClass.valueOf(sum / count);
     }
 }

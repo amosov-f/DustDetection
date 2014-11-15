@@ -7,41 +7,45 @@ import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectType;
 import ru.spbu.astro.dust.util.Converter;
 
+import java.io.InputStream;
 import java.util.*;
 
 import static ru.spbu.astro.dust.model.Catalogue.Parameter.*;
 
 public final class Catalogue implements Iterable<Catalogue.Row> {
-    public static final Catalogue HIPPARCOS_1997 = new Catalogue("/catalogues/hipparcos1997.txt");
-    public static final Catalogue HIPPARCOS_2007 = new Catalogue("/catalogues/hipparcos2007.txt").updateBy(HIPPARCOS_1997);
+    public static final Catalogue HIPPARCOS_1997 = Catalogue.read(Catalogue.class.getResourceAsStream("/catalogues/hipparcos1997.txt"));
+    public static final Catalogue HIPPARCOS_2007 = Catalogue.read(Catalogue.class.getResourceAsStream("/catalogues/hipparcos2007.txt")).updateBy(HIPPARCOS_1997);
     public static final Catalogue HIPPARCOS_UPDATED = HIPPARCOS_2007.updateBy(new LuminosityClassifier(HIPPARCOS_2007));
 
     @NotNull
-    private final Map<Integer, Row> id2row = new LinkedHashMap<>();
+    private final Map<Integer, Row> id2row = new HashMap<>();
 
-    public Catalogue() {
+    private Catalogue() {
     }
 
     private Catalogue(@NotNull final Catalogue catalogue) {
         this.id2row.putAll(catalogue.id2row);
     }
 
-    Catalogue(@NotNull final String path) {
-        final Scanner fin = new Scanner(Catalogue.class.getResourceAsStream(path));
+    @NotNull
+    public static Catalogue read(@NotNull final InputStream in) {
+        final Scanner fin = new Scanner(in);
         final List<Parameter> parameters = new ArrayList<>();
         final String[] parts = fin.nextLine().trim().split("\\|");
         for (final String name : Arrays.copyOfRange(parts, 1, parts.length)) {
             parameters.add(Parameter.valueOf(name.trim()));
         }
 
+        final Catalogue catalogue = new Catalogue();
         while (fin.hasNextLine()) {
             final Row row = Row.parse(fin.nextLine(), parameters);
             if (row != null) {
-                put(row);
+                catalogue.add(row);
             }
         }
 
         System.out.println("reading completed");
+        return catalogue;
     }
 
     @NotNull
@@ -51,14 +55,14 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         final Catalogue updatedCatalogue = new Catalogue();
         for (final Row row : this) {
             if (catalogue.id2row.get(row.id) != null) {
-                updatedCatalogue.put(row.updateBy(catalogue.id2row.get(row.id)));
+                updatedCatalogue.add(row.updateBy(catalogue.id2row.get(row.id)));
             }
         }
         System.out.println("update completed " + updatedCatalogue.id2row.size());
         return updatedCatalogue;
     }
 
-    private void put(@NotNull final Row row) {
+    private void add(@NotNull final Row row) {
         id2row.put(row.id, row);
     }
 
@@ -71,17 +75,23 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
                 continue;
             }
             final Row updatedRow = new Row(row);
-            final LuminosityClass luminosityClass = star.getSpectType().getLumin();
-            if (luminosityClass == null) {
-                updatedRow.values.put(SPECT_TYPE, star.getSpectType() + classifier.getLuminosityClass(star).name() + ":");
+            final LuminosityClass lumin = star.getSpectType().getLumin();
+            if (lumin == null) {
+                star.getSpectType().setLumin(classifier.classify(star));
+                updatedRow.values.put(SPECT_TYPE, star.getSpectType());
             }
-            updatedCatalogue.put(updatedRow);
+            updatedCatalogue.add(updatedRow);
         }
         return updatedCatalogue;
     }
 
     public void add(@NotNull final Star s) {
         id2row.put(s.getId(), new Row(s));
+    }
+
+    @Nullable
+    public Star get(final int id) {
+        return id2row.get(id).toStar();
     }
 
     @NotNull
@@ -98,50 +108,6 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
     }
 
     @Override
-    public String toString() {
-        if (id2row.isEmpty()) {
-            return "Catalogue is empty";
-        }
-        final StringBuilder sb = new StringBuilder(format("id"));
-        for (final Parameter parameter : id2row.entrySet().iterator().next().getValue().values.keySet()) {
-            sb.append(format(parameter.getName()));
-        }
-        sb.append('\n');
-        for (final Row row : id2row.values()) {
-            sb.append(format(String.valueOf(row.id)));
-            for (final String value : row.values.values()) {
-                sb.append(format(value));
-            }
-            sb.append('\n');
-        }
-        return sb.toString();
-    }
-
-    @NotNull
-    private static String format(@NotNull final String s) {
-        String format;
-        try {
-            {
-                double value = new Double(s);
-                format = String.format("%.2f", value);
-            }
-            {
-                int value = new Integer(s);
-                format = String.format("%d", value);
-            }
-        } catch (NumberFormatException e) {
-            format = s;
-        }
-        if (format.length() > 7) {
-            format = format.substring(0, 7);
-        }
-        if (format.length() < 4) {
-            format = format + "\t";
-        }
-        return format + "\t\t";
-    }
-
-    @Override
     public Iterator<Row> iterator() {
         return id2row.values().iterator();
     }
@@ -149,9 +115,9 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
     public static class Row {
         private final int id;
         @NotNull
-        private final Map<Parameter, String> values;
+        private final Map<Parameter, Object> values;
 
-        public Row(final int id, @NotNull final Map<Parameter, String> values) {
+        public Row(final int id, @NotNull final Map<Parameter, Object> values) {
             this.id = id;
             this.values = new LinkedHashMap<>(values);
         }
@@ -165,27 +131,29 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             String[] fields = row.split("\\|");
             fields = Arrays.copyOfRange(fields, 1, fields.length);
 
-            final Map<Parameter, String> values = new LinkedHashMap<>();
+            final Map<Parameter, Object> values = new LinkedHashMap<>();
 
             for (int i = 0; i < parameters.size(); ++i) {
-                values.put(parameters.get(i), fields[i].trim());
+                if (!fields[i].trim().isEmpty()) {
+                    values.put(parameters.get(i), parameters.get(i).parse(fields[i].trim()));
+                }
             }
 
-            final int id = HIP_NUMBER.parse(values.get(HIP_NUMBER));
+            final int id = (int) values.get(HIP_NUMBER);
             return new Row(id, values);
         }
 
         private Row(@NotNull final Star star) {
             id = star.getId();
-            values = new LinkedHashMap<Parameter, String>() {{
-                put(LII, String.valueOf(Converter.rad2deg(star.getDir().l)));
-                put(BII, String.valueOf(Converter.rad2deg(star.getDir().b)));
-                put(PARALLAX, String.valueOf(star.getParallax().getValue()));
-                put(PARALLAX_ERROR, String.valueOf(star.getParallax().getError()));
-                put(VMAG, String.valueOf(star.getVMag()));
-                put(SPECT_TYPE, star.getSpectType().toString());
-                put(BV_COLOR, String.valueOf(star.getBVColor().getValue()));
-                put(BV_COLOR_ERROR, String.valueOf(star.getBVColor().getError()));
+            values = new LinkedHashMap<Parameter, Object>() {{
+                put(LII, Converter.rad2deg(star.getDir().l));
+                put(BII, Converter.rad2deg(star.getDir().b));
+                put(PARALLAX, star.getParallax().getValue());
+                put(PARALLAX_ERROR, star.getParallax().getError());
+                put(VMAG, star.getVMag());
+                put(SPECT_TYPE, star.getSpectType());
+                put(BV_COLOR, star.getBVColor().getValue());
+                put(BV_COLOR_ERROR, star.getBVColor().getError());
             }};
         }
 
@@ -194,7 +162,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             if (id != row.id) {
                 throw new RuntimeException("Id of rows must be equal!");
             }
-            final Map<Parameter, String> parameter2value = new LinkedHashMap<>(this.values);
+            final Map<Parameter, Object> parameter2value = new LinkedHashMap<>(this.values);
             for (final Parameter parameter : row.values.keySet()) {
                 parameter2value.put(parameter, row.values.get(parameter));
             }
@@ -202,8 +170,9 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         }
 
         @Nullable
+        @SuppressWarnings("unchecked")
         public <T> T get(@NotNull final Parameter<T> parameter) {
-            return values.containsKey(parameter) ? parameter.parse(values.get(parameter)) : null;
+            return (T) values.get(parameter);
         }
 
         @Nullable

@@ -68,6 +68,10 @@ public class SpectClass {
         return 10 * Arrays.asList(TypeSymbol.values()).indexOf(getSymbol()) + getNumber().intValue();
     }
 
+    public double getDoubleCode() {
+        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(getSymbol()) + getNumber();
+    }
+
     @NotNull
     @Override
     public String toString() {

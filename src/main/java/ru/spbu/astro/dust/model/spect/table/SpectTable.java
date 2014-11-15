@@ -77,10 +77,10 @@ public final class SpectTable {
             return null;
         }
         final NavigableMap<Integer, Double> bvs = table.get(lumin);
-        final Integer x1 = bvs.floorKey(spect.getNumber().intValue());
-        final Integer x2 = bvs.higherKey(spect.getNumber().intValue());
+        final Integer x1 = bvs.floorKey(spect.getCode());
+        final Integer x2 = bvs.higherKey(spect.getCode());
         if (x1 != null && x2 != null) {
-            return interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getNumber().doubleValue());
+            return interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
         }
         return null;
     }

@@ -9,11 +9,14 @@ import static ru.spbu.astro.dust.model.spect.LuminosityClass.III;
 import static ru.spbu.astro.dust.model.spect.SpectClass.TypeSymbol.M;
 
 public class SpectTypeTest {
+    private static final double EPS = 1e-8;
+
     @Test
     public void testParsing1() {
         final SpectType type = SpectType.parse("K5III");
         assert type != null;
         assertEquals(III, type.getLumin());
+        assertEquals(1.450, type.toBV().getValue(), EPS);
     }
 
     @Test
