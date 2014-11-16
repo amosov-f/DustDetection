@@ -6,7 +6,10 @@ import ru.spbu.astro.dust.algo.SpectTableCalculator;
 import ru.spbu.astro.dust.model.spect.SpectClass;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 
+import java.io.DataOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.*;
 
 
@@ -16,9 +19,12 @@ import java.util.*;
 * Time: 13:03
 */
 public final class SpectTable {
-    public static final SpectTable TSVETKOV = SpectTable.read("Tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
-    public static final SpectTable STRIGEST = SpectTable.read("Strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
+    public static final SpectTable TSVETKOV = SpectTable.read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
+    public static final SpectTable STRIGEST = SpectTable.read("strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
     public static final SpectTable COMBINED = new IIIM2SpectTableCombinator().combine(TSVETKOV, STRIGEST);
+    public static final SpectTable MAX_5 = SpectTable.read("max-5%", SpectTable.class.getResourceAsStream("/table/max-0.05.txt"));
+    public static final SpectTable MAX_3 = SpectTable.read("max-3%", SpectTable.class.getResourceAsStream("/table/max-0.03.txt"));
+    public static final SpectTable COMPOSITE = SpectTable.read("composite", SpectTable.class.getResourceAsStream("/table/min(tsvetkov,max-3%).txt"));
     //public static final SpectTable MAX = SpectTableCalculator.calculate(0.1);
 
     @NotNull
@@ -48,12 +54,33 @@ public final class SpectTable {
             for (int i = 1; i < titles.length; i++) {
                 if (!"-".equals(fields[i])) {
                     double bv = Double.valueOf(fields[i]);
-                    table.get(LuminosityClass.valueOf(titles[i])).put(SpectClass.parse(fields[0]).getCode(), bv);
+                    final SpectClass spect = SpectClass.parse(fields[0]);
+                    assert spect != null;
+                    table.get(LuminosityClass.valueOf(titles[i])).put(spect.getCode(), bv);
                 }
             }
         }
         System.out.println("spect table loaded");
         return new SpectTable(name, table);
+    }
+
+    public void write(@NotNull final OutputStream out) {
+        final PrintWriter writer = new PrintWriter(out);
+        writer.print("Spec\t");
+        for (final LuminosityClass lumin : table.keySet()) {
+            writer.print(lumin + "\t");
+        }
+        writer.println();
+        for (int code = 5; code <= 67; code++) {
+            final SpectClass spect = SpectClass.valueOf(code);
+            writer.print(spect + "\t");
+            for (final LuminosityClass lumin : table.keySet()) {
+                //System.out.println(spect + " " + lumin + " -> " + getBV(spect, lumin));
+                writer.printf(Locale.US, "%.3f\t", getBV(spect, lumin));
+            }
+            writer.println();
+        }
+        writer.flush();
     }
 
     @NotNull
@@ -67,7 +94,7 @@ public final class SpectTable {
     }
 
     @NotNull
-    public Map<Integer, Double> getBVs(@NotNull final LuminosityClass lumin) {
+    public NavigableMap<Integer, Double> getBVs(@NotNull final LuminosityClass lumin) {
         return table.get(lumin);
     }
 

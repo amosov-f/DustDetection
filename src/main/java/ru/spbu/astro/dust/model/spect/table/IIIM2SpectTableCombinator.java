@@ -20,21 +20,21 @@ public class IIIM2SpectTableCombinator implements SpectTableCombinator {
 
     @NotNull
     @Override
-    public SpectTable combine(@NotNull final SpectTable... tables) {
+    public SpectTable combine(@NotNull final SpectTable... spectTables) {
         final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
-        for (final LuminosityClass lumin : tables[0].table.keySet()) {
+        for (final LuminosityClass lumin : spectTables[0].table.keySet()) {
             table.put(lumin, new TreeMap<>());
-            for (final Integer code : tables[0].table.get(lumin).keySet()) {
+            for (final Integer code : spectTables[0].table.get(lumin).keySet()) {
                 if (!lumin.equals(III) || code < CODE) {
-                    table.get(lumin).put(code, tables[0].table.get(lumin).get(code));
+                    table.get(lumin).put(code, spectTables[0].table.get(lumin).get(code));
                 }
             }
         }
-        for (final Integer code : tables[1].table.get(III).keySet()) {
+        for (final Integer code : spectTables[1].table.get(III).keySet()) {
             if (code >= CODE) {
-                table.get(III).put(code, tables[1].table.get(III).get(code));
+                table.get(III).put(code, spectTables[1].table.get(III).get(code));
             }
         }
-        return new SpectTable(tables[0].getName() + "+" + tables[1].getName(), table);
+        return new SpectTable(spectTables[0].getName() + "+" + spectTables[1].getName(), table);
     }
 }

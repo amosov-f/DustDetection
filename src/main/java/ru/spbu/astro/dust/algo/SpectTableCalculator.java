@@ -5,8 +5,11 @@ import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectClass;
+import ru.spbu.astro.dust.model.spect.table.MinCombinator;
 import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.*;
 
 
@@ -20,13 +23,15 @@ public class SpectTableCalculator {
     public static SpectTable calculate(final double missPart) {
         final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
         final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
+        spect2stars.put(LuminosityClass.III, new HashMap<>());
+        spect2stars.put(LuminosityClass.V, new HashMap<>());
         for (final Star star : Catalogue.HIPPARCOS_UPDATED.getStars()) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
-            final SpectClass spect = star.getSpectType().getSpect();
-
-            spect2stars.putIfAbsent(lumin, new HashMap<>());
-            spect2stars.get(lumin).putIfAbsent(spect.getCode(), new ArrayList<>());
-            spect2stars.get(lumin).get(spect.getCode()).add(star);
+            if (spect2stars.containsKey(lumin)) {
+                final SpectClass spect = star.getSpectType().getSpect();
+                spect2stars.get(lumin).putIfAbsent(spect.getCode(), new ArrayList<>());
+                spect2stars.get(lumin).get(spect.getCode()).add(star);
+            }
         }
         for (final LuminosityClass lumin : spect2stars.keySet()) {
             table.put(lumin, new TreeMap<>());
@@ -39,6 +44,11 @@ public class SpectTableCalculator {
                 table.get(lumin).put(code, ext);
             }
         }
-        return new SpectTable("Max" + missPart, table);
+        return new SpectTable("max-" + missPart, table);
+    }
+
+    public static void main(@NotNull final String[] args) throws FileNotFoundException {
+        final SpectTable spectTable = new MinCombinator().combine(SpectTable.TSVETKOV, SpectTable.MAX_3);
+        spectTable.write(new FileOutputStream("src/main/resources/table/" + spectTable.getName() + ".txt"));
     }
 }

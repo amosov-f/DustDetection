@@ -45,9 +45,9 @@ public final class PixPlot {
     }
 
     public void plot(@NotNull final Spheric dir) {
-        final List<Star> supportStars = dustTrendCalculator.getSupportStars(dir);
-        final List<Star> missStars = dustTrendCalculator.getMissStars(dir);
-        if (supportStars == null || missStars == null) {
+        final List<Star> baseStars = dustTrendCalculator.getBaseStars(dir);
+        final List<Star> outlierStars = dustTrendCalculator.getOutlierStars(dir);
+        if (baseStars == null || outlierStars == null) {
             return;
         }
 
@@ -63,12 +63,12 @@ public final class PixPlot {
         final double a = slope.getValue();
         final double b = intercept.getValue();
 
-        final List<Star> stars = new ArrayList<>(supportStars);
-        stars.addAll(missStars);
+        final List<Star> stars = new ArrayList<>(baseStars);
+        stars.addAll(outlierStars);
 
         final XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection() {{
-            addSeries(createXYIntegervalSeries(supportStars, "Звезды, по которым строится тренд"));
-            addSeries(createXYIntegervalSeries(missStars, "Выбросы"));
+            addSeries(createXYIntegervalSeries(baseStars, "Звезды, по которым строится тренд"));
+            addSeries(createXYIntegervalSeries(outlierStars, "Выбросы"));
         }};
 
         final XYPlot plot = new XYPlot(

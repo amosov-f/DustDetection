@@ -1,6 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
-import com.google.gwt.thirdparty.guava.common.collect.Iterables;
+import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -10,9 +10,9 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.dust.algo.SpectTableCalculator;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectClass;
+import ru.spbu.astro.dust.model.spect.table.MinCombinator;
 import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
 import java.util.Arrays;
@@ -27,13 +27,15 @@ import java.util.TreeSet;
  * Time: 16:19
  */
 public final class SpectTablePlot {
+    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.V);
+
     public SpectTablePlot(@NotNull final List<SpectTable> tables) {
         final XYSeriesCollection dataset = new XYSeriesCollection();
 
         final Set<Integer> codes = new TreeSet<>();
         for (final SpectTable table : tables) {
             for (final LuminosityClass lumin : table.getLumins()) {
-                if (LuminosityClass.USED.contains(lumin)) {
+                if (USED.contains(lumin)) {
                     final String name;
                     if (tables.size() == 1) {
                         name = lumin.name();
@@ -42,7 +44,7 @@ public final class SpectTablePlot {
                     }
                     final XYSeries series = new XYSeries(name);
                     for (final int code : table.getBVs(lumin).keySet()) {
-                        series.add(code, table.getBVs(lumin).get(code));
+                        series.add(code - 5, table.getBVs(lumin).get(code));
                         codes.add(code);
                     }
                     dataset.addSeries(series);
@@ -70,9 +72,11 @@ public final class SpectTablePlot {
     public static void main(@NotNull final String[] args) {
         new SpectTablePlot(Arrays.asList(
                 SpectTable.TSVETKOV,
-                SpectTableCalculator.calculate(0.5),
+                SpectTable.COMPOSITE
+                //SpectTable.MAX_3
                 //SpectTable.MAX,
-                SpectTableCalculator.calculate(0.03)
+                //SpectTableCalculator.calculate(0.03),
+                //new MinCombinator().combine(SpectTable.TSVETKOV, SpectTable.MAX_5)
         ));
     }
 }

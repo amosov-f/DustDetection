@@ -9,5 +9,5 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface SpectTableCombinator {
     @NotNull
-    SpectTable combine(@NotNull final SpectTable... tables);
+    SpectTable combine(@NotNull final SpectTable... spectTables);
 }

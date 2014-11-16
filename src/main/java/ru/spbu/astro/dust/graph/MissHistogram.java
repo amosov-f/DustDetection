@@ -1,7 +1,7 @@
 package ru.spbu.astro.dust.graph;
 
-import com.google.gwt.thirdparty.guava.common.collect.Iterables;
-import com.google.gwt.thirdparty.guava.common.primitives.Ints;
+import com.google.common.collect.Iterables;
+import com.google.common.primitives.Ints;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFactory;

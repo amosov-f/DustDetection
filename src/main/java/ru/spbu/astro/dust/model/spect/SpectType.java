@@ -103,7 +103,7 @@ public final class SpectType {
         R, S, N, C, DA, DB, DC, DD, DE, DF, DG, WR, WN, WC
     }
 
-    private static SpectTable spectTable = SpectTable.TSVETKOV;
+    private static SpectTable spectTable = SpectTable.COMPOSITE;
 
     @Nullable
     public static SpectType parse(@NotNull final String str) {

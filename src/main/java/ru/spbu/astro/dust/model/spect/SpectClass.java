@@ -65,16 +65,19 @@ public class SpectClass {
     }
 
     public int getCode() {
-        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(getSymbol()) + getNumber().intValue();
+        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(symbol) + number.intValue();
     }
 
     public double getDoubleCode() {
-        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(getSymbol()) + getNumber();
+        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(symbol) + number;
     }
 
     @NotNull
     @Override
     public String toString() {
-        return getSymbol() + "" + getNumber();
+        if (number == number.intValue()) {
+            return symbol + "" + number.intValue();
+        }
+        return symbol + "" + number;
     }
 }
