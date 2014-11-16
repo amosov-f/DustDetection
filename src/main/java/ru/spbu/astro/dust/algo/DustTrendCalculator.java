@@ -104,7 +104,7 @@ public final class DustTrendCalculator {
     }
 
     public int getPix(@NotNull final Spheric dir) {
-        return (int) pixTools.ang2pix_ring(N_SIDE, dir.getTheta(), dir.getPhi());
+        return (int) pixTools.ang2pix_ring(N_SIDE, dir.getPhi(), dir.getTheta());
     }
 
     @NotNull

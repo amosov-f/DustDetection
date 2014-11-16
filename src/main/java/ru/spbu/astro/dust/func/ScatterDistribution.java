@@ -29,7 +29,7 @@ public final class ScatterDistribution implements SphericDistribution {
     @Override
     public Value get(@NotNull Spheric dir) {
         for (final Spheric markedDir : dirs) {
-            if (markedDir.distanceTo(dir) < RADIUS) {
+            if (markedDir.distance(dir) < RADIUS) {
                 return new Value(1);
             }
         }

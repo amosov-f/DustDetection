@@ -1,55 +1,39 @@
 package ru.spbu.astro.dust.model;
 
+import org.apache.commons.math3.exception.MathArithmeticException;
+import org.apache.commons.math3.exception.OutOfRangeException;
+import org.apache.commons.math3.geometry.Point;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.spherical.twod.S2Point;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.util.Geom;
 
 import static java.lang.Math.*;
 
-public final class Spheric implements Comparable<Spheric> {
-    private final double l;
-    private final double b;
+public final class Spheric extends S2Point implements Comparable<Spheric> {
 
-    public Spheric(final double l, final double b) {
-        this.l = l;
-        this.b = b;
+    public Spheric(final double l, final double b) throws OutOfRangeException {
+        super(l, Math.PI / 2 - b);
     }
 
-    public Spheric(@NotNull final double[] p) {
-        l = Math.atan2(p[1], p[0]);
-        b = Math.asin(p[2] / Geom.abs(p));
+    public Spheric(@NotNull final Vector3D vector) throws MathArithmeticException {
+        super(vector);
     }
 
     public double getL() {
-        return l;
+        return getTheta();
     }
 
     public double getB() {
-        return b;
-    }
-
-    public double getTheta() {
-        return Math.PI / 2 - b;
-    }
-
-    public double getPhi() {
-        return l;
-    }
-
-    public double distanceTo(@NotNull final Spheric dir) {
-        final double theta1 = getTheta();
-        final double theta2 = dir.getTheta();
-        final double phi1 = getPhi();
-        final double phi2 = dir.getPhi();
-
-        return acos(cos(theta1) * cos(theta2) + sin(theta1) * sin(theta2) * cos(phi2 - phi1));
+        return Math.PI / 2 - getPhi();
     }
 
     @Override
     public int compareTo(@NotNull Spheric dir) {
-        if (l < dir.l) {
+        if (getL() < dir.getL()) {
             return -1;
         }
-        if (l > dir.l) {
+        if (getL() > dir.getL()) {
             return 1;
         }
         return 0;
@@ -58,7 +42,7 @@ public final class Spheric implements Comparable<Spheric> {
     @NotNull
     @Override
     public String toString() {
-        return String.format("%.2f° г.ш., %.2f° г.д.", Math.toDegrees(b), Math.toDegrees(l));
+        return String.format("%.2f° г.ш., %.2f° г.д.", Math.toDegrees(getB()), Math.toDegrees(getL()));
     }
 
     @NotNull

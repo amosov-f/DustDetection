@@ -24,7 +24,6 @@ public final class DustDetectionEngine {
         final HammerProjection hammerProjection = new HammerProjection(f);
         final PixPlot pixPlot = new PixPlot(dustTrendCalculator);
         hammerProjection.setVisible(true);
-
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

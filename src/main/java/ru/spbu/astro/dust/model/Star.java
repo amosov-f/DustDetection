@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.model;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.model.spect.SpectType;
@@ -29,12 +30,8 @@ public final class Star implements Comparable<Star> {
     }
 
     @NotNull
-    public double[] getCartesian() {
-        double r = getR().getValue();
-        double theta = dir.getTheta();
-        double phi = dir.getPhi();
-
-        return new double[]{r * sin(theta) * cos(phi), r * sin(theta) * sin(phi), r * cos(theta)};
+    public Vector3D getCartesian() {
+        return dir.getVector().scalarMultiply(getR().getValue());
     }
 
     @Override
