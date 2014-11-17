@@ -21,39 +21,37 @@ import ru.spbu.astro.dust.model.Value;
 import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.dust.util.count.Counter;
 
-import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class MissHistogram {
+public class OutlierHistogram {
 
     private final List<Star> missStars;
 
-    public <T extends Comparable<T>> MissHistogram(@NotNull final List<Star> stars, @NotNull final Counter<T> counter) {
+    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final Counter<T> counter) {
         missStars = new StarSelector(stars).selectByNegativeExtinction().getStars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        final Map<T, Integer> missCounts = counter.count(missStars);
-        final int missCount = IntStream.of(Ints.toArray(missCounts.values())).sum();
+        final Map<T, Integer> outlierCounts = counter.count(missStars);
+        final int outlierCount = IntStream.of(Ints.toArray(outlierCounts.values())).sum();
         final Map<T, Integer> counts = counter.count(stars);
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
 
-
         for (final T type : counts.keySet()) {
-            if (missCounts.get(type) == null) {
-                missCounts.put(type, 0);
+            if (outlierCounts.get(type) == null) {
+                outlierCounts.put(type, 0);
             }
-            dataset.addValue(1.0 * missCounts.get(type) / counts.get(type), "pizza", type);
+            dataset.addValue(1.0 * outlierCounts.get(type) / counts.get(type), "pizza", type);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
                 String.format(
-                        "Распределение звезд с отрицательным покраснением (%d%% или %d/%d)",
-                        100 * missCount / count, missCount, count),
+                        "%s\nОтрицательное покраснение у %d%% (%d/%d)",
+                        counter.getName(), 100 * outlierCount / count, outlierCount, count),
                 counter.getName(),
                 "Доля",
                 dataset,
@@ -81,7 +79,7 @@ public class MissHistogram {
             @Override
             public String generateLabel(CategoryDataset categoryDataset, int i, int i2) {
                 final T type = Iterables.get(counts.keySet(), i2);
-                return missCounts.get(type) + "/" + counts.get(type);
+                return outlierCounts.get(type) + "/" + counts.get(type);
             }
         });
         renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER));
@@ -93,8 +91,7 @@ public class MissHistogram {
         rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
         rangeAxis.setRange(0.0, 1.0);
 
-
-        ChartFrame frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
+        final ChartFrame frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
         frame.pack();
         frame.setVisible(true);
     }
@@ -121,23 +118,4 @@ public class MissHistogram {
         }
         return missIds;
     }
-
-    public static void main(final String[] args) throws FileNotFoundException {
-
-        /*{
-            final PrintWriter fout = new PrintWriter(new FileOutputStream("results/6.txt"));
-
-            Locale.setDefault(Locale.US);
-            fout.print(missObserver.toString());
-            fout.flush();
-        }
-        {
-            final PrintWriter fout = new PrintWriter(new FileOutputStream("results/10.txt"));
-            for (int id : missObserver.getMissIds()) {
-                fout.println(id);
-            }
-            fout.flush();
-        }*/
-    }
-
 }

@@ -1,11 +1,14 @@
 package ru.spbu.astro.dust.ml;
 
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.model.Value;
 
-import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * User: amosov-f
@@ -16,9 +19,10 @@ public class RansacRegression {
     private static final double OUTLIERS_PART = 0.1;
     private static final int MIN_FOR_TREND = 3;
 
-    private SimpleRegression regression;
     @NotNull
-    private final Map<Integer, Point2D.Double> points = new HashMap<>();
+    private final SimpleRegression regression;
+    @NotNull
+    private final Map<Integer, Vector2D> points = new HashMap<>();
     @NotNull
     private final List<Integer> bases = new ArrayList<>();
     @NotNull
@@ -28,7 +32,7 @@ public class RansacRegression {
         regression = new SimpleRegression(includeIntercept);
     }
 
-    public void add(int id, final Point2D.Double p) {
+    public void add(int id, @NotNull final Vector2D p) {
         points.put(id, p);
     }
 
@@ -37,12 +41,7 @@ public class RansacRegression {
         if (!train(ids)) {
             return false;
         }
-        final double a = regression.getSlope();
-        final double b = regression.getIntercept();
-        Collections.sort(ids, (id1, id2) -> Double.compare(
-                Math.abs(a * points.get(id1).getX() + b - points.get(id1).getY()),
-                Math.abs(a * points.get(id2).getX() + b - points.get(id2).getY())
-        ));
+        ids.sort((id1, id2) -> Double.compare(target(points.get(id1)), target(points.get(id2))));
         final int split = (int) ((1 - OUTLIERS_PART) * ids.size());
         bases.addAll(ids.subList(0, split));
         outliers.addAll(ids.subList(split, ids.size()));
@@ -67,6 +66,10 @@ public class RansacRegression {
     @NotNull
     public Value getIntercept() {
         return new Value(regression.getIntercept(), regression.getInterceptStdErr());
+    }
+
+    private double target(@NotNull final Vector2D p) {
+        return Math.pow(regression.predict(p.getX()) - p.getY(), 2);
     }
 
     private boolean train(@NotNull final List<Integer> ids) {

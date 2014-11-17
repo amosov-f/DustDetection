@@ -3,7 +3,6 @@ package ru.spbu.astro.dust.util;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -25,8 +24,8 @@ public class PointsDistribution {
 
     @NotNull
     public Vector3D next() {
-        return points.get(new Random().nextInt(points.size())).add(DEL, new Vector3D(IntStream
-                .range(0, 3)
-                .mapToDouble(i -> (2 * Math.random() - 1)).toArray()));
+        return points.get(new Random().nextInt(points.size())).add(DEL, new Vector3D(IntStream.range(0, 3).mapToDouble(
+                i -> (2 * Math.random() - 1)
+        ).toArray()));
     }
 }

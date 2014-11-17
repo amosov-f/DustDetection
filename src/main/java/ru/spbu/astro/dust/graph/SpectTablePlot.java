@@ -10,6 +10,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import ru.spbu.astro.dust.algo.SpectTableCalculator;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectClass;
 import ru.spbu.astro.dust.model.spect.table.MinCombinator;
@@ -19,6 +20,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /**
@@ -27,12 +30,11 @@ import java.util.TreeSet;
  * Time: 16:19
  */
 public final class SpectTablePlot {
-    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.V);
+    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.III, LuminosityClass.V);
 
     public SpectTablePlot(@NotNull final List<SpectTable> tables) {
         final XYSeriesCollection dataset = new XYSeriesCollection();
 
-        final Set<Integer> codes = new TreeSet<>();
         for (final SpectTable table : tables) {
             for (final LuminosityClass lumin : table.getLumins()) {
                 if (USED.contains(lumin)) {
@@ -44,22 +46,18 @@ public final class SpectTablePlot {
                     }
                     final XYSeries series = new XYSeries(name);
                     for (final int code : table.getBVs(lumin).keySet()) {
-                        series.add(code - 5, table.getBVs(lumin).get(code));
-                        codes.add(code);
+                        series.add(code - SpectTable.MIN_CODE, table.getBVs(lumin).get(code));
                     }
                     dataset.addSeries(series);
                 }
             }
         }
 
-        final String[] spects = new String[codes.size()];
-        for (int i = 0; i < spects.length; i++) {
-            spects[i] = SpectClass.valueOf(Iterables.get(codes, i)).toString();
-        }
+        final List<String> spects = SpectTable.CODE_RANGE.mapToObj(code -> SpectClass.valueOf(code).toString()).collect(Collectors.toList());
 
         final XYPlot plot = new XYPlot(
                 dataset,
-                new SymbolAxis("спектральный класс", spects),
+                new SymbolAxis("спектральный класс", spects.toArray(new String[spects.size()])),
                 new NumberAxis("B-V"),
                 new XYSplineRenderer()
         );
@@ -75,7 +73,6 @@ public final class SpectTablePlot {
                 SpectTable.COMPOSITE
                 //SpectTable.MAX_3
                 //SpectTable.MAX,
-                //SpectTableCalculator.calculate(0.03),
                 //new MinCombinator().combine(SpectTable.TSVETKOV, SpectTable.MAX_5)
         ));
     }

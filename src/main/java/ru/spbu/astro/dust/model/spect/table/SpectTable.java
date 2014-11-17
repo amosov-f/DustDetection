@@ -2,30 +2,35 @@ package ru.spbu.astro.dust.model.spect.table;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.dust.algo.SpectTableCalculator;
-import ru.spbu.astro.dust.model.spect.SpectClass;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
+import ru.spbu.astro.dust.model.spect.SpectClass;
 
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.IntStream;
 
 
 /**
-* User: amosov-f
-* Date: 26.10.14
-* Time: 13:03
-*/
+ * User: amosov-f
+ * Date: 26.10.14
+ * Time: 13:03
+ */
 public final class SpectTable {
     public static final SpectTable TSVETKOV = SpectTable.read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
     public static final SpectTable STRIGEST = SpectTable.read("strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
-    public static final SpectTable COMBINED = new IIIM2SpectTableCombinator().combine(TSVETKOV, STRIGEST);
-    public static final SpectTable MAX_5 = SpectTable.read("max-5%", SpectTable.class.getResourceAsStream("/table/max-0.05.txt"));
-    public static final SpectTable MAX_3 = SpectTable.read("max-3%", SpectTable.class.getResourceAsStream("/table/max-0.03.txt"));
     public static final SpectTable COMPOSITE = SpectTable.read("composite", SpectTable.class.getResourceAsStream("/table/min(tsvetkov,max-3%).txt"));
-    //public static final SpectTable MAX = SpectTableCalculator.calculate(0.1);
+
+    public static final int MIN_CODE = 5;
+    public static final int MAX_CODE = 66;
+
+    public static final IntStream CODE_RANGE = IntStream.range(MIN_CODE, MAX_CODE + 1);
+
+    @NotNull
+    public static SpectTable getInstance() {
+        return TSVETKOV;
+    }
 
     @NotNull
     private final String name;
@@ -71,11 +76,10 @@ public final class SpectTable {
             writer.print(lumin + "\t");
         }
         writer.println();
-        for (int code = 5; code <= 67; code++) {
+        for (int code : table.get(LuminosityClass.V).keySet()) {
             final SpectClass spect = SpectClass.valueOf(code);
             writer.print(spect + "\t");
             for (final LuminosityClass lumin : table.keySet()) {
-                //System.out.println(spect + " " + lumin + " -> " + getBV(spect, lumin));
                 writer.printf(Locale.US, "%.3f\t", getBV(spect, lumin));
             }
             writer.println();
@@ -104,8 +108,12 @@ public final class SpectTable {
             return null;
         }
         final NavigableMap<Integer, Double> bvs = table.get(lumin);
-        final Integer x1 = bvs.floorKey(spect.getCode());
-        final Integer x2 = bvs.higherKey(spect.getCode());
+        final int code = spect.getCode();
+        if (bvs.containsKey(code)) {
+            return bvs.get(code);
+        }
+        final Integer x1 = bvs.floorKey(code);
+        final Integer x2 = bvs.higherKey(code);
         if (x1 != null && x2 != null) {
             return interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
         }

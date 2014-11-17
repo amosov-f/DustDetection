@@ -333,6 +333,5 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             }
             return null;
         }
-
     }
 }

@@ -7,8 +7,8 @@ import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
+import ru.spbu.astro.dust.model.spect.SpectClass;
 import ru.spbu.astro.dust.model.spect.SpectClass.TypeSymbol;
-import ru.spbu.astro.dust.model.spect.SpectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,17 +104,17 @@ public final class StarSelector {
 
     @NotNull
     public StarSelector selectByLuminosityClass(@NotNull final LuminosityClass luminosityClass) {
-        return new StarSelector(stars.stream()
-                .filter(star -> star.getSpectType().getLumin() == luminosityClass)
-                .collect(Collectors.toList()));
+        return new StarSelector(stars.stream().filter(
+                star -> star.getSpectType().getLumin() == luminosityClass
+        ).collect(Collectors.toList()));
     }
 
     @NotNull
     public StarSelector selectBySpectralType(@NotNull TypeSymbol typeSymbol, final double min, final double max) {
         final List<Star> selection = new ArrayList<>();
         for (final Star star : stars) {
-            final SpectType spectralType = star.getSpectType();
-            if (spectralType.getSpect().getSymbol() == typeSymbol && min <= spectralType.getSpect().getNumber() && spectralType.getSpect().getNumber() <= max) {
+            final SpectClass spect = star.getSpectType().getSpect();
+            if (spect.getSymbol() == typeSymbol && min <= spect.getNumber() && spect.getNumber() <= max) {
                 selection.add(star);
             }
         }

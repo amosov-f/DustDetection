@@ -8,6 +8,8 @@ import ru.spbu.astro.dust.model.Value;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +23,8 @@ public final class HammerProjection extends JWindow {
     private final SphericDistribution distribution;
     @NotNull
     private final Mode mode;
+    @NotNull
+    private DirectionProcessor processor = dir -> {};
 
     private static final int PARALLEL_COUNT = 10;
     private static final int MERIDIAN_COUNT = 24;
@@ -34,6 +38,10 @@ public final class HammerProjection extends JWindow {
         DEFAULT, WITH_ERRORS
     }
 
+    public static interface DirectionProcessor {
+        void process(@NotNull final Spheric dir);
+    }
+
     public HammerProjection(@NotNull final SphericDistribution distribution) {
         this(distribution, Mode.DEFAULT);
     }
@@ -42,6 +50,16 @@ public final class HammerProjection extends JWindow {
         this.distribution = distribution;
         this.mode = mode;
         setSize(2 * SIZE, SIZE);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(@NotNull final MouseEvent e) {
+                final Spheric dir = toSpheric(fromWindow(getMousePosition()));
+                if (dir != null) {
+                    System.out.println(dir);
+                    processor.process(dir);
+                }
+            }
+        });
     }
 
     @Override
@@ -53,7 +71,7 @@ public final class HammerProjection extends JWindow {
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
-                final Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
+                final Spheric dir = toSpheric(fromWindow(new Point(x, y)));
                 if (dir == null) {
                     continue;
                 }
@@ -89,7 +107,7 @@ public final class HammerProjection extends JWindow {
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
-                final Spheric dir = plane2spheric(fromWindow(new Point(x, y)));
+                final Spheric dir = toSpheric(fromWindow(new Point(x, y)));
                 if (dir == null) {
                     continue;
                 }
@@ -122,29 +140,33 @@ public final class HammerProjection extends JWindow {
         paintCircles(g);
     }
 
+    public void setProcessor(@NotNull final DirectionProcessor processor) {
+        this.processor = processor;
+    }
+
     private void paintCircles(@NotNull final Graphics g) {
         g.setColor(new Color(148, 167, 187));
         for (double l = 0; l < 2 * Math.PI; l += 2 * Math.PI / MERIDIAN_COUNT) {
             for (double b = -Math.PI / 2; b < Math.PI / 2; b += 0.001) {
-                Point p = toWindow(shperic2plane(new Spheric(l, b)));
+                Point p = toWindow(toPlane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
         }
         for (double b = - Math.PI / 2; b < Math.PI / 2; b += 0.001) {
-            Point p = toWindow(shperic2plane(new Spheric(Math.PI - 0.00001, b)));
+            Point p = toWindow(toPlane(new Spheric(Math.PI - 0.00001, b)));
             g.drawLine(p.x, p.y, p.x, p.y);
         }
 
         for (double b = - Math.PI / 2; b < Math.PI / 2; b += Math.PI / PARALLEL_COUNT) {
             for (double l = 0; l < 2 * Math.PI; l += 0.0001) {
-                Point p = toWindow(shperic2plane(new Spheric(l, b)));
+                Point p = toWindow(toPlane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
         }
     }
 
     @NotNull
-    public static Point2D.Double shperic2plane(@NotNull final Spheric dir) {
+    public static Point2D.Double toPlane(@NotNull final Spheric dir) {
         double l = dir.getL();
         final double b = dir.getB();
 
@@ -161,7 +183,7 @@ public final class HammerProjection extends JWindow {
     }
 
     @Nullable
-    public static Spheric plane2spheric(@NotNull final Point2D.Double p) {
+    public static Spheric toSpheric(@NotNull final Point2D.Double p) {
         double x = p.getX();
         double y = p.getY();
 

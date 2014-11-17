@@ -83,7 +83,7 @@ public class DeepObserver extends JFrame {
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                final Spheric dir = HammerProjection.plane2spheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
+                final Spheric dir = HammerProjection.toSpheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
                 if (dir != null) {
                     pixPlot.plot(dir);
                 }

@@ -2,13 +2,9 @@ package ru.spbu.astro.dust.model;
 
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.exception.OutOfRangeException;
-import org.apache.commons.math3.geometry.Point;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.spherical.twod.S2Point;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.util.Geom;
-
-import static java.lang.Math.*;
 
 public final class Spheric extends S2Point implements Comparable<Spheric> {
 

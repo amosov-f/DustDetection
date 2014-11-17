@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.algo;
 
 import gov.fnal.eag.healpix.PixTools;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.ml.RansacRegression;
@@ -10,7 +11,6 @@ import ru.spbu.astro.dust.model.Star;
 import ru.spbu.astro.dust.model.Value;
 import ru.spbu.astro.dust.util.HealpixTools;
 
-import java.awt.geom.Point2D;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -59,7 +59,7 @@ public final class DustTrendCalculator {
         for (int pix = 0; pix < rings.size(); pix++) {
             final RansacRegression regression = new RansacRegression(includeIntercept);
             for (final Star star : rings.get(pix)) {
-                regression.add(star.getId(), new Point2D.Double(star.getR().getValue(), star.getExtinction().getValue()));
+                regression.add(star.getId(), new Vector2D(star.getR().getValue(), star.getExtinction().getValue()));
             }
             if (regression.train()) {
                 slopes[pix] = regression.getSlope();

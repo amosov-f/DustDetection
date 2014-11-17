@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.model.spect.SpectType;
 
-import static java.lang.Math.*;
+import static java.lang.Math.log10;
+import static java.lang.Math.pow;
 
 public final class Star implements Comparable<Star> {
     private final int id;

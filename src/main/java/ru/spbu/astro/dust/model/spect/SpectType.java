@@ -103,8 +103,6 @@ public final class SpectType {
         R, S, N, C, DA, DB, DC, DD, DE, DF, DG, WR, WN, WC
     }
 
-    private static SpectTable spectTable = SpectTable.COMPOSITE;
-
     @Nullable
     public static SpectType parse(@NotNull final String str) {
         if (!cache.containsKey(str)) {
@@ -228,7 +226,7 @@ public final class SpectType {
         final List<Double> bvs = new ArrayList<>();
         for (final SpectClass spect : spects) {
             for (final LuminosityClass lumin : lumins) {
-                final Double bv = spectTable.getBV(spect, lumin);
+                final Double bv = SpectTable.getInstance().getBV(spect, lumin);
                 if (bv != null) {
                     bvs.add(bv);
                 }

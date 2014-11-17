@@ -1,7 +1,7 @@
 package ru.spbu.astro.dust.algo;
 
-import com.google.common.collect.Iterables;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.dust.func.HealpixCounter;
 import ru.spbu.astro.dust.graph.HammerProjection;
@@ -9,17 +9,13 @@ import ru.spbu.astro.dust.ml.RansacRegression;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.model.Spheric;
 import ru.spbu.astro.dust.model.Star;
-import ru.spbu.astro.dust.util.Geom;
 import ru.spbu.astro.dust.util.PointsDistribution;
 import ru.spbu.astro.dust.util.StarSelector;
-import weka.classifiers.Classifier;
 import weka.core.*;
 import weka.core.neighboursearch.KDTree;
 import weka.core.neighboursearch.NearestNeighbourSearch;
 
-import java.awt.geom.Point2D;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +26,8 @@ import java.util.List;
  */
 public class DustDetector {
     private static final int K = 25;
-    private static final double THRESHOLD = 0.006;
-    private static final double MAX_RANGE = 100;//81.37697923079452;
+    private static final double THRESHOLD = 0.007;
+    private static final double MAX_RANGE = 100;
     private static final int LIM = 1000000;
 
     @NotNull
@@ -91,7 +87,7 @@ public class DustDetector {
 
             final RansacRegression regression = new RansacRegression(true);
             for (final Instance instance : knn) {
-                regression.add(instance.hashCode(), new Point2D.Double(Geom.abs(point(instance)), instance.value(3)));
+                regression.add(instance.hashCode(), new Vector2D(point(instance).getNorm(), instance.value(3)));
             }
             if (!regression.train()) {
                 continue;
@@ -126,8 +122,8 @@ public class DustDetector {
     }
 
     @NotNull
-    private static double[] point(@NotNull final Instance instance) {
-        return new double[]{instance.value(0), instance.value(1), instance.value(2)};
+    private static Vector3D point(@NotNull final Instance instance) {
+        return new Vector3D(instance.value(0), instance.value(1), instance.value(2));
     }
 
     public static void main(final String[] args) throws FileNotFoundException {
@@ -140,7 +136,7 @@ public class DustDetector {
             dirs.add(new Spheric(p));
         }
 
-        final HammerProjection hammerProjection = new HammerProjection(new HealpixCounter(dirs, 25));
+        final HammerProjection hammerProjection = new HammerProjection(new HealpixCounter(dirs, 30));
         hammerProjection.setVisible(true);
     }
 }

@@ -23,7 +23,11 @@ public class DoubleCounter extends Counter<Double> {
     private final double max;
     private final double dx;
 
-    public DoubleCounter(@NotNull final String name, @NotNull final Function<Star, Double> f, double min, double max, double dx) {
+    public DoubleCounter(@NotNull String name, @NotNull Function<Star, Double> f, final double dx) {
+        this(name, f, 0, 1, dx);
+    }
+
+    public DoubleCounter(@NotNull final String name, @NotNull final Function<Star, Double> f, final double min, final double max, final double dx) {
         this.name = name;
         this.f = f;
         this.min = min;
@@ -35,8 +39,8 @@ public class DoubleCounter extends Counter<Double> {
     @Override
     public Map<Double, Integer> count(@NotNull List<Star> stars) {
         final NavigableMap<Double, Integer> counts = new TreeMap<>();
-        for (double x = min + dx / 2; x <= max; x += dx) {
-            counts.put(x, 0);
+        for (int i = 0; min + dx * (i + 0.5) <= max; i++) {
+            counts.put(min + dx * (i + 0.5), 0);
         }
         for (final Star star : stars) {
             final double value = f.apply(star);
@@ -57,4 +61,5 @@ public class DoubleCounter extends Counter<Double> {
     public String getName() {
         return name;
     }
+
 }
