@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class DustCloudDetector {
     private static final double EPS = 500;
-    private static final double MIN_PTS_PART = 0.003;
+    private static final double MIN_PTS_PART = 0.005;
 
     @NotNull
     private final List<Cloud> clouds;
