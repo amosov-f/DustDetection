@@ -21,15 +21,18 @@ import java.util.stream.Collectors;
  * Time: 14:58
  */
 public class DustCloudDetector {
-    private static final double EPS = 30;
-    private static final double MIN_PTS_PART = 0.002;
+    private static final double EPS = 500;
+    private static final double MIN_PTS_PART = 0.003;
 
     @NotNull
     private final List<Cloud> clouds;
 
     public DustCloudDetector(@NotNull final List<Star> stars) {
         final List<Vector3D> dust = new DustDetector(stars).getDust();
-        clouds = new DBSCANClusterer<DoublePoint>(EPS, (int) (MIN_PTS_PART * dust.size()))
+        final double eps = EPS / Math.cbrt(dust.size());
+        final int minPts = (int) (MIN_PTS_PART * dust.size());
+        System.out.println("eps: " + eps + ", minPts: " + minPts);
+        clouds = new DBSCANClusterer<DoublePoint>(eps, minPts)
                 .cluster(dust.stream()
                         .map(p -> new DoublePoint(p.toArray())).collect(Collectors.toList())).stream()
                 .map(cluster -> new Cloud(cluster.getPoints().stream()

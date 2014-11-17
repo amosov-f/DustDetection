@@ -29,7 +29,7 @@ public final class SpectTable {
 
     @NotNull
     public static SpectTable getInstance() {
-        return TSVETKOV;
+        return COMPOSITE;
     }
 
     @NotNull

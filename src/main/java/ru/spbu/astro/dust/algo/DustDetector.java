@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class DustDetector {
     private static final int K = 25;
-    private static final double THRESHOLD = 0.007;
+    private static final double THRESHOLD = 0.008;
     private static final double MAX_RANGE = 100;
     private static final int LIM = 1000000;
 
