@@ -18,6 +18,7 @@ import ru.spbu.astro.dust.util.StarSelector;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -26,9 +27,11 @@ public final class HRDiagram {
     private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.20;
     private static final double ERROR = 2.5 * Math.log10((1 + PARALLAX_RELATIVE_ERROR_LIMIT) / (1 - PARALLAX_RELATIVE_ERROR_LIMIT));
 
+    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.III, LuminosityClass.V);
+
     private static final double BV_COLOR_ERROR_LIMIT = Double.MAX_VALUE;
 
-    private static final double ERROR_VIEW_SHARE = 1.0;
+    private static final double ERROR_VIEW_SHARE = 0;
 
     public HRDiagram(@NotNull final List<Star> stars) throws IOException {
         final EnumMap<LuminosityClass, List<Star>> class2stars = new EnumMap<>(LuminosityClass.class);
@@ -41,8 +44,11 @@ public final class HRDiagram {
 
         int starsCount = 0;
         for (final Star star : stars) {
-            class2stars.get(star.getSpectType().getLumin()).add(star);
-            starsCount++;
+            final LuminosityClass lumin = star.getSpectType().getLumin();
+            if (USED.contains(lumin)) {
+                class2stars.get(star.getSpectType().getLumin()).add(star);
+                starsCount++;
+            }
         }
 
         final XYIntervalSeriesCollection dataset = new XYIntervalSeriesCollection();
@@ -54,7 +60,7 @@ public final class HRDiagram {
         }
 
         final JFreeChart chart = ChartFactory.createScatterPlot(
-                String.format("%d (dr < %d%%), ±%.2f mag", starsCount, (int) (100 * PARALLAX_RELATIVE_ERROR_LIMIT), ERROR),
+                String.format("%d звезд", starsCount),
                 "B-V [зв. вел.]",
                 "M [зв. вел.]",
                 dataset,

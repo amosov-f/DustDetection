@@ -47,8 +47,8 @@ public class SpectTableCalculator {
         return new SpectTable("max-" + (int) (outlierPart * 100) + "%", table);
     }
 
-    private static final int BIN = 4;
-    private static final int B = 1;
+    private static final int BIN = 3;
+    private static final int B = 2;
 
     private static int key(final int code) {
         final int key = (code - B + (BIN - 1) / 2) / BIN * BIN + B;
@@ -65,7 +65,7 @@ public class SpectTableCalculator {
     }
 
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        //final SpectTable spectTable = new MinCombinator().combine(SpectTable.TSVETKOV, new SpectTableCalculator().calculate(0.03));
+        final SpectTable spectTable = new MinCombinator().combine(SpectTable.TSVETKOV, new SpectTableCalculator().calculate(0.05));
         //spectTable.write(new FileOutputStream("src/main/resources/table/" + spectTable.getName() + ".txt"));
     }
 }

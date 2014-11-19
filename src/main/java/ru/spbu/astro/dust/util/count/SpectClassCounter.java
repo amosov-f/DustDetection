@@ -26,7 +26,7 @@ public class SpectClassCounter extends Counter<String> {
     @Override
     public Map<String, Integer> count(@NotNull List<Star> stars) {
         final Map<String, Integer> counts = new LinkedHashMap<>();
-        SpectTable.CODE_RANGE.forEach(code -> counts.put(key(code), 0));
+        SpectTable.getCodeRange().forEach(code -> counts.put(key(code), 0));
         for (final Star star : stars) {
             final String key = key(star.getSpectType().getSpect().getCode());
             if (counts.containsKey(key)) {

@@ -30,7 +30,7 @@ import java.util.stream.IntStream;
  * Time: 16:19
  */
 public final class SpectTablePlot {
-    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.III, LuminosityClass.V);
+    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.III);
 
     public SpectTablePlot(@NotNull final List<SpectTable> tables) {
         final XYSeriesCollection dataset = new XYSeriesCollection();
@@ -53,7 +53,7 @@ public final class SpectTablePlot {
             }
         }
 
-        final List<String> spects = SpectTable.CODE_RANGE.mapToObj(code -> SpectClass.valueOf(code).toString()).collect(Collectors.toList());
+        final List<String> spects = SpectTable.getCodeRange().mapToObj(code -> SpectClass.valueOf(code).toString()).collect(Collectors.toList());
 
         final XYPlot plot = new XYPlot(
                 dataset,
@@ -70,10 +70,11 @@ public final class SpectTablePlot {
     public static void main(@NotNull final String[] args) {
         new SpectTablePlot(Arrays.asList(
                 SpectTable.TSVETKOV,
-                SpectTable.COMPOSITE
-                //SpectTable.MAX_3
+                SpectTable.COMPOSITE,
+                SpectTable.SCHMIDT_KALER
+                //SpectTable.MAX_5
                 //SpectTable.MAX,
-                //new MinCombinator().combine(SpectTable.TSVETKOV, SpectTable.MAX_5)
+                //new SpectTableCalculator().calculate(0.05)
         ));
     }
 }

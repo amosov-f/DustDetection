@@ -19,13 +19,17 @@ import java.util.stream.IntStream;
  */
 public final class SpectTable {
     public static final SpectTable TSVETKOV = SpectTable.read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
-    public static final SpectTable STRIGEST = SpectTable.read("strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
-    public static final SpectTable COMPOSITE = SpectTable.read("composite", SpectTable.class.getResourceAsStream("/table/min(tsvetkov,max-3%).txt"));
+    public static final SpectTable SCHMIDT_KALER = SpectTable.read("schmidt-kaler", SpectTable.class.getResourceAsStream("/table/schmidt-kaler.txt"));
+    public static final SpectTable COMPOSITE = SpectTable.read("composite", SpectTable.class.getResourceAsStream("/table/min(tsvetkov,max-5%).txt"));
+    public static final SpectTable MAX_5 =  SpectTable.read("max-5%", SpectTable.class.getResourceAsStream("/table/max-5%.txt"));
 
     public static final int MIN_CODE = 5;
-    public static final int MAX_CODE = 66;
+    public static final int MAX_CODE = 69;
 
-    public static final IntStream CODE_RANGE = IntStream.range(MIN_CODE, MAX_CODE + 1);
+    @NotNull
+    public static IntStream getCodeRange() {
+        return IntStream.range(MIN_CODE, MAX_CODE + 1);
+    }
 
     @NotNull
     public static SpectTable getInstance() {

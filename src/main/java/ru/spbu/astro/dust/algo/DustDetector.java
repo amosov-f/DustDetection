@@ -34,6 +34,8 @@ public class DustDetector {
     private final List<Vector3D> dust = new ArrayList<>();
 
     public DustDetector(@NotNull final List<Star> stars) {
+        System.out.println(stars.size());
+
         final Instances instances = new Instances("knn", new ArrayList<Attribute>() {{
             add(new Attribute("x"));
             add(new Attribute("y"));
