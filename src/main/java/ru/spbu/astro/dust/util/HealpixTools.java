@@ -9,11 +9,11 @@ import static java.lang.Math.sqrt;
  * Time: 0:36
  */
 public final class HealpixTools {
-    public static int pixNumber(final int sideNumber) {
-        return 12 * sideNumber * sideNumber;
+    public static int nPix(final int nSide) {
+        return 12 * nSide * nSide;
     }
 
-    public static int sideNumber(final int pixNumber) {
-        return (int) round(sqrt(pixNumber / 12.0));
+    public static int nSide(final int nPix) {
+        return (int) round(sqrt(nPix / 12.0));
     }
 }

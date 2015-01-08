@@ -7,5 +7,5 @@ import ru.spbu.astro.dust.model.Value;
 
 public interface SphericDistribution {
     @Nullable
-    Value get(@NotNull final Spheric dir);
+    Value get(@NotNull Spheric dir);
 }

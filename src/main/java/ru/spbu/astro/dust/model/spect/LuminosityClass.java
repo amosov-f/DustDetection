@@ -8,7 +8,7 @@ package ru.spbu.astro.dust.model.spect;
 public enum LuminosityClass {
     I, Ia, Ib, Iab, II, IIb, IIIa, IIIb, IV, IVa, V, III, Va, Vb, VI, VII;
 
-    public static boolean containsSymbol(final char c) {
+    public static boolean contains(final char c) {
         for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
             if (luminosityClass.name().contains(String.valueOf(c))) {
                 return true;

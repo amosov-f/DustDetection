@@ -12,7 +12,7 @@ public class HealpixDistribution implements SphericDistribution {
     protected final Value[] values;
 
     public HealpixDistribution(final int nSide) {
-        this(new Value[12 * nSide * nSide]);
+        this(new Value[HealpixTools.nPix(nSide)]);
     }
 
     public HealpixDistribution(@NotNull final Value[] values) {
@@ -21,12 +21,11 @@ public class HealpixDistribution implements SphericDistribution {
 
     @Nullable
     @Override
-    public Value get(@NotNull final Spheric dir) {
+    public final Value get(@NotNull final Spheric dir) {
         return values[getPix(dir)];
     }
 
-    public int getPix(@NotNull final Spheric dir) {
-        return (int) new PixTools().ang2pix_ring(HealpixTools.sideNumber(values.length), dir.getPhi(), dir.getTheta());
+    protected final int getPix(@NotNull final Spheric dir) {
+        return (int) new PixTools().ang2pix_ring(HealpixTools.nSide(values.length), dir.getPhi(), dir.getTheta());
     }
-
 }

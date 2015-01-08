@@ -26,6 +26,14 @@ public final class LuminosityClassifier {
     private static final double RELATIVE_ERROR_LIMIT = 0.10;
 
     private static final List<LuminosityClass> LUMINOSITY_CLASSES = Arrays.asList(III, V);
+    private static final ArrayList<Attribute> attributes = new ArrayList<Attribute>() {{
+        add(new Attribute("bv color"));
+        add(new Attribute("mag"));
+        add(new Attribute(
+                "luminosity classes",
+                LUMINOSITY_CLASSES.stream().map(LuminosityClass::name).collect(Collectors.toList())
+        ));
+    }};
 
     @NotNull
     private final Classifier classifier;
@@ -69,29 +77,6 @@ public final class LuminosityClassifier {
     }
 
     @NotNull
-    public LuminosityClass classify(@NotNull final Star star) {
-        if (star.getSpectType().getLumin() != null) {
-            return star.getSpectType().getLumin();
-        }
-
-        try {
-            int index = (int) classifier.classifyInstance(toInstances(star).get(0));
-            return LUMINOSITY_CLASSES.get(index);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static final ArrayList<Attribute> attributes = new ArrayList<Attribute>() {{
-        add(new Attribute("bv color"));
-        add(new Attribute("mag"));
-        add(new Attribute(
-                "luminosity classes",
-                LUMINOSITY_CLASSES.stream().map(LuminosityClass::name).collect(Collectors.toList())
-        ));
-    }};
-
-    @NotNull
     private static Instance toInstance(@NotNull final Star star) {
         return new DenseInstance(attributes.size()) {{
             setValue(attributes.get(0), star.getBVColor().getValue());
@@ -122,11 +107,25 @@ public final class LuminosityClassifier {
         return instances;
     }
 
-    public static enum Mode {
-        DEFAULT, TEST
-    }
-
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         new LuminosityClassifier(Catalogue.HIPPARCOS_2007, Mode.TEST);
+    }
+
+    @NotNull
+    public LuminosityClass classify(@NotNull final Star star) {
+        if (star.getSpectType().getLumin() != null) {
+            return star.getSpectType().getLumin();
+        }
+
+        try {
+            int index = (int) classifier.classifyInstance(toInstances(star).get(0));
+            return LUMINOSITY_CLASSES.get(index);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static enum Mode {
+        DEFAULT, TEST
     }
 }

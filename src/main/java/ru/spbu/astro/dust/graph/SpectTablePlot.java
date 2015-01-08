@@ -1,6 +1,5 @@
 package ru.spbu.astro.dust.graph;
 
-import com.google.common.collect.Iterables;
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
@@ -10,18 +9,13 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.dust.algo.SpectTableCalculator;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectClass;
-import ru.spbu.astro.dust.model.spect.table.MinCombinator;
 import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 
 /**

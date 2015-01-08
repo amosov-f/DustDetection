@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 import ru.spbu.astro.dust.model.spect.LuminosityClass;
 import ru.spbu.astro.dust.model.spect.SpectType;
+import ru.spbu.astro.dust.model.spect.SpectTypeParser;
 
 import java.io.InputStream;
 import java.util.*;
@@ -291,7 +292,7 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
             @Nullable
             @Override
             SpectType parse(@NotNull final String value) {
-                return SpectType.parse(value);
+                return SpectTypeParser.parse(value);
             }
         };
         public static final Parameter<Integer> HIP_NUMBER = new Parameter<Integer>("hip_number") {

@@ -43,7 +43,7 @@ public final class DustTrendCalculator {
         pixTools = new PixTools();
 
         final List<List<Star>> rings = new ArrayList<>();
-        for (int i = 0; i < HealpixTools.pixNumber(N_SIDE); i++) {
+        for (int i = 0; i < HealpixTools.nPix(N_SIDE); i++) {
             rings.add(new ArrayList<>());
         }
 

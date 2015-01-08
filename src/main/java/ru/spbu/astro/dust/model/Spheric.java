@@ -16,6 +16,11 @@ public final class Spheric extends S2Point implements Comparable<Spheric> {
         super(vector);
     }
 
+    @NotNull
+    public static Spheric valueOf(@NotNull final double[] dir) {
+        return new Spheric(dir[1], Math.PI / 2 - dir[0]);
+    }
+
     public double getL() {
         return getTheta();
     }
@@ -25,7 +30,7 @@ public final class Spheric extends S2Point implements Comparable<Spheric> {
     }
 
     @Override
-    public int compareTo(@NotNull Spheric dir) {
+    public int compareTo(@NotNull final Spheric dir) {
         if (getL() < dir.getL()) {
             return -1;
         }
@@ -39,10 +44,5 @@ public final class Spheric extends S2Point implements Comparable<Spheric> {
     @Override
     public String toString() {
         return String.format("%.2f° г.ш., %.2f° г.д.", Math.toDegrees(getB()), Math.toDegrees(getL()));
-    }
-
-    @NotNull
-    public static Spheric valueOf(@NotNull final double[] dir) {
-        return new Spheric(dir[1], Math.PI / 2 - dir[0]);
     }
 }

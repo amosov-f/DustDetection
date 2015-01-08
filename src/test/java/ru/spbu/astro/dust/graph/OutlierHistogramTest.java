@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.dust.util.StarSelector;
@@ -10,7 +11,7 @@ import static ru.spbu.astro.dust.model.spect.LuminosityClass.III;
 import static ru.spbu.astro.dust.model.spect.LuminosityClass.V;
 import static ru.spbu.astro.dust.model.spect.SpectClass.TypeSymbol.M;
 
-
+@Ignore
 public class OutlierHistogramTest {
     @Test
     public void histParallaxRelativeError() throws InterruptedException {

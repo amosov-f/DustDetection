@@ -19,7 +19,7 @@ public final class Cloud extends EnclosingBall<Euclidean3D, Vector3D> {
 
     public Cloud(@NotNull final List<Vector3D> points) {
         super(
-                points.stream().reduce(Vector3D.ZERO, (p1, p2) -> p1.add(p2)).scalarMultiply(1.0 / points.size()),
+                points.stream().reduce(Vector3D.ZERO, Vector3D::add).scalarMultiply(1.0 / points.size()),
                 IntStream.range(0, 3)
                         .mapToDouble(i -> new StandardDeviation().evaluate(points.stream()
                                 .mapToDouble(p -> p.toArray()[i]).toArray()))

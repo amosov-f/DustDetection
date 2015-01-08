@@ -5,190 +5,31 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.dust.model.Value;
 import ru.spbu.astro.dust.model.spect.table.SpectTable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public final class SpectType {
-    private static final Map<String, SpectType> cache = new HashMap<>();
-
-    private static enum Relation {
-        OR, INTERMEDIATE
-    }
-
+    @NotNull
     private final List<SpectClass> spects;
-    private Relation spectsRelation;
-
+    @NotNull
     private final List<LuminosityClass> lumins;
-    private Relation luminosRelation = Relation.OR;
+    @NotNull
+    private final Relation spectsRelation;
+    @NotNull
+    private final Relation luminosRelation;
 
-    private static final char STOP_SYMBOL = '$';
-
-    private final static class Component {
-        private String value = "";
-
-        private enum Type {
-            SPECT, LUMIN
-        }
-
-        public Component() {
-        }
-
-        public Component(final LuminosityClass luminosityClass) {
-            this.value += luminosityClass.name();
-        }
-
-        @Nullable
-        public Type getType() {
-            if (value.isEmpty()) {
-                return null;
-            }
-            return getType(value.charAt(0));
-        }
-
-        public Type getType(char c) {
-            if (isTypeSymbol(c)) {
-                return Type.SPECT;
-            }
-            if (LuminosityClass.containsSymbol(c)) {
-                return Type.LUMIN;
-            }
-            return null;
-        }
-
-        public boolean add(char c) {
-            if (value.isEmpty()) {
-                if (isComponentSymbol(c)) {
-                    value += c;
-                    return true;
-                }
-                return false;
-            }
-
-            if (getType() == getType(c)) {
-                if (SpectClass.TypeSymbol.parse(c) != null) {
-                    return false;
-                }
-                value += c;
-                return true;
-            }
-            return c == ':';
-        }
-
-        public void completeBy(@NotNull final Component prev) {
-            if (value.isEmpty() || prev.value.isEmpty()) {
-                return;
-            }
-            if (getType() != prev.getType()) {
-                return;
-            }
-            if (!Character.isUpperCase(value.charAt(0)) && Character.isUpperCase(prev.value.charAt(0))) {
-                value = prev.value.charAt(0) + value;
-            }
-        }
-
-        private static boolean isTypeSymbol(char c) {
-            return SpectClass.TypeSymbol.parse(c) != null || c == '.' || Character.isDigit(c);
-        }
-
-        private static boolean isComponentSymbol(char c) {
-            return isTypeSymbol(c) || LuminosityClass.containsSymbol(c);
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
-    }
-
-    private static enum ExceptionSpectralType {
-        R, S, N, C, DA, DB, DC, DD, DE, DF, DG, WR, WN, WC
-    }
-
-    @Nullable
-    public static SpectType parse(@NotNull final String str) {
-        if (!cache.containsKey(str)) {
-            for (ExceptionSpectralType exceptionSpectralType : ExceptionSpectralType.values()) {
-                if (str.startsWith(exceptionSpectralType.name())) {
-                    return null;
-                }
-            }
-
-            if (str.equals(str.toLowerCase())) {
-                return null;
-            }
-
-            final List<Component> luminComponents = new ArrayList<>();
-            final List<LuminosityClass> lumins = new ArrayList<>();
-            if (str.startsWith("sd")) {
-                luminComponents.add(new Component(LuminosityClass.VI));
-                lumins.add(LuminosityClass.VI);
-            }
-
-            final String s = str.split(" ")[0]
-                    .replaceAll("va", "")           //magic
-                    .replaceAll("CN.*", "")          //magic
-                    .replaceAll("\\+.*", "")          //magic
-                    .replaceAll("\\.+$", "")           //magic
-                    .replaceAll("[^OBAFGKM\\d\\.IVab/\\-:]", "")
-                    + STOP_SYMBOL;
-
-
-            final List<Component> spectComponents = new ArrayList<>();
-            final List<SpectClass> spects = new ArrayList<>();
-            Relation spectsRelation = Relation.OR;
-            Relation luminosityClassesRelation = Relation.OR;
-            Component cur = new Component();
-            for (char c : s.toCharArray()) {
-                if (cur.add(c)) {
-                    continue;
-                }
-
-                if (cur.getType() == Component.Type.SPECT) {
-                    if (!spectComponents.isEmpty()) {
-                        cur.completeBy(spectComponents.get(spectComponents.size() - 1));
-                    }
-                    final SpectClass spect = SpectClass.parse(cur.value);
-                    if (spect != null) {
-                        spectComponents.add(cur);
-                        spects.add(spect);
-                    }
-                    if (c == '-') {
-                        spectsRelation = Relation.INTERMEDIATE;
-                    }
-                }
-                if (cur.getType() == Component.Type.LUMIN) {
-                    if (!luminComponents.isEmpty()) {
-                        cur.completeBy(luminComponents.get(luminComponents.size() - 1));
-                    }
-                    try {
-                        luminComponents.add(cur);
-                        lumins.add(LuminosityClass.valueOf(cur.value));
-                    } catch (IllegalArgumentException ignored) {
-                    }
-                    if (c == '-') {
-                        luminosityClassesRelation = Relation.INTERMEDIATE;
-                    }
-                }
-
-                cur = new Component();
-                cur.add(c);
-            }
-            if (spectComponents.isEmpty()) {
-                return null;
-            }
-
-            cache.put(str, new SpectType(spects, spectsRelation, lumins, luminosityClassesRelation));
-        }
-        return cache.get(str);
-    }
-
-    private SpectType(@NotNull final List<SpectClass> spects, @NotNull final Relation spectsRelation,
-                      @NotNull final List<LuminosityClass> lumins, @NotNull final Relation luminosRelation) {
+    SpectType(@NotNull final List<SpectClass> spects,
+              @NotNull final Relation spectsRelation,
+              @NotNull final List<LuminosityClass> lumins,
+              @NotNull final Relation luminosRelation) {
         this.spects = spects;
         this.spectsRelation = spectsRelation;
         this.lumins = lumins;
         this.luminosRelation = luminosRelation;
     }
 
+    @NotNull
     @Override
     public String toString() {
         String s = "";
@@ -265,5 +106,9 @@ public final class SpectType {
             count++;
         }
         return SpectClass.valueOf(sum / count);
+    }
+
+    static enum Relation {
+        OR, INTERMEDIATE
     }
 }
