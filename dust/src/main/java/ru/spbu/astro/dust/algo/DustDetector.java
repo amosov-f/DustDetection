@@ -130,7 +130,7 @@ public class DustDetector {
 
     public static void main(final String[] args) throws FileNotFoundException {
         final DustDetector detector = new DustDetector(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED).parallaxRelativeError(0.35).getStars()
+                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
 
         final List<Spheric> dirs = new ArrayList<>();

@@ -39,7 +39,7 @@ public class DeepObserver extends JFrame {
 
 
     public DeepObserver(@NotNull final Catalogue catalogue) {
-        layers = split(new StarSelector(catalogue).parallaxRelativeError(0.25).getStars(), 2);
+        layers = split(new StarSelector(catalogue.getStars()).parallaxRelativeError(0.25).getStars(), 2);
 
         for (int i = 0; i < layers.size(); i++) {
             calculators.add(new DustTrendCalculator(layers.get(i), i != 0));

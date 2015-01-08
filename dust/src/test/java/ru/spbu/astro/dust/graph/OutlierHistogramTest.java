@@ -16,7 +16,7 @@ public class OutlierHistogramTest {
     @Test
     public void histParallaxRelativeError() throws InterruptedException {
         new OutlierHistogram(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED).getStars(),
+                Catalogue.HIPPARCOS_UPDATED.getStars(),
                 new DoubleStarCounter("Относительная ошибка в расстоянии", star -> star.getR().getRelativeError(), 0.1)
         );
         Thread.sleep(Long.MAX_VALUE);
@@ -25,7 +25,7 @@ public class OutlierHistogramTest {
     @Test
     public void histBVError() throws InterruptedException {
         new OutlierHistogram(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED).getStars(),
+                Catalogue.HIPPARCOS_UPDATED.getStars(),
                 new DoubleStarCounter("Ошибка B-V", star -> star.getBVColor().getValue(), 0, 2.3, 0.2)
         );
         Thread.sleep(Long.MAX_VALUE);

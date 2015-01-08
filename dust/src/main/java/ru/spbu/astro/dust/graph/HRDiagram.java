@@ -123,7 +123,7 @@ public final class HRDiagram {
                 .selectByAbsoluteMagnitude(4.5, 9.5)
                 .getCatalogue();*/
 
-        new HRDiagram(new StarSelector(Catalogue.HIPPARCOS_UPDATED)
+        new HRDiagram(new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars())
                 .negativeExtinction()
                         //.selectByParallaxRelativeError(PARALLAX_RELATIVE_ERROR_LIMIT)
                         //.selectByBVColorError(BV_COLOR_ERROR_LIMIT)

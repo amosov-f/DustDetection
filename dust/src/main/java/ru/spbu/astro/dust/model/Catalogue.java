@@ -12,13 +12,36 @@ import ru.spbu.astro.util.Value;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static ru.spbu.astro.dust.model.Catalogue.Parameter.*;
 
-public final class Catalogue implements Iterable<Catalogue.Row> {
+public final class Catalogue implements Iterable<Star> {
     public static final Catalogue HIPPARCOS_1997 = Catalogue.read(Catalogue.class.getResourceAsStream("/catalogues/hipparcos1997.txt"));
     public static final Catalogue HIPPARCOS_2007 = Catalogue.read(Catalogue.class.getResourceAsStream("/catalogues/hipparcos2007.txt")).updateBy(HIPPARCOS_1997);
-    public static final Catalogue HIPPARCOS_UPDATED = HIPPARCOS_2007.updateBy(new LuminosityClassifier(HIPPARCOS_2007));
+    public static final Catalogue HIPPARCOS_UPDATED = HIPPARCOS_2007.updateBy(new Function<Row, Row>() {
+        private final LuminosityClassifier classifier = new LuminosityClassifier(HIPPARCOS_2007);
+
+        @Nullable
+        @Override
+        public Row apply(@NotNull final Row row) {
+            final Star star = row.toStar();
+            if (star == null) {
+                return null;
+            }
+
+            final Row updatedRow = new Row(row);
+
+            final LuminosityClass lumin = star.getSpectType().getLumin();
+            if (lumin == null) {
+                star.getSpectType().setLumin(classifier.classify(star));
+                updatedRow.values.put(SPECT_TYPE, star.getSpectType());
+            }
+
+            return updatedRow;
+        }
+    });
 
     @NotNull
     private final Map<Integer, Row> id2row = new HashMap<>();
@@ -53,10 +76,8 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
 
     @NotNull
     public Catalogue updateBy(@NotNull final Catalogue catalogue) {
-        System.out.println(id2row.size());
-        System.out.println(catalogue.id2row.size());
         final Catalogue updatedCatalogue = new Catalogue();
-        for (final Row row : this) {
+        for (final Row row : id2row.values()) {
             if (catalogue.id2row.get(row.id) != null) {
                 updatedCatalogue.add(row.updateBy(catalogue.id2row.get(row.id)));
             }
@@ -69,21 +90,13 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
         id2row.put(row.id, row);
     }
 
-    @NotNull
-    public Catalogue updateBy(@NotNull final LuminosityClassifier classifier) {
+    public Catalogue updateBy(@NotNull final Function<Row, Row> processor) {
         final Catalogue updatedCatalogue = new Catalogue(this);
-        for (final Row row : updatedCatalogue) {
-            final Star star = row.toStar();
-            if (star == null) {
-                continue;
+        for (final Row row : updatedCatalogue.id2row.values()) {
+            final Row updatedRow = processor.apply(row);
+            if (updatedRow != null) {
+                updatedCatalogue.add(updatedRow);
             }
-            final Row updatedRow = new Row(row);
-            final LuminosityClass lumin = star.getSpectType().getLumin();
-            //if (lumin == null) {
-                star.getSpectType().setLumin(classifier.classify(star));
-                updatedRow.values.put(SPECT_TYPE, star.getSpectType());
-            //}
-            updatedCatalogue.add(updatedRow);
         }
         return updatedCatalogue;
     }
@@ -111,8 +124,8 @@ public final class Catalogue implements Iterable<Catalogue.Row> {
     }
 
     @Override
-    public Iterator<Row> iterator() {
-        return id2row.values().iterator();
+    public Iterator<Star> iterator() {
+        return id2row.values().stream().map(Row::toStar).collect(Collectors.toList()).iterator();
     }
 
     public static class Row {

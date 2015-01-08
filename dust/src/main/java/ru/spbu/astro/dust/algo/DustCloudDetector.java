@@ -46,7 +46,7 @@ public class DustCloudDetector {
 
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         final DustCloudDetector detector = new DustCloudDetector(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED).parallaxRelativeError(0.35).getStars()
+                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
         final List<Cloud> clouds = detector.getClouds();
         System.out.println(clouds.size());

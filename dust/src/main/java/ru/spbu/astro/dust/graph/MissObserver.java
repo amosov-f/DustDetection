@@ -15,7 +15,7 @@ import ru.spbu.astro.dust.util.StarSelector;
 public class MissObserver {
     public static void main(@NotNull final String[] args) {
         final SphericDistribution f = new HealpixCounter(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED).negativeExtinction().getStars(),
+                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).negativeExtinction().getStars(),
                 18
         );
         final HammerProjection hammerProjection = new HammerProjection(f);
