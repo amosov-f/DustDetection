@@ -8,46 +8,74 @@
     <groupId>ru.spbu.astro</groupId>
     <artifactId>dust-detector</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>dust</module>
+        <module>core</module>
+        <module>util</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>ru.spbu.astro</groupId>
+                <artifactId>util</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.spbu.astro</groupId>
+                <artifactId>core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.spbu.astro</groupId>
+                <artifactId>dust</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.4</version>
+            </dependency>
+            <dependency>
+                <groupId>nz.ac.waikato.cms.weka</groupId>
+                <artifactId>weka-dev</artifactId>
+                <version>3.7.12</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>1.0.19</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.intellij</groupId>
+                <artifactId>annotations</artifactId>
+                <version>12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>3.4</version>
-        </dependency>
-        <dependency>
-            <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-dev</artifactId>
-            <version>3.7.12</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.0.19</version>
-        </dependency>
-        <dependency>
             <groupId>com.intellij</groupId>
             <artifactId>annotations</artifactId>
-            <version>12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>gov.fnal.eag.healpix</groupId>
-            <artifactId>healpix</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/PixTools.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
