@@ -14,7 +14,7 @@ import java.util.Map;
  * Date: 12.10.14
  * Time: 19:26
  */
-public class SpectClassCounter extends StarCounter<String> {
+public class SpectClassCounter implements StarCounter<String> {
     private final int bin;
 
     public SpectClassCounter(final int bin) {

@@ -12,17 +12,17 @@ import java.util.Map;
  * Date: 12.10.14
  * Time: 18:52
  */
-public abstract class StarCounter<T extends Comparable<T>> {
+public interface StarCounter<T extends Comparable<T>> {
     @NotNull
-    public abstract Map<T, Integer> count(@NotNull final List<Star> stars);
+    Map<T, Integer> count(@NotNull List<Star> stars);
 
     @NotNull
-    public abstract String getName();
+    String getName();
 
-    private static final int LIMIT = 1;
+    static final int LIMIT = 1;
 
     @NotNull
-    protected Map<String, Integer> clean(@NotNull final Map<String, Integer> counts) {
+    default Map<String, Integer> clean(@NotNull final Map<String, Integer> counts) {
         final Map<String, Integer> cleanedCounts = new LinkedHashMap<>(counts);
         counts.keySet().stream().filter(name -> counts.get(name) <= LIMIT).forEach(cleanedCounts::remove);
         return cleanedCounts;

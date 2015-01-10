@@ -13,7 +13,7 @@ import java.util.Map;
  * Date: 12.10.14
  * Time: 19:30
  */
-public final class LuminosityClassCounter extends StarCounter<String> {
+public final class LuminosityClassCounter implements StarCounter<String> {
     @NotNull
     @Override
     public Map<String, Integer> count(@NotNull List<Star> stars) {

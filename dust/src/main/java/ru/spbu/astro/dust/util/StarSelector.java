@@ -1,14 +1,12 @@
 package ru.spbu.astro.dust.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.func.HealpixCounter;
-import ru.spbu.astro.core.graph.HammerProjection;
-import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.LuminosityClass;
 import ru.spbu.astro.core.spect.SpectClass;
 import ru.spbu.astro.core.spect.SpectClass.TypeSymbol;
+import ru.spbu.astro.dust.model.Catalogue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,9 +102,16 @@ public final class StarSelector {
     }
 
     @NotNull
-    public StarSelector luminosityClass(@NotNull final LuminosityClass luminosityClass) {
+    public StarSelector luminosityClass(@NotNull final LuminosityClass lumin) {
         return new StarSelector(stars.stream().filter(
-                star -> star.getSpectType().getLumin() == luminosityClass
+                star -> star.getSpectType().getLumin() == lumin
+        ).collect(Collectors.toList()));
+    }
+
+    @NotNull
+    public StarSelector luminosityClasses(@NotNull final LuminosityClass[] lumins) {
+        return new StarSelector(stars.stream().filter(
+                star -> ArrayUtils.contains(lumins, star.getSpectType().getLumin())
         ).collect(Collectors.toList()));
     }
 
@@ -125,6 +130,14 @@ public final class StarSelector {
     @NotNull
     public List<Star> getStars() {
         return new ArrayList<>(stars);
+    }
+
+    public static void main(String[] args) {
+        final Catalogue catalogue = Catalogue.HIPPARCOS_2007;
+        final int n1 = catalogue.getStars().size();
+        final int n2 = new StarSelector(catalogue).luminosityClasses(LuminosityClass.MAIN).getStars().size();
+        System.out.println(n1 - n2 + " " + n2);
+        System.out.println((double) (n1 - n2) / n1);
     }
 
 //    public static void main(String[] args) {

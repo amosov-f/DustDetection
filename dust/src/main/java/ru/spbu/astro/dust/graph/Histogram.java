@@ -17,41 +17,31 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.util.Value;
-import ru.spbu.astro.dust.util.StarSelector;
 import ru.spbu.astro.core.count.StarCounter;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-public class OutlierHistogram {
-
-    private final List<Star> outliers;
-
-    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final StarCounter<T> counter) {
-        outliers = new StarSelector(stars).negativeExtinction().getStars();
-
-        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        final Map<T, Integer> outlierCounts = counter.count(outliers);
-        final int outlierCount = IntStream.of(Ints.toArray(outlierCounts.values())).sum();
+/**
+ * User: amosov-f
+ * Date: 09.01.15
+ * Time: 2:45
+ */
+public class Histogram {
+    public <T extends Comparable<T>> Histogram(@NotNull final List<Star> stars, @NotNull final StarCounter<T> counter) {
         final Map<T, Integer> counts = counter.count(stars);
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
 
+        final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
         for (final T type : counts.keySet()) {
-            if (outlierCounts.get(type) == null) {
-                outlierCounts.put(type, 0);
-            }
-            dataset.addValue(1.0 * outlierCounts.get(type) / counts.get(type), "pizza", type);
+            dataset.addValue(1.0 * counts.get(type) / count, "pizza", type);
         }
 
         JFreeChart chart = ChartFactory.createBarChart(
-                String.format(
-                        "%s\nОтрицательное покраснение у %d%% (%d/%d)",
-                        counter.getName(), 100 * outlierCount / count, outlierCount, count),
+                "Гистограмма",
                 counter.getName(),
                 "Доля",
                 dataset,
@@ -79,7 +69,7 @@ public class OutlierHistogram {
             @Override
             public String generateLabel(CategoryDataset categoryDataset, int i, int i2) {
                 final T type = Iterables.get(counts.keySet(), i2);
-                return outlierCounts.get(type) + "/" + counts.get(type);
+                return counts.get(type).toString();
             }
         });
         renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER));
@@ -91,31 +81,8 @@ public class OutlierHistogram {
         rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
         rangeAxis.setRange(0.0, 1.0);
 
-        final ChartFrame frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
+        final ChartFrame frame = new ChartFrame("Гистограмма", chart);
         frame.pack();
         frame.setVisible(true);
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder str = new StringBuilder();
-        str.append("hip\tspect\text\tsigma_ext\n");
-        for (final Star star : outliers) {
-            final Value ext = star.getExtinction();
-            str.append(String.format(
-                    "%d\t%s\t%.2f\t%.2f\n",
-                    star.getId(), star.getSpectType().toString(), ext.getValue(), star.getExtinction().getError()
-            ));
-        }
-        return str.toString();
-    }
-
-    @NotNull
-    public List<Integer> getMissIds() {
-        final List<Integer> missIds = new ArrayList<>();
-        for (final Star s : outliers) {
-            missIds.add(s.getId());
-        }
-        return missIds;
     }
 }

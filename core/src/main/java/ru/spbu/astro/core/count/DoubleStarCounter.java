@@ -3,10 +3,7 @@ package ru.spbu.astro.core.count;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.Star;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -14,7 +11,7 @@ import java.util.function.Function;
  * Date: 25.10.14
  * Time: 18:49
  */
-public class DoubleStarCounter extends StarCounter<Double> {
+public class DoubleStarCounter implements StarCounter<Double> {
     @NotNull
     private final String name;
     @NotNull
@@ -40,7 +37,7 @@ public class DoubleStarCounter extends StarCounter<Double> {
     public Map<Double, Integer> count(@NotNull List<Star> stars) {
         final NavigableMap<Double, Integer> counts = new TreeMap<>();
         for (int i = 0; min + dx * (i + 0.5) <= max; i++) {
-            counts.put(min + dx * (i + 0.5), 0);
+            counts.put(removeUnnecessaryDigits(min + dx * (i + 0.5)), 0);
         }
         for (final Star star : stars) {
             final double value = f.apply(star);
@@ -62,4 +59,7 @@ public class DoubleStarCounter extends StarCounter<Double> {
         return name;
     }
 
+    private static double removeUnnecessaryDigits(final double x) {
+        return Double.valueOf(String.format(Locale.US, "%.2f", x));
+    }
 }
