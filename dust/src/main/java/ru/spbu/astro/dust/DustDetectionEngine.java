@@ -6,7 +6,7 @@ import ru.spbu.astro.core.func.HealpixDistribution;
 import ru.spbu.astro.core.func.SphericDistribution;
 import ru.spbu.astro.core.graph.HammerProjection;
 import ru.spbu.astro.dust.graph.PixPlot;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Catalogues;
 import ru.spbu.astro.dust.util.StarSelector;
 
 import java.io.FileNotFoundException;
@@ -14,7 +14,7 @@ import java.io.FileNotFoundException;
 public final class DustDetectionEngine {
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.25).getStars()
+                new StarSelector(Catalogues.HIPPARCOS_UPDATED).parallaxRelativeError(0.25).getStars()
         );
         final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);

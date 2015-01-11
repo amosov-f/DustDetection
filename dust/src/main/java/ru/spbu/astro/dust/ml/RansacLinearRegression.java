@@ -1,7 +1,6 @@
 package ru.spbu.astro.dust.ml;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.util.Value;
 
@@ -15,27 +14,29 @@ import java.util.Map;
  * Date: 16.11.14
  * Time: 3:06
  */
-public class RansacRegression {
+public final class RansacLinearRegression implements SimpleRegression {
     private static final double OUTLIERS_PART = 0.1;
     private static final int MIN_FOR_TREND = 3;
 
     @NotNull
-    private final SimpleRegression regression;
+    private final org.apache.commons.math3.stat.regression.SimpleRegression regression;
     @NotNull
     private final Map<Integer, Vector2D> points = new HashMap<>();
     @NotNull
-    private final List<Integer> bases = new ArrayList<>();
+    private final List<Integer> inliers = new ArrayList<>();
     @NotNull
     private final List<Integer> outliers = new ArrayList<>();
 
-    public RansacRegression(final boolean includeIntercept) {
-        regression = new SimpleRegression(includeIntercept);
+    public RansacLinearRegression(final boolean includeIntercept) {
+        regression = new org.apache.commons.math3.stat.regression.SimpleRegression(includeIntercept);
     }
 
-    public void add(int id, @NotNull final Vector2D p) {
-        points.put(id, p);
+    @Override
+    public void add(int id, @NotNull final Value x, @NotNull final Value y) {
+        points.put(id, new Vector2D(x.getValue(), y.getValue()));
     }
 
+    @Override
     public boolean train() {
         final List<Integer> ids = new ArrayList<>(points.keySet());
         if (!train(ids)) {
@@ -43,22 +44,25 @@ public class RansacRegression {
         }
         ids.sort((id1, id2) -> Double.compare(target(points.get(id1)), target(points.get(id2))));
         final int split = (int) ((1 - OUTLIERS_PART) * ids.size());
-        bases.addAll(ids.subList(0, split));
+        inliers.addAll(ids.subList(0, split));
         outliers.addAll(ids.subList(split, ids.size()));
-        return train(bases);
+        return train(inliers);
     }
 
     @NotNull
-    public List<Integer> getBases() {
-        return bases;
+    @Override
+    public List<Integer> getInliers() {
+        return inliers;
     }
 
     @NotNull
+    @Override
     public List<Integer> getOutliers() {
         return outliers;
     }
 
     @NotNull
+    @Override
     public Value getSlope() {
         return new Value(regression.getSlope(), regression.getSlopeStdErr());
     }

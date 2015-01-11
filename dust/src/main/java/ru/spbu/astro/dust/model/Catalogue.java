@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.dust.algo.LuminosityClassifier;
-import ru.spbu.astro.core.spect.LuminosityClass;
 import ru.spbu.astro.core.spect.SpectType;
 import ru.spbu.astro.core.spect.SpectTypeParser;
 import ru.spbu.astro.util.Value;
@@ -13,40 +11,15 @@ import ru.spbu.astro.util.Value;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static ru.spbu.astro.dust.model.Catalogue.Parameter.*;
 
-public final class Catalogue implements Iterable<Star> {
-    public static final Catalogue HIPPARCOS_1997 = Catalogue.read(Catalogue.class.getResourceAsStream("/catalogues/hipparcos1997.txt"));
-    public static final Catalogue HIPPARCOS_2007 = Catalogue.read(Catalogue.class.getResourceAsStream("/catalogues/hipparcos2007.txt")).updateBy(HIPPARCOS_1997);
-    public static final Catalogue HIPPARCOS_UPDATED = HIPPARCOS_2007.updateBy(new Function<Row, Row>() {
-        private final LuminosityClassifier classifier = new LuminosityClassifier(HIPPARCOS_2007);
-
-        @Nullable
-        @Override
-        public Row apply(@NotNull final Row row) {
-            final Star star = row.toStar();
-            if (star == null) {
-                return null;
-            }
-
-            final Row updatedRow = new Row(row);
-
-            final LuminosityClass lumin = star.getSpectType().getLumin();
-            if (lumin == null) {
-                star.getSpectType().setLumin(classifier.classify(star));
-                updatedRow.values.put(SPECT_TYPE, star.getSpectType());
-            }
-
-            return updatedRow;
-        }
-    });
+public final class Catalogue {
 
     @NotNull
-    private final Map<Integer, Row> id2row = new HashMap<>();
+    final Map<Integer, Row> id2row = new HashMap<>();
 
-    private Catalogue() {
+    Catalogue() {
     }
 
     private Catalogue(@NotNull final Catalogue catalogue) {
@@ -74,19 +47,7 @@ public final class Catalogue implements Iterable<Star> {
         return catalogue;
     }
 
-    @NotNull
-    public Catalogue updateBy(@NotNull final Catalogue catalogue) {
-        final Catalogue updatedCatalogue = new Catalogue();
-        for (final Row row : id2row.values()) {
-            if (catalogue.id2row.get(row.id) != null) {
-                updatedCatalogue.add(row.updateBy(catalogue.id2row.get(row.id)));
-            }
-        }
-        System.out.println("update completed " + updatedCatalogue.id2row.size());
-        return updatedCatalogue;
-    }
-
-    private void add(@NotNull final Row row) {
+    void add(@NotNull final Row row) {
         id2row.put(row.id, row);
     }
 
@@ -99,10 +60,6 @@ public final class Catalogue implements Iterable<Star> {
             }
         }
         return updatedCatalogue;
-    }
-
-    public void add(@NotNull final Star s) {
-        id2row.put(s.getId(), new Row(s));
     }
 
     @Nullable
@@ -123,35 +80,30 @@ public final class Catalogue implements Iterable<Star> {
         return stars;
     }
 
-    @Override
-    public Iterator<Star> iterator() {
-        return id2row.values().stream().map(Row::toStar).collect(Collectors.toList()).iterator();
-    }
-
-    public static class Row {
-        private final int id;
+    static final class Row {
+        final int id;
         @NotNull
-        private final Map<Parameter, Object> values;
+        final Map<Parameter, Object> values;
 
-        public Row(final int id, @NotNull final Map<Parameter, Object> values) {
+        Row(final int id, @NotNull final Map<Parameter, Object> values) {
             this.id = id;
             this.values = new LinkedHashMap<>(values);
         }
 
-        private Row(@NotNull final Row row) {
+        Row(@NotNull final Row row) {
             this(row.id, row.values);
         }
 
         @Nullable
-        public static Row parse(@NotNull final String row, @NotNull final List<Parameter> parameters) {
+        private static Row parse(@NotNull final String row, @NotNull final List<Parameter> parameters) {
             String[] fields = row.split("\\|");
             fields = Arrays.copyOfRange(fields, 1, fields.length);
 
             final Map<Parameter, Object> values = new LinkedHashMap<>();
-
-            for (int i = 0; i < parameters.size(); ++i) {
-                if (!fields[i].trim().isEmpty()) {
-                    values.put(parameters.get(i), parameters.get(i).parse(fields[i].trim()));
+            for (int i = 0; i < parameters.size(); i++) {
+                final Object value = parameters.get(i).parse(fields[i].trim());
+                if (value != null) {
+                    values.put(parameters.get(i), value);
                 }
             }
 
@@ -159,35 +111,9 @@ public final class Catalogue implements Iterable<Star> {
             return new Row(id, values);
         }
 
-        private Row(@NotNull final Star star) {
-            id = star.getId();
-            values = new LinkedHashMap<Parameter, Object>() {{
-                put(LII, Math.toDegrees(star.getDir().getL()));
-                put(BII, Math.toDegrees(star.getDir().getB()));
-                put(PARALLAX, star.getParallax().getValue());
-                put(PARALLAX_ERROR, star.getParallax().getError());
-                put(VMAG, star.getVMag());
-                put(SPECT_TYPE, star.getSpectType());
-                put(BV_COLOR, star.getBVColor().getValue());
-                put(BV_COLOR_ERROR, star.getBVColor().getError());
-            }};
-        }
-
-        @NotNull
-        private Row updateBy(@NotNull final Row row) {
-            if (id != row.id) {
-                throw new RuntimeException("Id of rows must be equal!");
-            }
-            final Map<Parameter, Object> parameter2value = new LinkedHashMap<>(this.values);
-            for (final Parameter parameter : row.values.keySet()) {
-                parameter2value.put(parameter, row.values.get(parameter));
-            }
-            return new Row(id, parameter2value);
-        }
-
         @Nullable
         @SuppressWarnings("unchecked")
-        public <T> T get(@NotNull final Parameter<T> parameter) {
+        <T> T get(@NotNull final Parameter<T> parameter) {
             return (T) values.get(parameter);
         }
 
@@ -203,15 +129,21 @@ public final class Catalogue implements Iterable<Star> {
             final Double bvColorError = get(BV_COLOR_ERROR);
             final Integer numberComponents = get(NUMBER_COMPONENTS);
 
-            assert lii != null;
-            assert bii != null;
+            if (lii == null) {
+                return null;
+            }
+            if (bii == null) {
+                return null;
+            }
             if (parallax == null) {
                 return null;
             }
             if (parallaxError == null) {
                 return null;
             }
-            assert vMag != null;
+            if (vMag == null) {
+                return null;
+            }
             if (spectType == null) {
                 return null;
             }
@@ -234,6 +166,7 @@ public final class Catalogue implements Iterable<Star> {
             );
         }
 
+        @NotNull
         @Override
         public String toString() {
             return id + " " + values;
@@ -241,69 +174,21 @@ public final class Catalogue implements Iterable<Star> {
     }
 
     public static abstract class Parameter<T> {
-        public static final Parameter<Double> LII = new Parameter<Double>("lii") {
+        public static final Parameter<Double> LII = new RadiansParameter("lii");
+        public static final Parameter<Double> BII = new RadiansParameter("bii");
+        public static final Parameter<Double> PARALLAX_ERROR = new DoubleParameter("parallax_error");
+        public static final Parameter<Double> VMAG = new DoubleParameter("vmag");
+        public static final DoubleParameter BV_COLOR = new DoubleParameter("bv_color");
+        public static final DoubleParameter BV_COLOR_ERROR = new DoubleParameter("bv_color_error");
+        public static final DoubleParameter PARALLAX = new DoubleParameter("parallax") {
             @Nullable
             @Override
             Double parse(@NotNull final String value) {
-                return Math.toRadians(Double.parseDouble(value));
+                final Double parallax = super.parse(value);
+                return parallax != null && parallax > 0 ? parallax : null;
             }
         };
-        public static final Parameter<Double> BII = new Parameter<Double>("bii") {
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                return Math.toRadians(Double.parseDouble(value));
-            }
-        };
-        public static final Parameter<Double> PARALLAX_ERROR = new Parameter<Double>("parallax_error") {
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                return !value.isEmpty() ? Double.valueOf(value) : null;
-            }
-        };
-        public static final Parameter<Double> VMAG = new Parameter<Double>("vmag") {
-            @NotNull
-            @Override
-            Double parse(@NotNull final String value) {
-                return Double.valueOf(value);
-            }
-        };
-        public static final Parameter<Double> BV_COLOR = new Parameter<Double>("bv_color") {
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                return !value.isEmpty() ? Double.valueOf(value) : null;
-            }
-        };
-        public static final Parameter<Double> BV_COLOR_ERROR = new Parameter<Double>("bv_color_error") {
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                return !value.isEmpty() ? Double.valueOf(value) : null;
-            }
-        };
-        public static final Parameter<Double> PARALLAX = new Parameter<Double>("parallax") {
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                if (value.isEmpty()) {
-                    return null;
-                }
-                final Double parallax = Double.valueOf(value);
-                if (parallax < 0) {
-                    return null;
-                }
-                return parallax;
-            }
-        };
-        public static final Parameter<Integer> NUMBER_COMPONENTS = new Parameter<Integer>("number_components") {
-            @NotNull
-            @Override
-            Integer parse(@NotNull final String value) {
-                return Integer.valueOf(value);
-            }
-        };
+        public static final IntegerParameter NUMBER_COMPONENTS = new IntegerParameter("number_components");
         public static final Parameter<SpectType> SPECT_TYPE = new Parameter<SpectType>("spect_type") {
             @Nullable
             @Override
@@ -311,13 +196,7 @@ public final class Catalogue implements Iterable<Star> {
                 return SpectTypeParser.parse(value);
             }
         };
-        public static final Parameter<Integer> HIP_NUMBER = new Parameter<Integer>("hip_number") {
-            @NotNull
-            @Override
-            Integer parse(@NotNull final String value) {
-                return Integer.valueOf(value);
-            }
-        };
+        public static final IntegerParameter HIP_NUMBER = new IntegerParameter("hip_number");
 
         @NotNull
         private final String name;
@@ -327,16 +206,10 @@ public final class Catalogue implements Iterable<Star> {
         }
 
         @NotNull
-        public String getName() {
-            return name;
-        }
-
-        abstract T parse(@NotNull final String value);
-
-        @NotNull
         public static Parameter[] values() {
             return new Parameter[]{
-                    LII, BII, PARALLAX_ERROR, VMAG, BV_COLOR, BV_COLOR_ERROR, PARALLAX,
+                    LII, BII, PARALLAX_ERROR, VMAG,
+                    BV_COLOR, BV_COLOR_ERROR, PARALLAX,
                     NUMBER_COMPONENTS, SPECT_TYPE, HIP_NUMBER
             };
         }
@@ -349,6 +222,58 @@ public final class Catalogue implements Iterable<Star> {
                 }
             }
             return null;
+        }
+
+        @NotNull
+        public final String getName() {
+            return name;
+        }
+
+        abstract T parse(@NotNull String value);
+
+        private static class DoubleParameter extends Parameter<Double> {
+            private DoubleParameter(@NotNull final String name) {
+                super(name);
+            }
+
+            @Nullable
+            @Override
+            Double parse(@NotNull final String value) {
+                try {
+                    return Double.valueOf(value);
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        }
+
+        private static final class RadiansParameter extends DoubleParameter {
+            private RadiansParameter(@NotNull String name) {
+                super(name);
+            }
+
+            @Nullable
+            @Override
+            Double parse(@NotNull String value) {
+                final Double deg = super.parse(value);
+                return deg != null ? Math.toRadians(deg) : null;
+            }
+        }
+
+        private static final class IntegerParameter extends Parameter<Integer> {
+            private IntegerParameter(@NotNull final String name) {
+                super(name);
+            }
+
+            @Nullable
+            @Override
+            Integer parse(@NotNull String value) {
+                try {
+                    return Integer.valueOf(value);
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
         }
     }
 }

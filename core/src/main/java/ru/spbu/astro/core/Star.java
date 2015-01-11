@@ -53,7 +53,9 @@ public final class Star implements Comparable<Star> {
     @NotNull
     public Value getExtinction() {
         final Value bv = spectType.toBV();
-        assert bv != null;
+        if (bv == null) {
+            throw new RuntimeException("Star #" + id + " hasn't B-V_{int}");
+        }
         return bvColor.subtract(bv);
     }
 

@@ -12,7 +12,13 @@ import java.util.Arrays;
  */
 public class SpectClass {
     public static enum TypeSymbol {
-        O, B, A, F, G, K, M;
+        O /* 0 */,
+        B /* 10 */,
+        A /* 20 */,
+        F /* 30 */,
+        G /* 40 */,
+        K /* 50 */,
+        M /* 60 */;
 
         @Nullable
         public static TypeSymbol parse(final char c) {
@@ -65,7 +71,7 @@ public class SpectClass {
     }
 
     public int getCode() {
-        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(symbol) + number.intValue();
+        return (int) getDoubleCode();
     }
 
     public double getDoubleCode() {

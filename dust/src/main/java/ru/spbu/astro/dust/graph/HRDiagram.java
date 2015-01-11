@@ -10,7 +10,7 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.LuminosityClass;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Catalogues;
 import ru.spbu.astro.dust.util.StarSelector;
 
 import java.io.IOException;
@@ -20,11 +20,14 @@ import java.util.List;
 
 
 public final class HRDiagram {
-    private static final double PARALLAX_RELATIVE_ERROR_LIMIT = 0.20;
-    private static final double ERROR = 2.5 * Math.log10((1 + PARALLAX_RELATIVE_ERROR_LIMIT) / (1 - PARALLAX_RELATIVE_ERROR_LIMIT));
-    private static final double BV_COLOR_ERROR_LIMIT = Double.MAX_VALUE;
+    public static final double BV_COLOR_LOWER_BOUND = -0.5;
+    public static final double BV_COLOR_UPPER_BOUND = 2;
+    public static final double ABSOLUTE_MAGNITUDE_LOWER_BOUND = -5;
+    public static final double ABSOLUTE_MAGNITUDE_UPPER_BOUND = 15;
 
-    private static final double ERROR_VIEW_SHARE = 0;
+    public static final double SCALE = (ABSOLUTE_MAGNITUDE_UPPER_BOUND - ABSOLUTE_MAGNITUDE_LOWER_BOUND) / (BV_COLOR_UPPER_BOUND - BV_COLOR_LOWER_BOUND);
+
+    private static final double ERROR_VIEW_SHARE = 1;
 
     public HRDiagram(@NotNull final List<Star> stars) {
         final EnumMap<LuminosityClass, List<Star>> lumin2stars = new EnumMap<>(LuminosityClass.class);
@@ -60,7 +63,7 @@ public final class HRDiagram {
         }
 
         final JFreeChart chart = ChartFactory.createScatterPlot(
-                String.format("%d звезд", lumin2stars.values().stream().mapToInt(List::size).sum()),
+                String.format("%d звезы", lumin2stars.values().stream().mapToInt(List::size).sum()),
                 "B-V [зв. вел.]",
                 "M [зв. вел.]",
                 dataset,
@@ -78,10 +81,10 @@ public final class HRDiagram {
         //    chart.getXYPlot().getRenderer().setSeriesShape(i, new Ellipse2D.Float(-0.5f, -0.5f, 1, 1));
         //}
 
-        chart.getXYPlot().getDomainAxis().setLowerBound(-0.5);
-        chart.getXYPlot().getDomainAxis().setUpperBound(2.0);
-        chart.getXYPlot().getRangeAxis().setLowerBound(-5);
-        chart.getXYPlot().getRangeAxis().setUpperBound(15);
+        chart.getXYPlot().getDomainAxis().setLowerBound(BV_COLOR_LOWER_BOUND);
+        chart.getXYPlot().getDomainAxis().setUpperBound(BV_COLOR_UPPER_BOUND);
+        chart.getXYPlot().getRangeAxis().setLowerBound(ABSOLUTE_MAGNITUDE_LOWER_BOUND);
+        chart.getXYPlot().getRangeAxis().setUpperBound(ABSOLUTE_MAGNITUDE_UPPER_BOUND);
 
         final ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
         frame.pack();
@@ -96,12 +99,12 @@ public final class HRDiagram {
                 .selectByAbsoluteMagnitude(4.5, 9.5)
                 .getCatalogue();*/
 
-        new HRDiagram(new StarSelector(Catalogue.HIPPARCOS_2007)
-                .luminosityClasses(LuminosityClass.MAIN)
-                .parallaxRelativeError(0.1)
-                        //.selectByBVColorError(BV_COLOR_ERROR_LIMIT)
-                        //.selectBySpectralType(SpectralType.TypeSymbol.M, 5, 9)
-                .getStars());
+        System.out.println(SCALE * 0.01);
+
+        new HRDiagram(new StarSelector(Catalogues.HIPPARCOS_2007)
+                .mainLuminosityClasses()
+                .absoluteMagnitudeError(SCALE * 0.01)
+                .bvColorError(0.01).getStars());
     }
 
 }

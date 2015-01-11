@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static ru.spbu.astro.dust.model.Catalogue.HIPPARCOS_UPDATED;
+import static ru.spbu.astro.dust.model.Catalogues.HIPPARCOS_UPDATED;
 
 /**
  * User: amosov-f

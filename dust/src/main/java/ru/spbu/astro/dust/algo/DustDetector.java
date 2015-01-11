@@ -5,12 +5,14 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.func.HealpixCounter;
 import ru.spbu.astro.core.graph.HammerProjection;
-import ru.spbu.astro.dust.ml.RansacRegression;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.ml.RansacLinearRegression;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
+import ru.spbu.astro.dust.ml.SimpleRegression;
+import ru.spbu.astro.dust.model.Catalogues;
 import ru.spbu.astro.util.PointsDistribution;
 import ru.spbu.astro.dust.util.StarSelector;
+import ru.spbu.astro.util.Value;
 import weka.core.*;
 import weka.core.neighboursearch.KDTree;
 import weka.core.neighboursearch.NearestNeighbourSearch;
@@ -87,9 +89,9 @@ public class DustDetector {
                 continue;
             }
 
-            final RansacRegression regression = new RansacRegression(true);
+            final SimpleRegression regression = new RansacLinearRegression(true);
             for (final Instance instance : knn) {
-                regression.add(instance.hashCode(), new Vector2D(point(instance).getNorm(), instance.value(3)));
+                regression.add(instance.hashCode(), new Value(point(instance).getNorm()), new Value(instance.value(3)));
             }
             if (!regression.train()) {
                 continue;
@@ -130,7 +132,7 @@ public class DustDetector {
 
     public static void main(final String[] args) throws FileNotFoundException {
         final DustDetector detector = new DustDetector(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                new StarSelector(Catalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
 
         final List<Spheric> dirs = new ArrayList<>();

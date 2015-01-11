@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.func.HealpixCounter;
 import ru.spbu.astro.core.func.SphericDistribution;
 import ru.spbu.astro.core.graph.HammerProjection;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Catalogues;
 import ru.spbu.astro.dust.util.StarSelector;
 
 /**
@@ -15,7 +15,7 @@ import ru.spbu.astro.dust.util.StarSelector;
 public class MissObserver {
     public static void main(@NotNull final String[] args) {
         final SphericDistribution f = new HealpixCounter(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).negativeExtinction().getStars(),
+                new StarSelector(Catalogues.HIPPARCOS_UPDATED.getStars()).negativeExtinction().getStars(),
                 18
         );
         final HammerProjection hammerProjection = new HammerProjection(f);

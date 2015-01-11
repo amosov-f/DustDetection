@@ -6,9 +6,9 @@ import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.func.CloudDistribution;
 import ru.spbu.astro.core.graph.HammerProjection;
-import ru.spbu.astro.dust.model.Catalogue;
 import ru.spbu.astro.core.Cloud;
 import ru.spbu.astro.core.Star;
+import ru.spbu.astro.dust.model.Catalogues;
 import ru.spbu.astro.dust.util.StarSelector;
 
 import java.io.FileNotFoundException;
@@ -46,7 +46,7 @@ public class DustCloudDetector {
 
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         final DustCloudDetector detector = new DustCloudDetector(
-                new StarSelector(Catalogue.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                new StarSelector(Catalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
         final List<Cloud> clouds = detector.getClouds();
         System.out.println(clouds.size());

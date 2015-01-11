@@ -1,15 +1,16 @@
 package ru.spbu.astro.dust.algo;
 
 import gov.fnal.eag.healpix.PixTools;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.dust.ml.RansacRegression;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.core.HealpixTools;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
+import ru.spbu.astro.dust.ml.RansacLinearRegression;
+import ru.spbu.astro.dust.ml.SimpleRegression;
+import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Catalogues;
 import ru.spbu.astro.util.Value;
-import ru.spbu.astro.core.HealpixTools;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +22,7 @@ public final class DustTrendCalculator {
     private static final int N_SIDE = 18;
 
     @NotNull
-    private final List<List<Star>> bases = new ArrayList<>();
+    private final List<List<Star>> inliers = new ArrayList<>();
     @NotNull
     private final List<List<Star>> outliers = new ArrayList<>();
 
@@ -57,20 +58,32 @@ public final class DustTrendCalculator {
         intercepts = new Value[rings.size()];
 
         for (int pix = 0; pix < rings.size(); pix++) {
-            final RansacRegression regression = new RansacRegression(includeIntercept);
+            final SimpleRegression regression = new RansacLinearRegression(includeIntercept);
             for (final Star star : rings.get(pix)) {
-                regression.add(star.getId(), new Vector2D(star.getR().getValue(), star.getExtinction().getValue()));
+                regression.add(star.getId(), star.getR(), star.getExtinction());
             }
             if (regression.train()) {
                 slopes[pix] = regression.getSlope();
                 intercepts[pix] = regression.getIntercept();
-                bases.add(regression.getBases().stream().map(id2star::get).collect(Collectors.toList()));
+                inliers.add(regression.getInliers().stream().map(id2star::get).collect(Collectors.toList()));
                 outliers.add(regression.getOutliers().stream().map(id2star::get).collect(Collectors.toList()));
             } else {
-                bases.add(null);
+                inliers.add(null);
                 outliers.add(null);
             }
         }
+    }
+
+    public static void main(@NotNull final String[] args) throws FileNotFoundException {
+        final Catalogue catalogue = Catalogues.HIPPARCOS_UPDATED;
+
+        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue.getStars());
+
+        final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
+
+        Locale.setDefault(Locale.US);
+        fout.print(dustTrendCalculator.toString());
+        fout.flush();
     }
 
     @NotNull
@@ -85,7 +98,7 @@ public final class DustTrendCalculator {
 
     @Nullable
     public List<Star> getBaseStars(@NotNull final Spheric dir) {
-        return bases.get(getPix(dir));
+        return inliers.get(getPix(dir));
     }
 
     @Nullable
@@ -115,7 +128,7 @@ public final class DustTrendCalculator {
     @Override
     public String toString() {
         double dr = 0;
-        for (final List<Star> ring : bases) {
+        for (final List<Star> ring : inliers) {
             for (final Star star : ring) {
                 dr = Math.max(dr, star.getR().getRelativeError());
             }
@@ -124,28 +137,16 @@ public final class DustTrendCalculator {
         final StringBuilder s = new StringBuilder();
         s.append("dr <= ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
         s.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
-        for (int i = 0; i < bases.size(); ++i) {
+        for (int i = 0; i < inliers.size(); ++i) {
             final Spheric dir = getPixCenter(i);
             final Value k = slopes[i];
-            final int n = bases.get(i).size();
+            final int n = inliers.get(i).size();
             s.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
                     i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), n
             ));
         }
         return s.toString();
-    }
-
-    public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = Catalogue.HIPPARCOS_UPDATED;
-
-        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue.getStars());
-
-        final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
-
-        Locale.setDefault(Locale.US);
-        fout.print(dustTrendCalculator.toString());
-        fout.flush();
     }
 
 }

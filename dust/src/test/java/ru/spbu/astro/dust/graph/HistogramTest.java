@@ -3,7 +3,7 @@ package ru.spbu.astro.dust.graph;
 import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.core.count.DoubleStarCounter;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.dust.model.Catalogues;
 
 /**
  * User: amosov-f
@@ -15,7 +15,7 @@ public class HistogramTest {
     @Test
     public void histRelativeError() throws Exception {
         new Histogram(
-                Catalogue.HIPPARCOS_UPDATED.getStars(),
+                Catalogues.HIPPARCOS_UPDATED.getStars(),
                 new DoubleStarCounter("Относительная ошибка в расстоянии", star -> star.getR().getRelativeError(), 0.1)
         );
         Thread.sleep(Long.MAX_VALUE);
