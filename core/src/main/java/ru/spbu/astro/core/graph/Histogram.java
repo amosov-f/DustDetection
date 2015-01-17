@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graph;
+package ru.spbu.astro.core.graph;
 
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
@@ -17,7 +17,7 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.count.StarCounter;
+import ru.spbu.astro.core.hist.StarCounter;
 
 import java.text.DecimalFormat;
 import java.util.List;

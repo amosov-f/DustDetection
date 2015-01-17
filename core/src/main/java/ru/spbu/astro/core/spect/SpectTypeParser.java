@@ -13,7 +13,7 @@ import java.util.Map;
  * Date: 07.01.15
  * Time: 1:17
  */
-public class SpectTypeParser {
+public final class SpectTypeParser {
     private static final Map<String, SpectType> CACHE = new HashMap<>();
 
     private static final char STOP_SYMBOL = '$';

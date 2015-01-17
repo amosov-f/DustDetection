@@ -1,9 +1,7 @@
-package ru.spbu.astro.dust.model;
+package ru.spbu.astro.core;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.core.Spheric;
-import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.SpectType;
 import ru.spbu.astro.core.spect.SpectTypeParser;
 import ru.spbu.astro.util.Value;
@@ -12,7 +10,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 
-import static ru.spbu.astro.dust.model.Catalogue.Parameter.*;
+import static ru.spbu.astro.core.Catalogue.Parameter.*;
 
 public final class Catalogue {
 
@@ -51,12 +49,13 @@ public final class Catalogue {
         id2row.put(row.id, row);
     }
 
-    public Catalogue updateBy(@NotNull final Function<Row, Row> processor) {
-        final Catalogue updatedCatalogue = new Catalogue(this);
-        for (final Row row : updatedCatalogue.id2row.values()) {
-            final Row updatedRow = processor.apply(row);
-            if (updatedRow != null) {
-                updatedCatalogue.add(updatedRow);
+    @NotNull
+    public Catalogue updateBy(@NotNull final Function<Star, Star> processor) {
+        final Catalogue updatedCatalogue = new Catalogue();
+        for (final Row row : id2row.values()) {
+            final Star star = row.toStar();
+            if (star != null) {
+                updatedCatalogue.add(new Row(processor.apply(star)));
             }
         }
         return updatedCatalogue;
@@ -83,15 +82,28 @@ public final class Catalogue {
     static final class Row {
         final int id;
         @NotNull
-        final Map<Parameter, Object> values;
+        final Map<Parameter, Object> values = new LinkedHashMap<>();
 
         Row(final int id, @NotNull final Map<Parameter, Object> values) {
             this.id = id;
-            this.values = new LinkedHashMap<>(values);
+            this.values.putAll(values);
         }
 
         Row(@NotNull final Row row) {
             this(row.id, row.values);
+        }
+
+        Row(@NotNull final Star star) {
+            id = star.getId();
+            values.put(LII, star.getDir().getL());
+            values.put(BII, star.getDir().getB());
+            values.put(PARALLAX, star.getParallax().getValue());
+            values.put(PARALLAX_ERROR, star.getParallax().getError());
+            values.put(VMAG, star.getVMag());
+            values.put(SPECT_TYPE, star.getSpectType());
+            values.put(BV_COLOR, star.getBVColor().getValue());
+            values.put(BV_COLOR_ERROR, star.getBVColor().getError());
+            values.put(NUMBER_COMPONENTS, 1);
         }
 
         @Nullable

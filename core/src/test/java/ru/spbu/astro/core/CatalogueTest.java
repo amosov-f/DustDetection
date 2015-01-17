@@ -1,6 +1,7 @@
-package ru.spbu.astro.dust.model;
+package ru.spbu.astro.core;
 
 import org.junit.Test;
+import ru.spbu.astro.core.Catalogues;
 import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.LuminosityClass;
 import ru.spbu.astro.util.Value;

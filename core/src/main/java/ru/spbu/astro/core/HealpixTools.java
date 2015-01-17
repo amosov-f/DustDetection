@@ -12,6 +12,9 @@ import static java.lang.Math.sqrt;
  * Time: 0:36
  */
 public final class HealpixTools {
+    private HealpixTools() {
+    }
+
     public static int nPix(final int nSide) {
         return 12 * nSide * nSide;
     }

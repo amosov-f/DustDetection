@@ -3,37 +3,21 @@ package ru.spbu.astro.core.spect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
 /**
  * User: amosov-f
  * Date: 13.11.14
  * Time: 1:38
  */
-public class SpectClass {
-    public static enum TypeSymbol {
-        O /* 0 */,
-        B /* 10 */,
-        A /* 20 */,
-        F /* 30 */,
-        G /* 40 */,
-        K /* 50 */,
-        M /* 60 */;
-
-        @Nullable
-        public static TypeSymbol parse(final char c) {
-            try {
-                return valueOf(String.valueOf(c));
-            } catch (IllegalArgumentException e) {
-                return null;
-            }
-        }
-    }
-
+public final class SpectClass {
     @NotNull
     private final TypeSymbol symbol;
     @NotNull
     private final Double number;
+
+    SpectClass(@NotNull final TypeSymbol symbol, @NotNull final Double number) {
+        this.symbol = symbol;
+        this.number = number;
+    }
 
     @Nullable
     public static SpectClass parse(@NotNull final String str) {
@@ -55,11 +39,6 @@ public class SpectClass {
         return new SpectClass(TypeSymbol.values()[code / 10], (double) (code % 10));
     }
 
-    SpectClass(@NotNull TypeSymbol symbol, @NotNull Double number) {
-        this.symbol = symbol;
-        this.number = number;
-    }
-
     @NotNull
     public TypeSymbol getSymbol() {
         return symbol;
@@ -75,7 +54,7 @@ public class SpectClass {
     }
 
     public double getDoubleCode() {
-        return 10 * Arrays.asList(TypeSymbol.values()).indexOf(symbol) + number;
+        return 10 * symbol.ordinal() + number;
     }
 
     @NotNull
@@ -85,5 +64,24 @@ public class SpectClass {
             return symbol + "" + number.intValue();
         }
         return symbol + "" + number;
+    }
+
+    public static enum TypeSymbol {
+        O /* 0 */,
+        B /* 10 */,
+        A /* 20 */,
+        F /* 30 */,
+        G /* 40 */,
+        K /* 50 */,
+        M /* 60 */;
+
+        @Nullable
+        public static TypeSymbol parse(final char c) {
+            try {
+                return valueOf(String.valueOf(c));
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
     }
 }

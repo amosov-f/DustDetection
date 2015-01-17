@@ -1,6 +1,5 @@
-package ru.spbu.astro.dust.ml;
+package ru.spbu.astro.util.ml;
 
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.util.Value;
 
@@ -26,5 +25,5 @@ public interface SimpleRegression {
 
     boolean train();
 
-    void add(int id, @NotNull final Value x, @NotNull final Value y);
+    void add(int id, @NotNull Value x, @NotNull Value y);
 }

@@ -46,7 +46,7 @@ public final class PixPlot {
     }
 
     public void plot(@NotNull final Spheric dir) {
-        final List<Star> baseStars = dustTrendCalculator.getBaseStars(dir);
+        final List<Star> baseStars = dustTrendCalculator.getInlierStars(dir);
         final List<Star> outlierStars = dustTrendCalculator.getOutlierStars(dir);
         if (baseStars == null || outlierStars == null) {
             return;

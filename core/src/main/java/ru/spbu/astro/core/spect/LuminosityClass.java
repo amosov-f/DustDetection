@@ -12,7 +12,7 @@ public enum LuminosityClass {
 
     public static boolean contains(final char c) {
         for (final LuminosityClass luminosityClass : values()) {
-            if (luminosityClass.name().contains(String.valueOf(c))) {
+            if (luminosityClass.name().indexOf(c) != -1) {
                 return true;
             }
         }

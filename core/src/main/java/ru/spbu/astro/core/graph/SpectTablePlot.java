@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graph;
+package ru.spbu.astro.core.graph;
 
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
@@ -59,16 +59,5 @@ public final class SpectTablePlot {
         final ChartFrame frame = new ChartFrame("Таблица B-V", new JFreeChart("Таблица B-V", plot));
         frame.pack();
         frame.setVisible(true);
-    }
-
-    public static void main(@NotNull final String[] args) {
-        new SpectTablePlot(Arrays.asList(
-                SpectTable.TSVETKOV,
-                SpectTable.COMPOSITE,
-                SpectTable.SCHMIDT_KALER
-                //SpectTable.MAX_5
-                //SpectTable.MAX,
-                //new SpectTableCalculator().calculate(0.05)
-        ));
     }
 }

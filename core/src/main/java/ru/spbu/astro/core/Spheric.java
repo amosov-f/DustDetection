@@ -7,7 +7,6 @@ import org.apache.commons.math3.geometry.spherical.twod.S2Point;
 import org.jetbrains.annotations.NotNull;
 
 public final class Spheric extends S2Point implements Comparable<Spheric> {
-
     public Spheric(final double l, final double b) throws OutOfRangeException {
         super(l, Math.PI / 2 - b);
     }

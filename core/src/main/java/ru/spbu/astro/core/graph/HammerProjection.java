@@ -125,7 +125,6 @@ public final class HammerProjection extends JWindow {
                     }
 
                     if (value >= 0) {
-
                         color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
                     } else {
                         color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
@@ -227,17 +226,11 @@ public final class HammerProjection extends JWindow {
     }
 
     private static double normalize(double x, double min, double max) {
-        if (x == Double.POSITIVE_INFINITY || Double.isNaN(x)) {
+        if (x == Double.POSITIVE_INFINITY || Double.isNaN(x) || x > max) {
             x = max;
         }
-        if (x == Double.NEGATIVE_INFINITY) {
+        if (x == Double.NEGATIVE_INFINITY || x < min) {
             x = min;
-        }
-        if (x < min) {
-            x = min;
-        }
-        if (x > max) {
-            x = max;
         }
 
         double d = Math.max(Math.abs(min), Math.abs(max));

@@ -1,4 +1,4 @@
-package ru.spbu.astro.core.count;
+package ru.spbu.astro.core.hist;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.Star;

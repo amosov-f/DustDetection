@@ -8,8 +8,8 @@ import ru.spbu.astro.core.func.CloudDistribution;
 import ru.spbu.astro.core.graph.HammerProjection;
 import ru.spbu.astro.core.Cloud;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.dust.model.Catalogues;
-import ru.spbu.astro.dust.util.StarSelector;
+import ru.spbu.astro.dust.DustCatalogues;
+import ru.spbu.astro.core.StarFilter;
 
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Date: 16.11.14
  * Time: 14:58
  */
-public class DustCloudDetector {
+public final class DustCloudDetector {
     private static final double EPS = 450;
     private static final double MIN_PTS_PART = 0.004;
 
@@ -46,7 +46,7 @@ public class DustCloudDetector {
 
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
         final DustCloudDetector detector = new DustCloudDetector(
-                new StarSelector(Catalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
         final List<Cloud> clouds = detector.getClouds();
         System.out.println(clouds.size());

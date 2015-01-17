@@ -1,17 +1,16 @@
 package ru.spbu.astro.dust.algo;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.func.HealpixCounter;
 import ru.spbu.astro.core.graph.HammerProjection;
-import ru.spbu.astro.dust.ml.RansacLinearRegression;
+import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.dust.ml.SimpleRegression;
-import ru.spbu.astro.dust.model.Catalogues;
+import ru.spbu.astro.util.ml.SimpleRegression;
+import ru.spbu.astro.dust.DustCatalogues;
 import ru.spbu.astro.util.PointsDistribution;
-import ru.spbu.astro.dust.util.StarSelector;
+import ru.spbu.astro.core.StarFilter;
 import ru.spbu.astro.util.Value;
 import weka.core.*;
 import weka.core.neighboursearch.KDTree;
@@ -26,7 +25,7 @@ import java.util.List;
  * Date: 15.11.14
  * Time: 20:39
  */
-public class DustDetector {
+public final class DustDetector {
     private static final int K = 25;
     private static final double THRESHOLD = 0.008;
     private static final double MAX_RANGE = 100;
@@ -132,7 +131,7 @@ public class DustDetector {
 
     public static void main(final String[] args) throws FileNotFoundException {
         final DustDetector detector = new DustDetector(
-                new StarSelector(Catalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
 
         final List<Spheric> dirs = new ArrayList<>();

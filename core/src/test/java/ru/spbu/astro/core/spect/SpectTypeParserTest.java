@@ -1,4 +1,4 @@
-package ru.astro.core.spect;
+package ru.spbu.astro.core.spect;
 
 import org.junit.Test;
 import ru.spbu.astro.core.spect.SpectType;

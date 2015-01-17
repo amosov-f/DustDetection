@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.ml;
+package ru.spbu.astro.util.ml;
 
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;

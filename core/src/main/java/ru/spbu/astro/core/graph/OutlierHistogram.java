@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graph;
+package ru.spbu.astro.core.graph;
 
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
@@ -17,22 +17,22 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.core.Star;
+import ru.spbu.astro.core.hist.StarCounter;
+import ru.spbu.astro.core.StarFilter;
 import ru.spbu.astro.util.Value;
-import ru.spbu.astro.dust.util.StarSelector;
-import ru.spbu.astro.core.count.StarCounter;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 public class OutlierHistogram {
-
+    @NotNull
     private final List<Star> outliers;
 
-    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final StarCounter<T> counter) {
-        outliers = new StarSelector(stars).negativeExtinction().getStars();
+    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final Predicate<Star> outlierFilter, @NotNull final StarCounter<T> counter) {
+        outliers = new StarFilter(stars).filter(outlierFilter).getStars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -108,14 +108,5 @@ public class OutlierHistogram {
             ));
         }
         return str.toString();
-    }
-
-    @NotNull
-    public List<Integer> getMissIds() {
-        final List<Integer> missIds = new ArrayList<>();
-        for (final Star s : outliers) {
-            missIds.add(s.getId());
-        }
-        return missIds;
     }
 }

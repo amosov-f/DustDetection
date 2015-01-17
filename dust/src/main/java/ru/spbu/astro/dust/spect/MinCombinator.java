@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.model.spect.table;
+package ru.spbu.astro.dust.spect;
 
 import com.google.common.base.Joiner;
 import org.jetbrains.annotations.NotNull;

@@ -3,8 +3,8 @@ package ru.spbu.astro.dust.algo;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.LuminosityClass;
-import ru.spbu.astro.dust.model.Catalogues;
-import ru.spbu.astro.dust.model.spect.table.MinCombinator;
+import ru.spbu.astro.dust.DustCatalogues;
+import ru.spbu.astro.dust.spect.MinCombinator;
 import ru.spbu.astro.core.spect.SpectTable;
 
 import java.io.FileNotFoundException;
@@ -16,14 +16,14 @@ import java.util.*;
  * Date: 26.10.14
  * Time: 21:12
  */
-public class SpectTableCalculator {
+public final class SpectTableCalculator {
     @NotNull
     public SpectTable calculate(final double outlierPart) {
         final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
         final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
         spect2stars.put(LuminosityClass.III, new HashMap<>());
         spect2stars.put(LuminosityClass.V, new HashMap<>());
-        for (final Star star : Catalogues.HIPPARCOS_UPDATED.getStars()) {
+        for (final Star star : DustCatalogues.HIPPARCOS_UPDATED.getStars()) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
             if (spect2stars.containsKey(lumin)) {
                 final int key = key(star.getSpectType().getSpect().getCode());

@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.model.spect.table;
+package ru.spbu.astro.dust.spect;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.spect.SpectTable;

@@ -4,8 +4,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.LuminosityClass;
-import ru.spbu.astro.dust.model.Catalogues;
-import ru.spbu.astro.dust.util.StarSelector;
+import ru.spbu.astro.core.Catalogues;
+import ru.spbu.astro.core.StarFilter;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
@@ -16,7 +16,7 @@ import weka.core.Instances;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.spbu.astro.dust.graph.HRDiagram.SCALE;
+import static ru.spbu.astro.core.graph.HRDiagram.SCALE;
 
 public final class LuminosityClassifier {
     private static final double BV_COLOR_ERROR_LIMIT = 0.01;
@@ -38,7 +38,7 @@ public final class LuminosityClassifier {
     }
 
     public LuminosityClassifier(@NotNull final List<Star> stars, @NotNull final Mode mode) {
-        final Instances learn = toInstances("learn", new StarSelector(stars)
+        final Instances learn = toInstances("learn", new StarFilter(stars)
                 .mainLuminosityClasses()
                 .absoluteMagnitudeError(SCALE * BV_COLOR_ERROR_LIMIT)
                 .bvColorError(BV_COLOR_ERROR_LIMIT).getStars());

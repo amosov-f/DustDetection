@@ -4,10 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.core.graph.HammerProjection;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.core.func.HealpixBinaryDistribution;
-import ru.spbu.astro.dust.model.Catalogue;
+import ru.spbu.astro.core.Catalogue;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.dust.util.StarSelector;
+import ru.spbu.astro.core.StarFilter;
 
 import javax.swing.*;
 import java.awt.event.KeyAdapter;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static ru.spbu.astro.dust.model.Catalogues.HIPPARCOS_UPDATED;
+import static ru.spbu.astro.dust.DustCatalogues.HIPPARCOS_UPDATED;
 
 /**
  * User: amosov-f
@@ -39,7 +39,7 @@ public class DeepObserver extends JFrame {
 
 
     public DeepObserver(@NotNull final Catalogue catalogue) {
-        layers = split(new StarSelector(catalogue.getStars()).parallaxRelativeError(0.25).getStars(), 2);
+        layers = split(new StarFilter(catalogue.getStars()).parallaxRelativeError(0.25).getStars(), 2);
 
         for (int i = 0; i < layers.size(); i++) {
             calculators.add(new DustTrendCalculator(layers.get(i), i != 0));

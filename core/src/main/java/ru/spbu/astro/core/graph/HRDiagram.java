@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.graph;
+package ru.spbu.astro.core.graph;
 
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFactory;
@@ -10,8 +10,8 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.core.Star;
 import ru.spbu.astro.core.spect.LuminosityClass;
-import ru.spbu.astro.dust.model.Catalogues;
-import ru.spbu.astro.dust.util.StarSelector;
+import ru.spbu.astro.core.Catalogues;
+import ru.spbu.astro.core.StarFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public final class HRDiagram {
 
         System.out.println(SCALE * 0.01);
 
-        new HRDiagram(new StarSelector(Catalogues.HIPPARCOS_2007)
+        new HRDiagram(new StarFilter(Catalogues.HIPPARCOS_2007)
                 .mainLuminosityClasses()
                 .absoluteMagnitudeError(SCALE * 0.01)
                 .bvColorError(0.01).getStars());

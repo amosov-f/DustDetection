@@ -6,10 +6,10 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.core.HealpixTools;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.dust.ml.RansacLinearRegression;
-import ru.spbu.astro.dust.ml.SimpleRegression;
-import ru.spbu.astro.dust.model.Catalogue;
-import ru.spbu.astro.dust.model.Catalogues;
+import ru.spbu.astro.util.ml.RansacLinearRegression;
+import ru.spbu.astro.util.ml.SimpleRegression;
+import ru.spbu.astro.core.Catalogue;
+import ru.spbu.astro.dust.DustCatalogues;
 import ru.spbu.astro.util.Value;
 
 import java.io.FileNotFoundException;
@@ -75,7 +75,7 @@ public final class DustTrendCalculator {
     }
 
     public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = Catalogues.HIPPARCOS_UPDATED;
+        final Catalogue catalogue = DustCatalogues.HIPPARCOS_UPDATED;
 
         final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue.getStars());
 
@@ -97,7 +97,7 @@ public final class DustTrendCalculator {
     }
 
     @Nullable
-    public List<Star> getBaseStars(@NotNull final Spheric dir) {
+    public List<Star> getInlierStars(@NotNull final Spheric dir) {
         return inliers.get(getPix(dir));
     }
 

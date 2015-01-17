@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.ml;
+package ru.spbu.astro.util.ml;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.util.Value;
