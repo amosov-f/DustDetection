@@ -10,5 +10,5 @@ import ru.spbu.astro.core.spect.SpectTable;
  */
 public interface SpectTableCombinator {
     @NotNull
-    SpectTable combine(@NotNull final SpectTable... spectTables);
+    SpectTable combine(@NotNull SpectTable... spectTables);
 }

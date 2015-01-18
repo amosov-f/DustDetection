@@ -32,7 +32,7 @@ public final class Value implements Comparable<Value> {
         return Math.abs(getError() / getValue());
     }
 
-    public double getMax() {
+    public double getPlusThreeSigma() {
         return value + 3 * error;
     }
 

@@ -74,18 +74,6 @@ public final class DustTrendCalculator {
         }
     }
 
-    public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        final Catalogue catalogue = DustCatalogues.HIPPARCOS_UPDATED;
-
-        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(catalogue.getStars());
-
-        final PrintWriter fout = new PrintWriter(new FileOutputStream("results/2.txt"));
-
-        Locale.setDefault(Locale.US);
-        fout.print(dustTrendCalculator.toString());
-        fout.flush();
-    }
-
     @NotNull
     public Value[] getSlopes() {
         return slopes;
@@ -140,10 +128,9 @@ public final class DustTrendCalculator {
         for (int i = 0; i < inliers.size(); ++i) {
             final Spheric dir = getPixCenter(i);
             final Value k = slopes[i];
-            final int n = inliers.get(i).size();
             s.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
-                    i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), n
+                    i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), inliers.get(i).size()
             ));
         }
         return s.toString();

@@ -12,7 +12,7 @@ import ru.spbu.astro.core.StarFilter;
  * Date: 12.10.14
  * Time: 17:51
  */
-public class MissObserver {
+public final class MissObserver {
     public static void main(@NotNull final String[] args) {
         final SphericDistribution f = new HealpixCounter(
                 new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).negativeExtinction().getStars(),

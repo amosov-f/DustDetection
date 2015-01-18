@@ -15,7 +15,7 @@ import java.util.TreeMap;
  * Date: 16.11.14
  * Time: 0:05
  */
-public class MinCombinator implements SpectTableCombinator {
+public final class MinCombinator implements SpectTableCombinator {
     @NotNull
     @Override
     public SpectTable combine(@NotNull SpectTable... spectTables) {

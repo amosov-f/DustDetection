@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
  * Date: 15.11.14
  * Time: 18:13
  */
-public class PointsDistribution {
+public final class PointsDistribution {
     private static final int DEL = 10;
 
     @NotNull

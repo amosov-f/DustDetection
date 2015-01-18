@@ -14,7 +14,7 @@ import java.util.Map;
  * Date: 12.10.14
  * Time: 19:26
  */
-public class SpectClassHist implements StarHist<String> {
+public final class SpectClassHist implements StarHist<String> {
     private final int bin;
 
     public SpectClassHist(final int bin) {
