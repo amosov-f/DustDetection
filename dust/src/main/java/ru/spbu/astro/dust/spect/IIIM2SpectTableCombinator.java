@@ -17,7 +17,7 @@ import static ru.spbu.astro.core.spect.LuminosityClass.III;
  * Time: 14:24
  */
 public class IIIM2SpectTableCombinator implements SpectTableCombinator {
-    private static final double CODE = SpectClass.parse("M2").getNumber();
+    private static final double CODE = SpectClass.parse("M2").getDoubleNumber();
 
     @NotNull
     @Override

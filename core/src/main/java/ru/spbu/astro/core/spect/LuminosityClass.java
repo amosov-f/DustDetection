@@ -9,13 +9,4 @@ public enum LuminosityClass {
     I, Ia, Ib, Iab, II, IIb, IIIa, IIIb, IV, IVa, V, III, Va, Vb, VI, VII;
 
     public static final LuminosityClass[] MAIN = {III, V};
-
-    public static boolean contains(final char c) {
-        for (final LuminosityClass luminosityClass : values()) {
-            if (luminosityClass.name().indexOf(c) != -1) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

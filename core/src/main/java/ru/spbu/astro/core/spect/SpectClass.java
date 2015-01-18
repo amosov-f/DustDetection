@@ -25,13 +25,11 @@ public final class SpectClass {
         if (symbol == null) {
             return null;
         }
-        final Double number;
         try {
-            number = Double.valueOf(str.substring(1));
+            return new SpectClass(symbol, Double.valueOf(str.substring(1)));
         } catch (NumberFormatException e) {
             return null;
         }
-        return new SpectClass(symbol, number);
     }
 
     @NotNull
@@ -45,8 +43,12 @@ public final class SpectClass {
     }
 
     @NotNull
-    public Double getNumber() {
+    public Double getDoubleNumber() {
         return number;
+    }
+
+    public int getNumber() {
+        return number.intValue();
     }
 
     public int getCode() {

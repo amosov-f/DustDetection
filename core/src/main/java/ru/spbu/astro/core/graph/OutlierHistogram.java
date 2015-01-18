@@ -17,7 +17,7 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.hist.StarCounter;
+import ru.spbu.astro.core.hist.StarHist;
 import ru.spbu.astro.core.StarFilter;
 import ru.spbu.astro.util.Value;
 
@@ -31,14 +31,14 @@ public class OutlierHistogram {
     @NotNull
     private final List<Star> outliers;
 
-    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final Predicate<Star> outlierFilter, @NotNull final StarCounter<T> counter) {
+    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final Predicate<Star> outlierFilter, @NotNull final StarHist<T> counter) {
         outliers = new StarFilter(stars).filter(outlierFilter).getStars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        final Map<T, Integer> outlierCounts = counter.count(outliers);
+        final Map<T, Integer> outlierCounts = counter.hist(outliers);
         final int outlierCount = IntStream.of(Ints.toArray(outlierCounts.values())).sum();
-        final Map<T, Integer> counts = counter.count(stars);
+        final Map<T, Integer> counts = counter.hist(stars);
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
 
         for (final T type : counts.keySet()) {

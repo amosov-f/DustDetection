@@ -1,11 +1,9 @@
 package ru.spbu.astro.core.spect;
 
 import org.junit.Test;
-import ru.spbu.astro.core.spect.SpectType;
-import ru.spbu.astro.core.spect.SpectTypeParser;
+import ru.spbu.astro.util.Value;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static ru.spbu.astro.core.spect.LuminosityClass.III;
 
 public class SpectTypeParserTest {
@@ -14,9 +12,11 @@ public class SpectTypeParserTest {
     @Test
     public void testParsing1() {
         final SpectType type = SpectTypeParser.parse("K5III");
-        assert type != null;
+        assertNotNull(type);
         assertEquals(III, type.getLumin());
-        assertEquals(1.450, type.toBV().getValue(), EPS);
+        final Value bv = type.toBV();
+        assertNotNull(bv);
+        assertEquals(1.450, bv.getValue(), EPS);
     }
 
     @Test
@@ -28,7 +28,23 @@ public class SpectTypeParserTest {
     @Test
     public void testParsing3() {
         final SpectType type = SpectTypeParser.parse("G8/K0III");
-        assert type != null;
+        assertNotNull(type);
         assertEquals(III, type.getLumin());
+    }
+
+    @Test
+    public void testParsing4() throws Exception {
+        final SpectType type = SpectTypeParser.parse("K2");
+        assertNotNull(type);
+        assertEquals(SpectClass.TypeSymbol.K, type.getSpect().getSymbol());
+        assertEquals(2, type.getSpect().getNumber());
+        assertNull(type.getLumin());
+    }
+
+    @Test
+    public void testToString() {
+        final SpectType type = SpectTypeParser.parse("B3/B4V");
+        assertNotNull(type);
+        assertEquals("B3/B4V", type.toString());
     }
 }

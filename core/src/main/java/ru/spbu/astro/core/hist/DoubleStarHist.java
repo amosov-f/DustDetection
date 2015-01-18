@@ -11,7 +11,7 @@ import java.util.function.Function;
  * Date: 25.10.14
  * Time: 18:49
  */
-public class DoubleStarCounter implements StarCounter<Double> {
+public final class DoubleStarHist implements StarHist<Double> {
     @NotNull
     private final String name;
     @NotNull
@@ -20,11 +20,11 @@ public class DoubleStarCounter implements StarCounter<Double> {
     private final double max;
     private final double dx;
 
-    public DoubleStarCounter(@NotNull final String name, @NotNull final Function<Star, Double> f, final double dx) {
+    public DoubleStarHist(@NotNull final String name, @NotNull final Function<Star, Double> f, final double dx) {
         this(name, f, 0, 1, dx);
     }
 
-    public DoubleStarCounter(@NotNull final String name, @NotNull final Function<Star, Double> f, final double min, final double max, final double dx) {
+    public DoubleStarHist(@NotNull final String name, @NotNull final Function<Star, Double> f, final double min, final double max, final double dx) {
         this.name = name;
         this.f = f;
         this.min = min;
@@ -32,9 +32,13 @@ public class DoubleStarCounter implements StarCounter<Double> {
         this.dx = dx;
     }
 
+    private static double removeUnnecessaryDigits(final double x) {
+        return Double.valueOf(String.format(Locale.US, "%.2f", x));
+    }
+
     @NotNull
     @Override
-    public Map<Double, Integer> count(@NotNull List<Star> stars) {
+    public Map<Double, Integer> hist(@NotNull final List<Star> stars) {
         final NavigableMap<Double, Integer> counts = new TreeMap<>();
         for (int i = 0; min + dx * (i + 0.5) <= max; i++) {
             counts.put(removeUnnecessaryDigits(min + dx * (i + 0.5)), 0);
@@ -57,9 +61,5 @@ public class DoubleStarCounter implements StarCounter<Double> {
     @Override
     public String getName() {
         return name;
-    }
-
-    private static double removeUnnecessaryDigits(final double x) {
-        return Double.valueOf(String.format(Locale.US, "%.2f", x));
     }
 }

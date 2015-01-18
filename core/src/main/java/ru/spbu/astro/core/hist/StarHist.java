@@ -12,9 +12,9 @@ import java.util.Map;
  * Date: 12.10.14
  * Time: 18:52
  */
-public interface StarCounter<T extends Comparable<T>> {
+public interface StarHist<T extends Comparable<T>> {
     @NotNull
-    Map<T, Integer> count(@NotNull List<Star> stars);
+    Map<T, Integer> hist(@NotNull List<Star> stars);
 
     @NotNull
     String getName();

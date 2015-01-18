@@ -14,16 +14,16 @@ import java.util.Map;
  * Date: 12.10.14
  * Time: 19:26
  */
-public class SpectClassCounter implements StarCounter<String> {
+public class SpectClassHist implements StarHist<String> {
     private final int bin;
 
-    public SpectClassCounter(final int bin) {
+    public SpectClassHist(final int bin) {
         this.bin = bin;
     }
 
     @NotNull
     @Override
-    public Map<String, Integer> count(@NotNull List<Star> stars) {
+    public Map<String, Integer> hist(@NotNull List<Star> stars) {
         final Map<String, Integer> counts = new LinkedHashMap<>();
         SpectTable.getCodeRange().forEach(code -> counts.put(key(code), 0));
         for (final Star star : stars) {
@@ -39,7 +39,7 @@ public class SpectClassCounter implements StarCounter<String> {
     private String key(final int code) {
         final SpectClass spect = SpectClass.valueOf(code);
         final String symbol = spect.getSymbol().name();
-        final int number = spect.getNumber().intValue();
+        final int number = spect.getDoubleNumber().intValue();
         int l = number / bin * bin;
         if (l + bin > 10) {
             l -= bin;

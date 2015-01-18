@@ -17,7 +17,7 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.hist.StarCounter;
+import ru.spbu.astro.core.hist.StarHist;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -30,8 +30,8 @@ import java.util.stream.IntStream;
  * Time: 2:45
  */
 public class Histogram {
-    public <T extends Comparable<T>> Histogram(@NotNull final List<Star> stars, @NotNull final StarCounter<T> counter) {
-        final Map<T, Integer> counts = counter.count(stars);
+    public <T extends Comparable<T>> Histogram(@NotNull final List<Star> stars, @NotNull final StarHist<T> counter) {
+        final Map<T, Integer> counts = counter.hist(stars);
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
