@@ -12,7 +12,6 @@
         <module>dust</module>
         <module>core</module>
         <module>util</module>
-        <module>acceptance-tests</module>
     </modules>
     <packaging>pom</packaging>
 
