@@ -18,7 +18,6 @@ public final class MissObserver {
                 new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).negativeExtinction().getStars(),
                 18
         );
-        final HammerProjection hammerProjection = new HammerProjection(f);
-        hammerProjection.setVisible(true);
+        new HammerProjection(f).setVisible(true);
     }
 }

@@ -2,14 +2,13 @@ package ru.spbu.astro.core;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.core.spect.SpectType;
 import ru.spbu.astro.util.Value;
 
 import static java.lang.Math.log10;
 import static java.lang.Math.pow;
 
-public final class Star implements Comparable<Star> {
+public final class Star {
     private final int id;
     @NotNull
     private final Spheric dir;
@@ -40,11 +39,6 @@ public final class Star implements Comparable<Star> {
         return dir.getVector().scalarMultiply(getR().getValue());
     }
 
-    @Override
-    public int compareTo(@NotNull Star star) {
-        return star.getParallax().compareTo(getParallax());
-    }
-
     @NotNull
     public Value getR() {
         return new Value(1000 / parallax.getValue(), 1000 * parallax.getError() / pow(parallax.getValue(), 2));
@@ -60,6 +54,7 @@ public final class Star implements Comparable<Star> {
     }
 
     @NotNull
+    @SuppressWarnings("MagicNumber")
     public Value getAbsoluteMagnitude() {
         return new Value(
                 vMag + 5 * log10(parallax.getValue()) - 10,
@@ -91,22 +86,13 @@ public final class Star implements Comparable<Star> {
     }
 
     @NotNull
-    public Value getBVColor() {
-        return bvColor;
+    public Star setSpectType(@NotNull final SpectType spectType) {
+        return new Star(id, dir, parallax, vMag, spectType, bvColor);
     }
 
-    @Override
-    public boolean equals(@Nullable final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Star)) {
-            return false;
-        }
-
-        Star star = (Star) o;
-
-        return id == star.id;
+    @NotNull
+    public Value getBVColor() {
+        return bvColor;
     }
 
     @NotNull

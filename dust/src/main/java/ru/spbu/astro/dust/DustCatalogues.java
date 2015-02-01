@@ -5,7 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.core.Catalogue;
 import ru.spbu.astro.core.Catalogues;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.spect.LuminosityClass;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 
 import java.util.function.Function;
@@ -22,12 +21,13 @@ public final class DustCatalogues {
         @Nullable
         @Override
         public Star apply(@NotNull final Star star) {
-            final LuminosityClass lumin = star.getSpectType().getLumin();
-            if (lumin == null) {
-                star.getSpectType().setLumin(classifier.classify(star));
+            if (star.getSpectType().hasLumin()) {
+                return star;
             }
-            return star;
+            return star.setSpectType(star.getSpectType().setLumin(classifier.classify(star)));
         }
     });
 
+    private DustCatalogues() {
+    }
 }

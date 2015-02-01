@@ -14,11 +14,14 @@ import weka.core.DenseInstance;
 import weka.core.Instances;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static ru.spbu.astro.core.graph.HRDiagram.SCALE;
 
 public final class LuminosityClassifier {
+    private static final Logger LOGGER = Logger.getLogger(LuminosityClassifier.class.getName());
+
     private static final double BV_COLOR_ERROR_LIMIT = 0.01;
 
     private static final ArrayList<Attribute> ATTRIBUTES = new ArrayList<Attribute>() {{
@@ -58,9 +61,9 @@ public final class LuminosityClassifier {
             final Evaluation evaluation = new Evaluation(learn);
             evaluation.crossValidateModel(classifier, learn, 10, new Random(0));
 
-            System.out.println(evaluation.toSummaryString());
-            System.out.println(evaluation.toMatrixString());
-            System.out.println(evaluation.toClassDetailsString());
+            LOGGER.info(evaluation.toSummaryString());
+            LOGGER.info(evaluation.toMatrixString());
+            LOGGER.info(evaluation.toClassDetailsString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -78,7 +81,7 @@ public final class LuminosityClassifier {
         }};
     }
 
-    public static void main(String[] args) {
+    public static void main(@NotNull final String[] args) {
         new LuminosityClassifier(Catalogues.HIPPARCOS_2007.getStars(), Mode.TEST);
     }
 
@@ -92,7 +95,7 @@ public final class LuminosityClassifier {
         }
     }
 
-    public static enum Mode {
+    public enum Mode {
         DEFAULT, TEST
     }
 }

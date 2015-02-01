@@ -5,7 +5,6 @@ import org.apache.commons.math3.geometry.spherical.twod.S2Point;
 import org.apache.commons.math3.geometry.spherical.twod.Sphere2D;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.core.func.SphericDistribution;
 import ru.spbu.astro.core.Cloud;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.util.Value;

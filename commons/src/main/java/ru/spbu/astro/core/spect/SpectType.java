@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.util.Value;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.DoubleStream;
 
@@ -68,17 +69,21 @@ public final class SpectType {
 
     @Nullable
     public LuminosityClass getLumin() {
-        if (lumins.isEmpty()) {
+        if (!hasLumin()) {
             return null;
         }
         return lumins.get(0);
     }
 
-    public void setLumin(@NotNull final LuminosityClass lumin) {
-        if (!lumins.isEmpty()) {
+    public boolean hasLumin() {
+        return !lumins.isEmpty();
+    }
+
+    public SpectType setLumin(@NotNull final LuminosityClass lumin) {
+        if (hasLumin()) {
             throw new RuntimeException("Already has luminosity class!");
         }
-        lumins.add(lumin);
+        return new SpectType(spects, spectsRelation, Collections.singletonList(lumin), luminsRelation);
     }
 
     @NotNull
@@ -86,12 +91,12 @@ public final class SpectType {
         return SpectClass.valueOf(spects.stream().mapToInt(SpectClass::getCode).sum() / spects.size());
     }
 
-    static enum Relation {
+    enum Relation {
         OR('/'), INTERMEDIATE('-');
 
         private final char symbol;
 
-        Relation(char symbol) {
+        Relation(final char symbol) {
             this.symbol = symbol;
         }
 

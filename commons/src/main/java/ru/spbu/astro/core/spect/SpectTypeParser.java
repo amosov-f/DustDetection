@@ -3,7 +3,6 @@ package ru.spbu.astro.core.spect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.core.Catalogues;
-import ru.spbu.astro.core.Star;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +16,9 @@ import java.util.Map;
  */
 public final class SpectTypeParser {
     private static final Map<String, SpectType> CACHE = new HashMap<>();
+
+    private SpectTypeParser() {
+    }
 
     @Nullable
     public static SpectType parse(@NotNull final String str) {
@@ -34,7 +36,8 @@ public final class SpectTypeParser {
         SpectType.Relation luminRelation = SpectType.Relation.INTERMEDIATE;
 
         boolean lastSpect = true;
-        for (String s = str; !s.isEmpty();) {
+        String s = str;
+        while (!s.isEmpty()) {
             final SpectClass spect = nextSpect(s);
             if (spect != null) {
                 s = s.substring(spect.toString().length());
@@ -68,7 +71,7 @@ public final class SpectTypeParser {
     }
 
     @Nullable
-    private static SpectType process(@NotNull final String str, @Nullable SpectType type) {
+    private static SpectType process(@NotNull final String str, @Nullable final SpectType type) {
         CACHE.put(str, type);
         return type;
     }
@@ -102,12 +105,12 @@ public final class SpectTypeParser {
         }
         try {
             return SpectType.Relation.parse(str.charAt(0));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignored) {
             return null;
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(@NotNull final String[] args) {
         Catalogues.HIPPARCOS_2007.getStars();
         for (final String key : CACHE.keySet()) {
             System.out.println(key + " -> " + CACHE.get(key));

@@ -23,7 +23,7 @@ public final class SpectClassHist implements StarHist<String> {
 
     @NotNull
     @Override
-    public Map<String, Integer> hist(@NotNull List<Star> stars) {
+    public Map<String, Integer> hist(@NotNull final List<Star> stars) {
         final Map<String, Integer> counts = new LinkedHashMap<>();
         SpectTable.getCodeRange().forEach(code -> counts.put(key(code), 0));
         for (final Star star : stars) {

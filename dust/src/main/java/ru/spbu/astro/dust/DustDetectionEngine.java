@@ -1,17 +1,18 @@
 package ru.spbu.astro.dust;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.dust.algo.DustTrendCalculator;
+import ru.spbu.astro.core.StarFilter;
 import ru.spbu.astro.core.func.HealpixDistribution;
 import ru.spbu.astro.core.func.SphericDistribution;
 import ru.spbu.astro.core.graph.HammerProjection;
+import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.dust.graph.PixPlot;
-import ru.spbu.astro.core.StarFilter;
-
-import java.io.FileNotFoundException;
 
 public final class DustDetectionEngine {
-    public static void main(@NotNull final String[] args) throws FileNotFoundException {
+    private DustDetectionEngine() {
+    }
+
+    public static void main(@NotNull final String[] args) {
         final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(
                 new StarFilter(DustCatalogues.HIPPARCOS_UPDATED).parallaxRelativeError(0.25).getStars()
         );

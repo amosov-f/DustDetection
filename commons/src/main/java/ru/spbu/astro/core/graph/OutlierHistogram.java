@@ -48,7 +48,7 @@ public class OutlierHistogram {
             dataset.addValue(1.0 * outlierCounts.get(type) / counts.get(type), "pizza", type);
         }
 
-        JFreeChart chart = ChartFactory.createBarChart(
+        final JFreeChart chart = ChartFactory.createBarChart(
                 String.format(
                         "%s\nОтрицательное покраснение у %d%% (%d/%d)",
                         counter.getName(), 100 * outlierCount / count, outlierCount, count),
@@ -65,19 +65,19 @@ public class OutlierHistogram {
         renderer.setBaseItemLabelGenerator(new CategoryItemLabelGenerator() {
             @Nullable
             @Override
-            public String generateRowLabel(CategoryDataset categoryDataset, int i) {
+            public String generateRowLabel(@NotNull final CategoryDataset categoryDataset, final int i) {
                 return null;
             }
 
             @Nullable
             @Override
-            public String generateColumnLabel(CategoryDataset categoryDataset, int i) {
+            public String generateColumnLabel(@NotNull final CategoryDataset categoryDataset, final int i) {
                 return null;
             }
 
             @NotNull
             @Override
-            public String generateLabel(CategoryDataset categoryDataset, int i, int i2) {
+            public String generateLabel(@NotNull final CategoryDataset categoryDataset, final int i, final int i2) {
                 final T type = Iterables.get(counts.keySet(), i2);
                 return outlierCounts.get(type) + "/" + counts.get(type);
             }
@@ -96,6 +96,7 @@ public class OutlierHistogram {
         frame.setVisible(true);
     }
 
+    @NotNull
     @Override
     public String toString() {
         final StringBuilder str = new StringBuilder();

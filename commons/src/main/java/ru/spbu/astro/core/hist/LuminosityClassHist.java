@@ -16,7 +16,7 @@ import java.util.Map;
 public final class LuminosityClassHist implements StarHist<String> {
     @NotNull
     @Override
-    public Map<String, Integer> hist(@NotNull List<Star> stars) {
+    public Map<String, Integer> hist(@NotNull final List<Star> stars) {
         final Map<String, Integer> counts = new LinkedHashMap<>();
         for (final LuminosityClass luminosityClass : LuminosityClass.values()) {
             counts.put(luminosityClass.name(), 0);

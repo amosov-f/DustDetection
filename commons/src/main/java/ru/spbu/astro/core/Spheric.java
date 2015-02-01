@@ -6,7 +6,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.spherical.twod.S2Point;
 import org.jetbrains.annotations.NotNull;
 
-public final class Spheric extends S2Point implements Comparable<Spheric> {
+public final class Spheric extends S2Point {
     public Spheric(final double l, final double b) throws OutOfRangeException {
         super(l, Math.PI / 2 - b);
     }
@@ -26,17 +26,6 @@ public final class Spheric extends S2Point implements Comparable<Spheric> {
 
     public double getB() {
         return Math.PI / 2 - getPhi();
-    }
-
-    @Override
-    public int compareTo(@NotNull final Spheric dir) {
-        if (getL() < dir.getL()) {
-            return -1;
-        }
-        if (getL() > dir.getL()) {
-            return 1;
-        }
-        return 0;
     }
 
     @NotNull

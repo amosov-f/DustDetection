@@ -14,7 +14,7 @@ public final class HealpixCounter extends HealpixDistribution {
         super(nSide);
         Arrays.setAll(values, i -> new Value(0, 0));
         for (final Spheric dir : dirs) {
-            int pix = getPix(dir);
+            final int pix = getPix(dir);
             values[pix] = values[pix].add(new Value(1, 0));
         }
     }

@@ -27,7 +27,7 @@ public final class SpectClass {
         }
         try {
             return new SpectClass(symbol, Double.valueOf(str.substring(1)));
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             return null;
         }
     }
@@ -68,7 +68,8 @@ public final class SpectClass {
         return symbol + "" + number;
     }
 
-    public static enum TypeSymbol {
+    @SuppressWarnings("all")
+    public enum TypeSymbol {
         O /* 0 */,
         B /* 10 */,
         A /* 20 */,
@@ -81,7 +82,7 @@ public final class SpectClass {
         public static TypeSymbol parse(final char c) {
             try {
                 return valueOf(String.valueOf(c));
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignored) {
                 return null;
             }
         }

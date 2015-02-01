@@ -1,6 +1,7 @@
 package ru.spbu.astro.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
@@ -32,8 +33,8 @@ public final class Value implements Comparable<Value> {
         return Math.abs(getError() / getValue());
     }
 
-    public double getPlusThreeSigma() {
-        return value + 3 * error;
+    public double getNSigma(final int n) {
+        return value + n * error;
     }
 
     @NotNull
@@ -54,6 +55,27 @@ public final class Value implements Comparable<Value> {
     @Override
     public int compareTo(@NotNull final Value value) {
         return new Double(getValue()).compareTo(value.getValue());
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Value other = (Value) o;
+        return Double.compare(other.error, error) == 0 && Double.compare(other.value, this.value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        long temp = Double.doubleToLongBits(value);
+        int result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(error);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 
     @NotNull

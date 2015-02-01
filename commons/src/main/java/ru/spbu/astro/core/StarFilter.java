@@ -13,7 +13,7 @@ import static org.apache.commons.lang3.ArrayUtils.contains;
 
 @SuppressWarnings("unused")
 public final class StarFilter {
-    public static final Predicate<Star> NEGATIVE_EXTINCTION = star -> star.getExtinction().getPlusThreeSigma() < 0;
+    public static final Predicate<Star> NEGATIVE_EXTINCTION = star -> star.getExtinction().getNSigma(3) < 0;
 
     @NotNull
     private final List<Star> stars;

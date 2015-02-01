@@ -9,10 +9,12 @@ import ru.spbu.astro.util.Value;
 import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static ru.spbu.astro.core.Catalogue.Parameter.*;
 
 public final class Catalogue {
+    private static final Logger LOGGER = Logger.getLogger(Catalogue.class.getName());
 
     @NotNull
     final Map<Integer, Row> id2row = new HashMap<>();
@@ -20,17 +22,13 @@ public final class Catalogue {
     Catalogue() {
     }
 
-    private Catalogue(@NotNull final Catalogue catalogue) {
-        this.id2row.putAll(catalogue.id2row);
-    }
-
     @NotNull
     public static Catalogue read(@NotNull final InputStream in) {
         final Scanner fin = new Scanner(in);
-        final List<Parameter> parameters = new ArrayList<>();
+        final List<Parameter<?>> parameters = new ArrayList<>();
         final String[] parts = fin.nextLine().trim().split("\\|");
         for (final String name : Arrays.copyOfRange(parts, 1, parts.length)) {
-            parameters.add(Parameter.valueOf(name.trim()));
+            parameters.add(valueOf(name.trim()));
         }
 
         final Catalogue catalogue = new Catalogue();
@@ -41,7 +39,7 @@ public final class Catalogue {
             }
         }
 
-        System.out.println("reading completed");
+        LOGGER.info("Reading completed");
         return catalogue;
     }
 
@@ -75,16 +73,16 @@ public final class Catalogue {
                 stars.add(row.toStar());
             }
         }
-        System.out.println("getting stars completed");
+        LOGGER.info("Getting stars completed");
         return stars;
     }
 
     static final class Row {
         final int id;
         @NotNull
-        final Map<Parameter, Object> values = new LinkedHashMap<>();
+        final Map<Parameter<?>, Object> values = new LinkedHashMap<>();
 
-        Row(final int id, @NotNull final Map<Parameter, Object> values) {
+        Row(final int id, @NotNull final Map<Parameter<?>, Object> values) {
             this.id = id;
             this.values.putAll(values);
         }
@@ -107,11 +105,11 @@ public final class Catalogue {
         }
 
         @Nullable
-        private static Row parse(@NotNull final String row, @NotNull final List<Parameter> parameters) {
+        private static Row parse(@NotNull final String row, @NotNull final List<Parameter<?>> parameters) {
             String[] fields = row.split("\\|");
             fields = Arrays.copyOfRange(fields, 1, fields.length);
 
-            final Map<Parameter, Object> values = new LinkedHashMap<>();
+            final Map<Parameter<?>, Object> values = new LinkedHashMap<>();
             for (int i = 0; i < parameters.size(); i++) {
                 final Object value = parameters.get(i).parse(fields[i].trim());
                 if (value != null) {
@@ -185,14 +183,14 @@ public final class Catalogue {
         }
     }
 
-    public static abstract class Parameter<T> {
+    public abstract static class Parameter<T> {
         public static final Parameter<Double> LII = new RadiansParameter("lii");
         public static final Parameter<Double> BII = new RadiansParameter("bii");
         public static final Parameter<Double> PARALLAX_ERROR = new DoubleParameter("parallax_error");
         public static final Parameter<Double> VMAG = new DoubleParameter("vmag");
-        public static final DoubleParameter BV_COLOR = new DoubleParameter("bv_color");
-        public static final DoubleParameter BV_COLOR_ERROR = new DoubleParameter("bv_color_error");
-        public static final DoubleParameter PARALLAX = new DoubleParameter("parallax") {
+        public static final Parameter<Double> BV_COLOR = new DoubleParameter("bv_color");
+        public static final Parameter<Double> BV_COLOR_ERROR = new DoubleParameter("bv_color_error");
+        public static final Parameter<Double> PARALLAX = new DoubleParameter("parallax") {
             @Nullable
             @Override
             Double parse(@NotNull final String value) {
@@ -200,7 +198,7 @@ public final class Catalogue {
                 return parallax != null && parallax > 0 ? parallax : null;
             }
         };
-        public static final IntegerParameter NUMBER_COMPONENTS = new IntegerParameter("number_components");
+        public static final Parameter<Integer> NUMBER_COMPONENTS = new IntegerParameter("number_components");
         public static final Parameter<SpectType> SPECT_TYPE = new Parameter<SpectType>("spect_type") {
             @Nullable
             @Override
@@ -208,7 +206,7 @@ public final class Catalogue {
                 return SpectTypeParser.parse(value);
             }
         };
-        public static final IntegerParameter HIP_NUMBER = new IntegerParameter("hip_number");
+        public static final Parameter<Integer> HIP_NUMBER = new IntegerParameter("hip_number");
 
         @NotNull
         private final String name;
@@ -218,7 +216,7 @@ public final class Catalogue {
         }
 
         @NotNull
-        public static Parameter[] values() {
+        public static Parameter<?>[] values() {
             return new Parameter[]{
                     LII, BII, PARALLAX_ERROR, VMAG,
                     BV_COLOR, BV_COLOR_ERROR, PARALLAX,
@@ -227,8 +225,8 @@ public final class Catalogue {
         }
 
         @Nullable
-        public static Parameter valueOf(@NotNull final String name) {
-            for (final Parameter parameter : values()) {
+        public static Parameter<?> valueOf(@NotNull final String name) {
+            for (final Parameter<?> parameter : values()) {
                 if (name.equals(parameter.getName())) {
                     return parameter;
                 }
@@ -253,20 +251,20 @@ public final class Catalogue {
             Double parse(@NotNull final String value) {
                 try {
                     return Double.valueOf(value);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                     return null;
                 }
             }
         }
 
         private static final class RadiansParameter extends DoubleParameter {
-            private RadiansParameter(@NotNull String name) {
+            private RadiansParameter(@NotNull final String name) {
                 super(name);
             }
 
             @Nullable
             @Override
-            Double parse(@NotNull String value) {
+            Double parse(@NotNull final String value) {
                 final Double deg = super.parse(value);
                 return deg != null ? Math.toRadians(deg) : null;
             }
@@ -279,10 +277,10 @@ public final class Catalogue {
 
             @Nullable
             @Override
-            Integer parse(@NotNull String value) {
+            Integer parse(@NotNull final String value) {
                 try {
                     return Integer.valueOf(value);
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                     return null;
                 }
             }

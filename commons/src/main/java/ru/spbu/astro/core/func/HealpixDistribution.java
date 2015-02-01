@@ -2,10 +2,9 @@ package ru.spbu.astro.core.func;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.core.Spheric;
-import ru.spbu.astro.core.func.SphericDistribution;
-import ru.spbu.astro.util.Value;
 import ru.spbu.astro.core.HealpixTools;
+import ru.spbu.astro.core.Spheric;
+import ru.spbu.astro.util.Value;
 
 public class HealpixDistribution implements SphericDistribution {
     @NotNull

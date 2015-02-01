@@ -13,18 +13,16 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
+import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.util.Value;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
@@ -32,7 +30,7 @@ public final class PixPlot {
     @NotNull
     private final DustTrendCalculator dustTrendCalculator;
     @NotNull
-    private ChartFrame frame;
+    private final ChartFrame frame;
 
     public PixPlot(@NotNull final DustTrendCalculator dustTrendCalculator) {
         this.dustTrendCalculator = dustTrendCalculator;
@@ -79,8 +77,8 @@ public final class PixPlot {
                 new XYErrorRenderer()
         );
 
-        final double r1 = b != 0 ? Collections.min(stars).getR().getValue() : 0;
-        final double r2 = Collections.max(stars.stream().map(s -> s.getR().getValue() + s.getR().getError()).collect(Collectors.toList()));
+        final double r1 = b != 0 ? stars.stream().mapToDouble(s -> s.getR().getNSigma(-1)).min().getAsDouble() : 0;
+        final double r2 = stars.stream().mapToDouble(s -> s.getR().getNSigma(1)).max().getAsDouble();
 
         final XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(r1, a * r1 + b);
@@ -110,9 +108,9 @@ public final class PixPlot {
         frame.getChartPanel().setChart(chart);
     }
 
-    private XYIntervalSeries createXYIntegervalSeries(List<Star> stars, String name) {
-        XYIntervalSeries series = new XYIntervalSeries(name);
-        for (Star s : stars) {
+    private XYIntervalSeries createXYIntegervalSeries(@NotNull final List<Star> stars, @NotNull final String name) {
+        final XYIntervalSeries series = new XYIntervalSeries(name);
+        for (final Star s : stars) {
             series.add(
                     s.getR().getValue(),
                     s.getR().getValue() - s.getR().getError(),

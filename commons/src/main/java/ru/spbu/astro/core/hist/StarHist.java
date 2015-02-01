@@ -19,12 +19,10 @@ public interface StarHist<T extends Comparable<T>> {
     @NotNull
     String getName();
 
-    static final int LIMIT = 1;
-
     @NotNull
     default Map<String, Integer> clean(@NotNull final Map<String, Integer> counts) {
         final Map<String, Integer> cleanedCounts = new LinkedHashMap<>(counts);
-        counts.keySet().stream().filter(name -> counts.get(name) <= LIMIT).forEach(cleanedCounts::remove);
+        counts.keySet().stream().filter(name -> counts.get(name) <= 1).forEach(cleanedCounts::remove);
         return cleanedCounts;
     }
 }

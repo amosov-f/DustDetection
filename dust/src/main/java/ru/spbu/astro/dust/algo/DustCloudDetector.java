@@ -4,15 +4,15 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.func.CloudDistribution;
-import ru.spbu.astro.core.graph.HammerProjection;
 import ru.spbu.astro.core.Cloud;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.dust.DustCatalogues;
 import ru.spbu.astro.core.StarFilter;
+import ru.spbu.astro.core.func.CloudDistribution;
+import ru.spbu.astro.core.graph.HammerProjection;
+import ru.spbu.astro.dust.DustCatalogues;
 
-import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
  * Time: 14:58
  */
 public final class DustCloudDetector {
+    private static final Logger LOGGER = Logger.getLogger(DustCloudDetector.class.getName());
+
     private static final double EPS = 450;
     private static final double MIN_PTS_PART = 0.004;
 
@@ -31,7 +33,7 @@ public final class DustCloudDetector {
         final List<Vector3D> dust = new DustDetector(stars).getDust();
         final double eps = EPS / Math.cbrt(dust.size());
         final int minPts = (int) (MIN_PTS_PART * dust.size());
-        System.out.println("eps: " + eps + ", minPts: " + minPts);
+        LOGGER.info("eps: " + eps + ", minPts: " + minPts);
         clouds = new DBSCANClusterer<DoublePoint>(eps, minPts)
                 .cluster(dust.stream()
                         .map(p -> new DoublePoint(p.toArray())).collect(Collectors.toList())).stream()
@@ -39,19 +41,19 @@ public final class DustCloudDetector {
                         .map(p -> new Vector3D(p.getPoint())).collect(Collectors.toList()))).collect(Collectors.toList());
     }
 
-    @NotNull
-    public List<Cloud> getClouds() {
-        return clouds;
-    }
-
-    public static void main(@NotNull final String[] args) throws FileNotFoundException {
+    public static void main(@NotNull final String[] args) {
         final DustCloudDetector detector = new DustCloudDetector(
                 new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
         final List<Cloud> clouds = detector.getClouds();
-        System.out.println(clouds.size());
-        clouds.forEach(System.out::println);
+        LOGGER.info("#clouds: " + clouds.size());
+        clouds.forEach(cloud -> LOGGER.info(cloud.toString()));
         final HammerProjection hammerProjection = new HammerProjection(new CloudDistribution(detector.getClouds()));
         hammerProjection.setVisible(true);
+    }
+
+    @NotNull
+    public List<Cloud> getClouds() {
+        return clouds;
     }
 }

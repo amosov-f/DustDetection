@@ -26,7 +26,7 @@ public final class IIIM2SpectTableCombinator implements SpectTableCombinator {
         for (final LuminosityClass lumin : spectTables[0].table.keySet()) {
             table.put(lumin, new TreeMap<>());
             for (final Integer code : spectTables[0].table.get(lumin).keySet()) {
-                if (!lumin.equals(III) || code < CODE) {
+                if (lumin != III || code < CODE) {
                     table.get(lumin).put(code, spectTables[0].table.get(lumin).get(code));
                 }
             }

@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+@SuppressWarnings("MagicNumber")
 public class LuminosityClassifierTest {
     private LuminosityClassifier classifier;
 

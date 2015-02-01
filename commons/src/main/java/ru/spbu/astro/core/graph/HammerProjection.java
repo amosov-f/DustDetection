@@ -2,8 +2,8 @@ package ru.spbu.astro.core.graph;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.core.func.SphericDistribution;
 import ru.spbu.astro.core.Spheric;
+import ru.spbu.astro.core.func.SphericDistribution;
 import ru.spbu.astro.util.Value;
 
 import javax.swing.*;
@@ -15,32 +15,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import static java.lang.Math.*;
 
 public final class HammerProjection extends JWindow {
+    private static final Logger LOGGER = Logger.getLogger(HammerProjection.class.getName());
+
+    private static final int PARALLEL_COUNT = 10;
+    private static final int MERIDIAN_COUNT = 24;
+    private static final int SIZE = 500;
+    private static final int REMOVE_LIMIT = 100;
+    private static final int OUTLIERS = 2;
     @NotNull
     private final SphericDistribution distribution;
     @NotNull
     private final Mode mode;
     @NotNull
-    private DirectionProcessor processor = dir -> {};
-
-    private static final int PARALLEL_COUNT = 10;
-    private static final int MERIDIAN_COUNT = 24;
-
-    private static final int SIZE = 500;
-
-    private static final int REMOVE_LIMIT = 100;
-    private static final int OUTLIERS = 2;
-
-    public static enum Mode {
-        DEFAULT, WITH_ERRORS
-    }
-
-    public static interface DirectionProcessor {
-        void process(@NotNull final Spheric dir);
-    }
+    private DirectionProcessor processor = dir -> {
+    };
 
     public HammerProjection(@NotNull final SphericDistribution distribution) {
         this(distribution, Mode.DEFAULT);
@@ -55,16 +48,84 @@ public final class HammerProjection extends JWindow {
             public void mouseClicked(@NotNull final MouseEvent e) {
                 final Spheric dir = toSpheric(fromWindow(getMousePosition()));
                 if (dir != null) {
-                    System.out.println(dir);
+                    LOGGER.info(dir.toString());
                     processor.process(dir);
                 }
             }
         });
     }
 
+    @NotNull
+    public static Point2D.Double toPlane(@NotNull final Spheric dir) {
+        double l = dir.getL();
+        final double b = dir.getB();
+
+        if (l > PI) {
+            l -= 2 * PI;
+        }
+
+        final double denominator = sqrt(1 + cos(b) * cos(l / 2));
+
+        final double x = -2 * cos(b) * sin(l / 2) / denominator;
+        final double y = -sin(b) / denominator;
+
+        return new Point2D.Double(x, y);
+    }
+
+    @Nullable
+    public static Spheric toSpheric(@NotNull final Point2D.Double p) {
+        double x = p.getX();
+        double y = p.getY();
+
+        if (1 - pow(0.5 * x, 2) - pow(y, 2) < 0) {
+            return null;
+        }
+
+        x *= sqrt(2);
+        y *= sqrt(2);
+
+        final double z = sqrt(1 - pow(0.25 * x, 2) - pow(0.5 * y, 2));
+
+        double l = 2 * atan2(z * x, (2 * (2 * pow(z, 2) - 1)));
+        final double b = asin(z * y);
+
+        l = -l;
+        if (l < 0) {
+            l += 2 * PI;
+        }
+
+        return new Spheric(l, b);
+    }
+
+    private static double normalize(final double x, final double min, final double max) {
+        double normalized = x;
+        if (normalized > max) {
+            normalized = max;
+        }
+        if (normalized < min) {
+            normalized = min;
+        }
+
+        final double d = max(abs(min), abs(max));
+        return d == 0 ? 0 : normalized / d;
+    }
+
+    private static void removeExtremeValues(@NotNull final Collection<Double> values) {
+        for (int i = 0; i < OUTLIERS; ) {
+            if (values.size() > 2 && Collections.max(values) > 0) {
+                values.remove(Collections.max(values));
+                i++;
+            }
+            if (values.size() > 2 && Collections.min(values) < 0) {
+                values.remove(Collections.min(values));
+                i++;
+            }
+        }
+    }
+
     @Override
     public void paint(@NotNull final Graphics g) {
-        final Value[][] f = new Value[Math.min(getWidth(), 2 * getHeight())][Math.min(getHeight(), getWidth() / 2)];
+        final Value[][] f = new Value[min(getWidth(), 2 * getHeight())][min(getHeight(), getWidth() / 2)];
 
         final Set<Double> values = new TreeSet<>();
         final Set<Double> errors = new TreeSet<>();
@@ -103,7 +164,7 @@ public final class HammerProjection extends JWindow {
         final double maxValue = Collections.max(values);
         //}
 
-        double maxError = Collections.max(errors);
+        final double maxError = Collections.max(errors);
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
@@ -127,7 +188,7 @@ public final class HammerProjection extends JWindow {
                     if (value >= 0) {
                         color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
                     } else {
-                        color = Color.getHSBColor(240f / 360, (float) Math.abs(value), (float) (1.0 - error));
+                        color = Color.getHSBColor(240f / 360, (float) abs(value), (float) (1.0 - error));
                     }
                 }
 
@@ -143,67 +204,26 @@ public final class HammerProjection extends JWindow {
         this.processor = processor;
     }
 
+    @SuppressWarnings("MagicNumber")
     private void paintCircles(@NotNull final Graphics g) {
         g.setColor(new Color(148, 167, 187));
-        for (double l = 0; l < 2 * Math.PI; l += 2 * Math.PI / MERIDIAN_COUNT) {
-            for (double b = -Math.PI / 2; b < Math.PI / 2; b += 0.001) {
-                Point p = toWindow(toPlane(new Spheric(l, b)));
+        for (double l = 0; l < 2 * PI; l += 2 * PI / MERIDIAN_COUNT) {
+            for (double b = -PI / 2; b < PI / 2; b += 0.001) {
+                final Point p = toWindow(toPlane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
         }
-        for (double b = - Math.PI / 2; b < Math.PI / 2; b += 0.001) {
-            Point p = toWindow(toPlane(new Spheric(Math.PI - 0.00001, b)));
+        for (double b = -PI / 2; b < PI / 2; b += 0.001) {
+            final Point p = toWindow(toPlane(new Spheric(PI - 0.00001, b)));
             g.drawLine(p.x, p.y, p.x, p.y);
         }
 
-        for (double b = - Math.PI / 2; b < Math.PI / 2; b += Math.PI / PARALLEL_COUNT) {
-            for (double l = 0; l < 2 * Math.PI; l += 0.0001) {
-                Point p = toWindow(toPlane(new Spheric(l, b)));
+        for (double b = -PI / 2; b < PI / 2; b += PI / PARALLEL_COUNT) {
+            for (double l = 0; l < 2 * PI; l += 0.0001) {
+                final Point p = toWindow(toPlane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
         }
-    }
-
-    @NotNull
-    public static Point2D.Double toPlane(@NotNull final Spheric dir) {
-        double l = dir.getL();
-        final double b = dir.getB();
-
-        if (l > Math.PI) {
-            l -= 2 * Math.PI;
-        }
-
-        final double denominator = sqrt(1 + Math.cos(b) * Math.cos(l / 2));
-
-        final double x = - 2 * Math.cos(b) * Math.sin(l / 2) / denominator;
-        final double y = - Math.sin(b) / denominator;
-
-        return new Point2D.Double(x, y);
-    }
-
-    @Nullable
-    public static Spheric toSpheric(@NotNull final Point2D.Double p) {
-        double x = p.getX();
-        double y = p.getY();
-
-        if (1 - pow(0.5 * x, 2) - pow(y, 2) < 0) {
-            return null;
-        }
-
-        x *= sqrt(2);
-        y *= sqrt(2);
-
-        final double z = sqrt(1 - pow(0.25 * x, 2) - pow(0.5 * y, 2));
-
-        double l = 2 * atan2(z * x, (2 * (2 * pow(z, 2) - 1)));
-        final double b = Math.asin(z * y);
-
-        l = -l;
-        if (l < 0) {
-            l += 2 * Math.PI;
-        }
-
-        return new Spheric(l, b);
     }
 
     @NotNull
@@ -219,34 +239,17 @@ public final class HammerProjection extends JWindow {
 
     @NotNull
     public Point2D.Double fromWindow(@NotNull final Point p) {
-        double x = 2 * (p.getX() / getHeight() - 1);
-        double y = 2 * (getHeight() - p.getY()) / getHeight() - 1;
+        final double x = 2 * (p.getX() / getHeight() - 1);
+        final double y = 2 * (getHeight() - p.getY()) / getHeight() - 1;
 
         return new Point2D.Double(x, y);
     }
 
-    private static double normalize(double x, double min, double max) {
-        if (x == Double.POSITIVE_INFINITY || Double.isNaN(x) || x > max) {
-            x = max;
-        }
-        if (x == Double.NEGATIVE_INFINITY || x < min) {
-            x = min;
-        }
-
-        double d = Math.max(Math.abs(min), Math.abs(max));
-        return d == 0 ? 0 : x / d;
+    public enum Mode {
+        DEFAULT, WITH_ERRORS
     }
 
-    private static void removeExtremeValues(@NotNull final Collection<Double> values) {
-        for (int i = 0; i < OUTLIERS;) {
-            if (values.size() > 2 && Collections.max(values) > 0) {
-                values.remove(Collections.max(values));
-                i++;
-            }
-            if (values.size() > 2 && Collections.min(values) < 0) {
-                values.remove(Collections.min(values));
-                i++;
-            }
-        }
+    public interface DirectionProcessor {
+        void process(@NotNull final Spheric dir);
     }
 }

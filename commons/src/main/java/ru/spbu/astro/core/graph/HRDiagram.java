@@ -45,10 +45,10 @@ public final class HRDiagram {
             final XYIntervalSeries series = new XYIntervalSeries(lumin);
 
             for (final Star star : luminStars) {
-                double bv = star.getBVColor().getValue();
-                double dbv = star.getBVColor().getError();
-                double M = star.getAbsoluteMagnitude().getValue();
-                double dM = star.getAbsoluteMagnitude().getError();
+                final double bv = star.getBVColor().getValue();
+                final double dbv = star.getBVColor().getError();
+                final double M = star.getAbsoluteMagnitude().getValue();
+                final double dM = star.getAbsoluteMagnitude().getError();
 
                 if (Math.random() < ERROR_VIEW_SHARE) {
                     series.add(bv, bv - dbv, bv + dbv, M, M - dM, M + dM);
@@ -106,5 +106,4 @@ public final class HRDiagram {
                 .absoluteMagnitudeError(SCALE * 0.01)
                 .bvColorError(0.01).getStars());
     }
-
 }

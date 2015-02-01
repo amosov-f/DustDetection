@@ -6,19 +6,20 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.core.HealpixTools;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
+import ru.spbu.astro.util.Value;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.util.ml.SimpleRegression;
-import ru.spbu.astro.core.Catalogue;
-import ru.spbu.astro.dust.DustCatalogues;
-import ru.spbu.astro.util.Value;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class DustTrendCalculator {
+    private static final Logger LOGGER = Logger.getLogger(DustTrendCalculator.class.getName());
+
     private static final int N_SIDE = 18;
 
     @NotNull
@@ -39,7 +40,7 @@ public final class DustTrendCalculator {
     }
 
     public DustTrendCalculator(@NotNull final List<Star> stars, final boolean includeIntercept) {
-        System.out.println("number of stars: " + stars.size());
+        LOGGER.info("Number of stars: " + stars.size());
 
         pixTools = new PixTools();
 

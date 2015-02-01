@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
  * Date: 09.01.15
  * Time: 2:45
  */
-public class Histogram {
+public final class Histogram {
     public <T extends Comparable<T>> Histogram(@NotNull final List<Star> stars, @NotNull final StarHist<T> counter) {
         final Map<T, Integer> counts = counter.hist(stars);
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
@@ -40,7 +40,7 @@ public class Histogram {
             dataset.addValue(1.0 * counts.get(type) / count, "pizza", type);
         }
 
-        JFreeChart chart = ChartFactory.createBarChart(
+        final JFreeChart chart = ChartFactory.createBarChart(
                 "Гистограмма",
                 counter.getName(),
                 "Доля",
@@ -55,19 +55,19 @@ public class Histogram {
         renderer.setBaseItemLabelGenerator(new CategoryItemLabelGenerator() {
             @Nullable
             @Override
-            public String generateRowLabel(CategoryDataset categoryDataset, int i) {
+            public String generateRowLabel(@NotNull final CategoryDataset categoryDataset, final int i) {
                 return null;
             }
 
             @Nullable
             @Override
-            public String generateColumnLabel(CategoryDataset categoryDataset, int i) {
+            public String generateColumnLabel(@NotNull final CategoryDataset categoryDataset, final int i) {
                 return null;
             }
 
             @NotNull
             @Override
-            public String generateLabel(CategoryDataset categoryDataset, int i, int i2) {
+            public String generateLabel(@NotNull final CategoryDataset categoryDataset, final int i, final int i2) {
                 final T type = Iterables.get(counts.keySet(), i2);
                 return counts.get(type).toString();
             }

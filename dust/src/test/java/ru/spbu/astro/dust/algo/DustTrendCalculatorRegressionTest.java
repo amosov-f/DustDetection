@@ -12,7 +12,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 public class DustTrendCalculatorRegressionTest {
-    public static void main(@NotNull String[] args) throws IOException {
+    public static void main(@NotNull final String[] args) throws IOException {
         FileUtils.writeStringToFile(
                 new File("dust/src/test/resources/dust-trend-calculator.txt"),
                 new DustTrendCalculator(DustCatalogues.HIPPARCOS_UPDATED.getStars()).toString()
@@ -20,7 +20,7 @@ public class DustTrendCalculatorRegressionTest {
     }
 
     @Test
-    public void regression() throws Exception {
+    public void regression() throws IOException {
         assertEquals(
                 IOUtils.toString(getClass().getResourceAsStream("/dust-trend-calculator.txt")),
                 new DustTrendCalculator(DustCatalogues.HIPPARCOS_UPDATED.getStars()).toString()

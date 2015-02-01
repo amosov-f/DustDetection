@@ -2,23 +2,23 @@ package ru.spbu.astro.dust.algo;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.func.HealpixCounter;
-import ru.spbu.astro.core.graph.HammerProjection;
-import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.core.Spheric;
 import ru.spbu.astro.core.Star;
-import ru.spbu.astro.util.ml.SimpleRegression;
+import ru.spbu.astro.core.StarFilter;
+import ru.spbu.astro.core.func.HealpixCounter;
+import ru.spbu.astro.core.graph.HammerProjection;
 import ru.spbu.astro.dust.DustCatalogues;
 import ru.spbu.astro.util.PointsDistribution;
-import ru.spbu.astro.core.StarFilter;
 import ru.spbu.astro.util.Value;
+import ru.spbu.astro.util.ml.RansacLinearRegression;
+import ru.spbu.astro.util.ml.SimpleRegression;
 import weka.core.*;
 import weka.core.neighboursearch.KDTree;
 import weka.core.neighboursearch.NearestNeighbourSearch;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * User: amosov-f
@@ -26,6 +26,8 @@ import java.util.List;
  * Time: 20:39
  */
 public final class DustDetector {
+    private static final Logger LOGGER = Logger.getLogger(DustDetector.class.getName());
+
     private static final int K = 25;
     private static final double THRESHOLD = 0.008;
     private static final double MAX_RANGE = 100;
@@ -35,7 +37,8 @@ public final class DustDetector {
     private final List<Vector3D> dust = new ArrayList<>();
 
     public DustDetector(@NotNull final List<Star> stars) {
-        System.out.println(stars.size());
+        LOGGER.info("Dust detection started!");
+        LOGGER.info("#stars = " + stars.size());
 
         final Instances instances = new Instances("knn", new ArrayList<Attribute>() {{
             add(new Attribute("x"));
@@ -67,8 +70,8 @@ public final class DustDetector {
 
         final PointsDistribution distribution = new PointsDistribution(points);
         for (int t = 0; t < LIM; t++) {
-            if (t % 1000 == 0) {
-                System.out.println(t);
+            if (t % 10000 == 0) {
+                LOGGER.info(t + " points processed");
             }
             final Vector3D p = distribution.next();
 
@@ -95,12 +98,12 @@ public final class DustDetector {
             if (!regression.train()) {
                 continue;
             }
-            double slope = regression.getSlope().getValue();
+            final double slope = regression.getSlope().getValue();
             if (slope > THRESHOLD) {
                 dust.add(p);
             }
         }
-        System.out.println(dust.size());
+        LOGGER.info("#dust = " + dust.size() + " from " + LIM + " random points");
     }
 
     @NotNull
@@ -129,7 +132,7 @@ public final class DustDetector {
         return new Vector3D(instance.value(0), instance.value(1), instance.value(2));
     }
 
-    public static void main(final String[] args) throws FileNotFoundException {
+    public static void main(final String[] args) {
         final DustDetector detector = new DustDetector(
                 new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );

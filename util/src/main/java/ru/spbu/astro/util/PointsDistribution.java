@@ -18,7 +18,7 @@ public final class PointsDistribution {
     @NotNull
     private final List<Vector3D> points;
 
-    public PointsDistribution(@NotNull List<Vector3D> points) {
+    public PointsDistribution(@NotNull final List<Vector3D> points) {
         this.points = points;
     }
 

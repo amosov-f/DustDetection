@@ -5,7 +5,6 @@ import org.apache.commons.math3.geometry.euclidean.threed.Euclidean3D;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.Spheric;
 
 import java.util.List;
 import java.util.stream.IntStream;

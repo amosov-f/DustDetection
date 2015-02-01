@@ -19,11 +19,12 @@ import java.io.IOException;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
+@SuppressWarnings("MagicNumber")
 public final class ExtPlot {
     @NotNull
     private XYSeries[] getSeries() {
-        XYSeries series = new XYSeries("Кривая покраснения");
-        XYSeries dustSeries = new XYSeries("Пылевые облака");
+        final XYSeries series = new XYSeries("Кривая покраснения");
+        final XYSeries dustSeries = new XYSeries("Пылевые облака");
 
         double r = 0;
         double ext = 0;
@@ -112,7 +113,7 @@ public final class ExtPlot {
         return new XYSeries[]{series, dustSeries};
     }
 
-    public ExtPlot() throws IOException {
+    public ExtPlot() {
         final XYItemRenderer renderer = new XYSplineRenderer();
         renderer.setSeriesShape(0, new Ellipse2D.Double(0, 0, 0, 0));
         renderer.setSeriesStroke(0, new BasicStroke(3));
@@ -143,7 +144,7 @@ public final class ExtPlot {
         frame.setVisible(true);
     }
 
-    public static void main(@NotNull final String[] args) throws IOException {
+    public static void main(@NotNull final String[] args) {
         new ExtPlot();
     }
 }

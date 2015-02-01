@@ -32,7 +32,7 @@ public final class RansacLinearRegression implements SimpleRegression {
     }
 
     @Override
-    public void add(int id, @NotNull final Value x, @NotNull final Value y) {
+    public void add(final int id, @NotNull final Value x, @NotNull final Value y) {
         points.put(id, new Vector2D(x.getValue(), y.getValue()));
     }
 
@@ -68,6 +68,7 @@ public final class RansacLinearRegression implements SimpleRegression {
     }
 
     @NotNull
+    @Override
     public Value getIntercept() {
         return new Value(regression.getIntercept(), regression.getInterceptStdErr());
     }

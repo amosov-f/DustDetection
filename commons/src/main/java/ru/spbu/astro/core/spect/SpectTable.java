@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
 
@@ -16,8 +17,10 @@ import java.util.stream.IntStream;
  * Time: 13:03
  */
 public final class SpectTable {
-    public static final SpectTable TSVETKOV = SpectTable.read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
-    public static final SpectTable SCHMIDT_KALER = SpectTable.read("schmidt-kaler", SpectTable.class.getResourceAsStream("/table/schmidt-kaler.txt"));
+    private static final Logger LOGGER = Logger.getLogger(SpectTable.class.getName());
+
+    public static final SpectTable TSVETKOV = read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
+    public static final SpectTable SCHMIDT_KALER = read("schmidt-kaler", SpectTable.class.getResourceAsStream("/table/schmidt-kaler.txt"));
 
     public static final int MIN_CODE = 5;
     public static final int MAX_CODE = 69;
@@ -58,14 +61,16 @@ public final class SpectTable {
             final String[] fields = fin.nextLine().trim().split("\\s+");
             for (int i = 1; i < titles.length; i++) {
                 if (!"-".equals(fields[i])) {
-                    double bv = Double.valueOf(fields[i]);
+                    final double bv = Double.valueOf(fields[i]);
                     final SpectClass spect = SpectClass.parse(fields[0]);
-                    assert spect != null;
+                    if (spect == null) {
+                        throw new RuntimeException("Spect is null!");
+                    }
                     table.get(LuminosityClass.valueOf(titles[i])).put(spect.getCode(), bv);
                 }
             }
         }
-        System.out.println("spect table loaded");
+        LOGGER.info("Spect table loaded");
         return new SpectTable(name, table);
     }
 
@@ -76,7 +81,7 @@ public final class SpectTable {
             writer.print(lumin + "\t");
         }
         writer.println();
-        for (int code : table.get(LuminosityClass.V).keySet()) {
+        for (final int code : table.get(LuminosityClass.V).keySet()) {
             final SpectClass spect = SpectClass.valueOf(code);
             writer.print(spect + "\t");
             for (final LuminosityClass lumin : table.keySet()) {
@@ -121,6 +126,8 @@ public final class SpectTable {
     }
 
     private static double interpolate(final double x1, final double y1, final double x2, final double y2, final double x) {
-        return (y2 - y1) / (x2 - x1) * (x - x1) + y1;
+        final double dx = x2 - x1;
+        final double dy = y2 - y1;
+        return dy / dx * (x - x1) + y1;
     }
 }

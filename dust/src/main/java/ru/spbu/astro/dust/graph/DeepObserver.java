@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static ru.spbu.astro.dust.DustCatalogues.HIPPARCOS_UPDATED;
@@ -34,9 +35,7 @@ public class DeepObserver extends JFrame {
 
     private int deep = 0;
 
-    @NotNull
     private HammerProjection hammerProjection;
-
 
     public DeepObserver(@NotNull final Catalogue catalogue) {
         layers = split(new StarFilter(catalogue.getStars()).parallaxRelativeError(0.25).getStars(), 2);
@@ -62,6 +61,8 @@ public class DeepObserver extends JFrame {
                             update();
                         }
                         break;
+                    default:
+                        break;
                 }
             }
         });
@@ -71,8 +72,8 @@ public class DeepObserver extends JFrame {
     }
 
     public void update() {
-        final double r1 = Collections.min(layers.get(deep)).getR().getValue();
-        final double r2 = Collections.max(layers.get(deep)).getR().getValue();
+        final double r1 = layers.get(deep).stream().mapToDouble(s -> s.getR().getValue()).min().getAsDouble();
+        final double r2 = layers.get(deep).stream().mapToDouble(s -> s.getR().getValue()).max().getAsDouble();
 
         System.out.println("Between " + r1 + " and " + r2);
 
@@ -83,7 +84,7 @@ public class DeepObserver extends JFrame {
 
         hammerProjection.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 final Spheric dir = HammerProjection.toSpheric(hammerProjection.fromWindow(hammerProjection.getMousePosition()));
                 if (dir != null) {
                     pixPlot.plot(dir);
@@ -98,7 +99,7 @@ public class DeepObserver extends JFrame {
         final List<List<Star>> layers = new ArrayList<>();
         layers.add(new ArrayList<>());
 
-        Collections.sort(stars);
+        Collections.sort(stars, Comparator.comparing(Star::getR));
 
         for (final Star star : stars) {
             layers.get(layers.size() - 1).add(star);
