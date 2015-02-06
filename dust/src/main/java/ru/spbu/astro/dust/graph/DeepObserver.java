@@ -1,13 +1,13 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.graph.HammerProjection;
+import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
-import ru.spbu.astro.core.func.HealpixBinaryDistribution;
-import ru.spbu.astro.core.Catalogue;
-import ru.spbu.astro.core.Spheric;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.StarFilter;
+import ru.spbu.astro.commons.func.HealpixBinaryDistribution;
+import ru.spbu.astro.commons.Catalogue;
+import ru.spbu.astro.commons.Spheric;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
 
 import javax.swing.*;
 import java.awt.event.KeyAdapter;

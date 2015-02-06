@@ -13,8 +13,8 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.core.Spheric;
-import ru.spbu.astro.core.Star;
+import ru.spbu.astro.commons.Spheric;
+import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.util.Value;
 

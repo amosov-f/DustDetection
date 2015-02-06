@@ -1,10 +1,10 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.graph.OutlierHistogram;
-import ru.spbu.astro.core.hist.StarHist;
-import ru.spbu.astro.core.StarFilter;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.graph.OutlierHistogram;
+import ru.spbu.astro.commons.hist.StarHist;
+import ru.spbu.astro.commons.StarFilter;
 
 import java.util.List;
 

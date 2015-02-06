@@ -2,9 +2,9 @@ package ru.spbu.astro.dust;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.core.Catalogue;
-import ru.spbu.astro.core.Catalogues;
-import ru.spbu.astro.core.Star;
+import ru.spbu.astro.commons.Catalogue;
+import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 
 import java.util.function.Function;

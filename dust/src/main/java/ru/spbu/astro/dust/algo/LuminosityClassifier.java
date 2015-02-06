@@ -2,10 +2,10 @@ package ru.spbu.astro.dust.algo;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.spect.LuminosityClass;
-import ru.spbu.astro.core.Catalogues;
-import ru.spbu.astro.core.StarFilter;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.StarFilter;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static ru.spbu.astro.core.graph.HRDiagram.SCALE;
+import static ru.spbu.astro.commons.graph.HRDiagram.SCALE;
 
 public final class LuminosityClassifier {
     private static final Logger LOGGER = Logger.getLogger(LuminosityClassifier.class.getName());

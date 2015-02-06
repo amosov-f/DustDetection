@@ -1,11 +1,11 @@
 package ru.spbu.astro.dust.graph;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.func.HealpixCounter;
-import ru.spbu.astro.core.func.SphericDistribution;
-import ru.spbu.astro.core.graph.HammerProjection;
+import ru.spbu.astro.commons.func.HealpixCounter;
+import ru.spbu.astro.commons.func.SphericDistribution;
+import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.DustCatalogues;
-import ru.spbu.astro.core.StarFilter;
+import ru.spbu.astro.commons.StarFilter;
 
 /**
  * User: amosov-f

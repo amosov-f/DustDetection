@@ -1,11 +1,11 @@
 package ru.spbu.astro.dust.algo;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.spect.LuminosityClass;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.dust.DustCatalogues;
 import ru.spbu.astro.dust.spect.MinCombinator;
-import ru.spbu.astro.core.spect.SpectTable;
+import ru.spbu.astro.commons.spect.SpectTable;
 
 import java.io.FileNotFoundException;
 import java.util.*;

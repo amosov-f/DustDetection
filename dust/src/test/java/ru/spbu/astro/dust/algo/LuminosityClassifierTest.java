@@ -2,9 +2,9 @@ package ru.spbu.astro.dust.algo;
 
 import org.junit.Before;
 import org.junit.Test;
-import ru.spbu.astro.core.Catalogues;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.spect.LuminosityClass;
+import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.spect.LuminosityClass;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

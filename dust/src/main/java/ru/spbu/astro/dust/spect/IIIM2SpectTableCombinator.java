@@ -1,15 +1,15 @@
 package ru.spbu.astro.dust.spect;
 
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.spect.LuminosityClass;
-import ru.spbu.astro.core.spect.SpectClass;
-import ru.spbu.astro.core.spect.SpectTable;
+import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.commons.spect.SpectClass;
+import ru.spbu.astro.commons.spect.SpectTable;
 
 import java.util.EnumMap;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import static ru.spbu.astro.core.spect.LuminosityClass.III;
+import static ru.spbu.astro.commons.spect.LuminosityClass.III;
 
 /**
  * User: amosov-f

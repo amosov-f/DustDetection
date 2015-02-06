@@ -4,11 +4,11 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
 import org.apache.commons.math3.ml.clustering.DoublePoint;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.Cloud;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.StarFilter;
-import ru.spbu.astro.core.func.CloudDistribution;
-import ru.spbu.astro.core.graph.HammerProjection;
+import ru.spbu.astro.commons.Cloud;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.func.CloudDistribution;
+import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.DustCatalogues;
 
 import java.util.List;

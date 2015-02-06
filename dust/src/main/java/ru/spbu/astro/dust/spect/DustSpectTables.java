@@ -1,6 +1,6 @@
 package ru.spbu.astro.dust.spect;
 
-import ru.spbu.astro.core.spect.SpectTable;
+import ru.spbu.astro.commons.spect.SpectTable;
 
 /**
  * User: amosov-f

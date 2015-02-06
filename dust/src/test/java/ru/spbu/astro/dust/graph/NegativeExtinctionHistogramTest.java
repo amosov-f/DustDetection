@@ -3,14 +3,15 @@ package ru.spbu.astro.dust.graph;
 import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.dust.DustCatalogues;
-import ru.spbu.astro.core.StarFilter;
-import ru.spbu.astro.core.hist.DoubleStarHist;
-import ru.spbu.astro.core.hist.SpectClassHist;
+import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.hist.DoubleStarHist;
+import ru.spbu.astro.commons.hist.SpectClassHist;
 
-import static ru.spbu.astro.core.spect.LuminosityClass.III;
-import static ru.spbu.astro.core.spect.LuminosityClass.V;
+import static ru.spbu.astro.commons.spect.LuminosityClass.III;
+import static ru.spbu.astro.commons.spect.LuminosityClass.V;
 
 @Ignore
+@SuppressWarnings("MagicNumber")
 public class NegativeExtinctionHistogramTest {
     @Test
     public void histParallaxRelativeError() throws InterruptedException {

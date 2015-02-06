@@ -2,8 +2,8 @@ package ru.spbu.astro.dust.graph;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.spbu.astro.core.graph.Histogram;
-import ru.spbu.astro.core.hist.DoubleStarHist;
+import ru.spbu.astro.commons.graph.Histogram;
+import ru.spbu.astro.commons.hist.DoubleStarHist;
 import ru.spbu.astro.dust.DustCatalogues;
 
 /**

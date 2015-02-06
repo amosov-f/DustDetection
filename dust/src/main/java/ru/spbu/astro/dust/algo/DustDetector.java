@@ -2,11 +2,11 @@ package ru.spbu.astro.dust.algo;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.NotNull;
-import ru.spbu.astro.core.Spheric;
-import ru.spbu.astro.core.Star;
-import ru.spbu.astro.core.StarFilter;
-import ru.spbu.astro.core.func.HealpixCounter;
-import ru.spbu.astro.core.graph.HammerProjection;
+import ru.spbu.astro.commons.Spheric;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.func.HealpixCounter;
+import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.DustCatalogues;
 import ru.spbu.astro.util.PointsDistribution;
 import ru.spbu.astro.util.Value;
