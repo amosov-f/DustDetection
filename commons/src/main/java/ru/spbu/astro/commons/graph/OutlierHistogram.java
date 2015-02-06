@@ -31,7 +31,10 @@ public class OutlierHistogram {
     @NotNull
     private final List<Star> outliers;
 
-    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars, @NotNull final Predicate<Star> outlierFilter, @NotNull final StarHist<T> counter) {
+    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars,
+                                                      @NotNull final Predicate<Star> outlierFilter,
+                                                      @NotNull final StarHist<T> counter)
+    {
         outliers = new StarFilter(stars).filter(outlierFilter).getStars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();

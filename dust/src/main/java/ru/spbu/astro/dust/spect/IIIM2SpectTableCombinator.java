@@ -5,10 +5,6 @@ import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectClass;
 import ru.spbu.astro.commons.spect.SpectTable;
 
-import java.util.EnumMap;
-import java.util.NavigableMap;
-import java.util.TreeMap;
-
 import static ru.spbu.astro.commons.spect.LuminosityClass.III;
 
 /**
@@ -22,20 +18,19 @@ public final class IIIM2SpectTableCombinator implements SpectTableCombinator {
     @NotNull
     @Override
     public SpectTable combine(@NotNull final SpectTable... spectTables) {
-        final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
-        for (final LuminosityClass lumin : spectTables[0].table.keySet()) {
-            table.put(lumin, new TreeMap<>());
-            for (final Integer code : spectTables[0].table.get(lumin).keySet()) {
+        final SpectTable spectTable = new SpectTable(spectTables[0].getName() + "+" + spectTables[1].getName());
+        for (final LuminosityClass lumin : spectTables[0].getLumins()) {
+            for (final Integer code : spectTables[0].getBVs(lumin).keySet()) {
                 if (lumin != III || code < CODE) {
-                    table.get(lumin).put(code, spectTables[0].table.get(lumin).get(code));
+                    spectTable.add(lumin, code, spectTables[0].getBVs(lumin).get(code));
                 }
             }
         }
-        for (final Integer code : spectTables[1].table.get(III).keySet()) {
+        for (final Integer code : spectTables[1].getBVs(III).keySet()) {
             if (code >= CODE) {
-                table.get(III).put(code, spectTables[1].table.get(III).get(code));
+                spectTable.add(III, code, spectTables[1].getBVs(III).get(code));
             }
         }
-        return new SpectTable(spectTables[0].getName() + "+" + spectTables[1].getName(), table);
+        return spectTable;
     }
 }

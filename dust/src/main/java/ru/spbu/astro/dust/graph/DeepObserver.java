@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.commons.func.HealpixBinaryDistribution;
-import ru.spbu.astro.commons.Catalogue;
+import ru.spbu.astro.commons.Catalog;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
@@ -37,8 +37,8 @@ public class DeepObserver extends JFrame {
 
     private HammerProjection hammerProjection;
 
-    public DeepObserver(@NotNull final Catalogue catalogue) {
-        layers = split(new StarFilter(catalogue.getStars()).parallaxRelativeError(0.25).getStars(), 2);
+    public DeepObserver(@NotNull final Catalog catalog) {
+        layers = split(new StarFilter(catalog.getStars()).parallaxRelativeError(0.25).getStars(), 2);
 
         for (int i = 0; i < layers.size(); i++) {
             calculators.add(new DustTrendCalculator(layers.get(i), i != 0));

@@ -7,12 +7,13 @@ import ru.spbu.astro.util.Value;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class CatalogueTest {
+@SuppressWarnings("MagicNumber")
+public final class CatalogTest {
     private static final double EPS = 1e-8;
 
     @Test
     public void testReading() {
-        final Star star = Catalogues.HIPPARCOS_1997.get(42708);
+        final Star star = Catalogs.HIPPARCOS_1997.get(42708);
         assertNotNull(star);
         assertEquals(2.39, star.getParallax().getValue(), EPS);
         assertEquals(LuminosityClass.III, star.getSpectType().getLumin());
@@ -31,11 +32,11 @@ public class CatalogueTest {
 
     @Test
     public void testInnerJoin() {
-        final Star star = Catalogues.HIPPARCOS_1997.get(71729);
+        final Star star = Catalogs.HIPPARCOS_1997.get(71729);
         assertNotNull(star);
         assertEquals(9.47, star.getParallax().getValue(), EPS);
         assertEquals("G0V", star.getSpectType().toString());
-        final Star updatedStar = Catalogues.HIPPARCOS_2007.get(71729);
+        final Star updatedStar = Catalogs.HIPPARCOS_2007.get(71729);
         assertNotNull(updatedStar);
         assertEquals(8.60, updatedStar.getParallax().getValue(), EPS);
         assertEquals("G0V", star.getSpectType().toString());

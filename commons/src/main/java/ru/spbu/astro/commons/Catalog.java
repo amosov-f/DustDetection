@@ -8,22 +8,21 @@ import ru.spbu.astro.util.Value;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static ru.spbu.astro.commons.Catalogue.Parameter.*;
+import static ru.spbu.astro.commons.Catalog.Parameter.*;
 
-public final class Catalogue {
-    private static final Logger LOGGER = Logger.getLogger(Catalogue.class.getName());
+public final class Catalog {
+    private static final Logger LOGGER = Logger.getLogger(Catalog.class.getName());
 
     @NotNull
     final Map<Integer, Row> id2row = new HashMap<>();
 
-    Catalogue() {
+    Catalog() {
     }
 
     @NotNull
-    public static Catalogue read(@NotNull final InputStream in) {
+    public static Catalog read(@NotNull final InputStream in) {
         final Scanner fin = new Scanner(in);
         final List<Parameter<?>> parameters = new ArrayList<>();
         final String[] parts = fin.nextLine().trim().split("\\|");
@@ -31,37 +30,26 @@ public final class Catalogue {
             parameters.add(valueOf(name.trim()));
         }
 
-        final Catalogue catalogue = new Catalogue();
+        final Catalog catalog = new Catalog();
         while (fin.hasNextLine()) {
             final Row row = Row.parse(fin.nextLine(), parameters);
             if (row != null) {
-                catalogue.add(row);
+                catalog.add(row);
             }
         }
 
-        LOGGER.info("Reading completed");
-        return catalogue;
+        LOGGER.info("Catalog reading completed, #rows = " + catalog.id2row.size());
+        return catalog;
     }
 
     void add(@NotNull final Row row) {
         id2row.put(row.id, row);
     }
 
-    @NotNull
-    public Catalogue updateBy(@NotNull final Function<Star, Star> processor) {
-        final Catalogue updatedCatalogue = new Catalogue();
-        for (final Row row : id2row.values()) {
-            final Star star = row.toStar();
-            if (star != null) {
-                updatedCatalogue.add(new Row(processor.apply(star)));
-            }
-        }
-        return updatedCatalogue;
-    }
-
     @Nullable
     public Star get(final int id) {
-        return id2row.get(id).toStar();
+        final Row row = id2row.get(id);
+        return row != null ? row.toStar() : null;
     }
 
     @NotNull
@@ -73,7 +61,7 @@ public final class Catalogue {
                 stars.add(row.toStar());
             }
         }
-        LOGGER.info("Getting stars completed");
+        LOGGER.info("Getting stars completed, #rows = " + id2row.size() + ", #stars = " + stars.size());
         return stars;
     }
 
@@ -128,7 +116,7 @@ public final class Catalogue {
         }
 
         @Nullable
-        public Star toStar() {
+        Star toStar() {
             final Double lii = get(LII);
             final Double bii = get(BII);
             final Double parallax = get(PARALLAX);
@@ -139,41 +127,22 @@ public final class Catalogue {
             final Double bvColorError = get(BV_COLOR_ERROR);
             final Integer numberComponents = get(NUMBER_COMPONENTS);
 
-            if (lii == null) {
-                return null;
-            }
-            if (bii == null) {
-                return null;
-            }
-            if (parallax == null) {
-                return null;
-            }
-            if (parallaxError == null) {
-                return null;
-            }
-            if (vMag == null) {
-                return null;
-            }
-            if (spectType == null) {
-                return null;
-            }
-            if (bvColor == null) {
-                return null;
-            }
-            if (bvColorError == null) {
-                return null;
-            }
-            if (numberComponents != null && numberComponents >= 2) {
+            boolean invalid = lii == null || bii == null;
+            invalid |= parallax == null || parallaxError == null;
+            invalid |= vMag == null;
+            invalid |= spectType == null;
+            invalid |= bvColor == null || bvColorError == null;
+            invalid |= numberComponents != null && numberComponents >= 2;
+            if (invalid) {
                 return null;
             }
 
-            return new Star(id,
-                    new Spheric(lii, bii),
-                    new Value(parallax, parallaxError),
-                    vMag,
-                    spectType,
-                    new Value(bvColor, bvColorError)
-            );
+            return new Star.Builder(id)
+                    .setDir(new Spheric(lii, bii))
+                    .setParallax(new Value(parallax, parallaxError))
+                    .setVMag(vMag)
+                    .setSpectType(spectType)
+                    .setBVColor(new Value(bvColor, bvColorError)).build();
         }
 
         @NotNull
@@ -183,14 +152,14 @@ public final class Catalogue {
         }
     }
 
-    public abstract static class Parameter<T> {
-        public static final Parameter<Double> LII = new RadiansParameter("lii");
-        public static final Parameter<Double> BII = new RadiansParameter("bii");
-        public static final Parameter<Double> PARALLAX_ERROR = new DoubleParameter("parallax_error");
-        public static final Parameter<Double> VMAG = new DoubleParameter("vmag");
-        public static final Parameter<Double> BV_COLOR = new DoubleParameter("bv_color");
-        public static final Parameter<Double> BV_COLOR_ERROR = new DoubleParameter("bv_color_error");
-        public static final Parameter<Double> PARALLAX = new DoubleParameter("parallax") {
+    abstract static class Parameter<T> {
+        static final Parameter<Double> LII = new RadiansParameter("lii");
+        static final Parameter<Double> BII = new RadiansParameter("bii");
+        static final Parameter<Double> PARALLAX_ERROR = new DoubleParameter("parallax_error");
+        static final Parameter<Double> VMAG = new DoubleParameter("vmag");
+        static final Parameter<Double> BV_COLOR = new DoubleParameter("bv_color");
+        static final Parameter<Double> BV_COLOR_ERROR = new DoubleParameter("bv_color_error");
+        static final Parameter<Double> PARALLAX = new DoubleParameter("parallax") {
             @Nullable
             @Override
             Double parse(@NotNull final String value) {
@@ -198,15 +167,15 @@ public final class Catalogue {
                 return parallax != null && parallax > 0 ? parallax : null;
             }
         };
-        public static final Parameter<Integer> NUMBER_COMPONENTS = new IntegerParameter("number_components");
-        public static final Parameter<SpectType> SPECT_TYPE = new Parameter<SpectType>("spect_type") {
+        static final Parameter<Integer> NUMBER_COMPONENTS = new IntegerParameter("number_components");
+        static final Parameter<SpectType> SPECT_TYPE = new Parameter<SpectType>("spect_type") {
             @Nullable
             @Override
             SpectType parse(@NotNull final String value) {
                 return SpectTypeParser.parse(value);
             }
         };
-        public static final Parameter<Integer> HIP_NUMBER = new IntegerParameter("hip_number");
+        static final Parameter<Integer> HIP_NUMBER = new IntegerParameter("hip_number");
 
         @NotNull
         private final String name;
@@ -216,7 +185,7 @@ public final class Catalogue {
         }
 
         @NotNull
-        public static Parameter<?>[] values() {
+        private static Parameter<?>[] values() {
             return new Parameter[]{
                     LII, BII, PARALLAX_ERROR, VMAG,
                     BV_COLOR, BV_COLOR_ERROR, PARALLAX,
@@ -225,18 +194,13 @@ public final class Catalogue {
         }
 
         @Nullable
-        public static Parameter<?> valueOf(@NotNull final String name) {
+        static Parameter<?> valueOf(@NotNull final String name) {
             for (final Parameter<?> parameter : values()) {
-                if (name.equals(parameter.getName())) {
+                if (parameter.name.equals(name)) {
                     return parameter;
                 }
             }
             return null;
-        }
-
-        @NotNull
-        public final String getName() {
-            return name;
         }
 
         abstract T parse(@NotNull String value);

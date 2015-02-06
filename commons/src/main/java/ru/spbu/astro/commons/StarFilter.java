@@ -11,15 +11,14 @@ import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ArrayUtils.contains;
 
-@SuppressWarnings("unused")
 public final class StarFilter {
     public static final Predicate<Star> NEGATIVE_EXTINCTION = star -> star.getExtinction().getNSigma(3) < 0;
 
     @NotNull
     private final List<Star> stars;
 
-    public StarFilter(@NotNull final Catalogue catalogue) {
-        this(catalogue.getStars());
+    public StarFilter(@NotNull final Catalog catalog) {
+        this(catalog.getStars());
     }
 
     public StarFilter(@NotNull final List<Star> stars) {

@@ -2,6 +2,7 @@ package ru.spbu.astro.commons.spect;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbu.astro.util.MathTools;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +27,15 @@ public final class SpectTable {
     public static final int MAX_CODE = 69;
 
     @NotNull
+    private final String name;
+    @NotNull
+    private final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
+
+    public SpectTable(@NotNull final String name) {
+        this.name = name;
+    }
+
+    @NotNull
     public static IntStream getCodeRange() {
         return IntStream.range(MIN_CODE, MAX_CODE + 1);
     }
@@ -36,42 +46,30 @@ public final class SpectTable {
     }
 
     @NotNull
-    private final String name;
-
-    @NotNull
-    public final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table;
-
-    public SpectTable(@NotNull final String name, @NotNull final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table) {
-        this.name = name;
-        this.table = table;
-    }
-
-    @NotNull
     public static SpectTable read(@NotNull final String name, @NotNull final InputStream in) {
-        final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
-
+        final SpectTable spectTable = new SpectTable(name);
         final Scanner fin = new Scanner(in);
-
         final String[] titles = fin.nextLine().trim().split("\\s+");
-        for (int i = 1; i < titles.length; ++i) {
-            table.put(LuminosityClass.valueOf(titles[i]), new TreeMap<>());
-        }
-
         while (fin.hasNextLine()) {
             final String[] fields = fin.nextLine().trim().split("\\s+");
             for (int i = 1; i < titles.length; i++) {
                 if (!"-".equals(fields[i])) {
-                    final double bv = Double.valueOf(fields[i]);
+                    final double bv = Double.parseDouble(fields[i]);
                     final SpectClass spect = SpectClass.parse(fields[0]);
                     if (spect == null) {
-                        throw new RuntimeException("Spect is null!");
+                        throw new RuntimeException(fields[0] + " isn't spectral class!");
                     }
-                    table.get(LuminosityClass.valueOf(titles[i])).put(spect.getCode(), bv);
+                    spectTable.add(LuminosityClass.valueOf(titles[i]), spect.getCode(), bv);
                 }
             }
         }
-        LOGGER.info("Spect table loaded");
-        return new SpectTable(name, table);
+        LOGGER.info("'" + name + "' + spect table loaded");
+        return spectTable;
+    }
+
+    public void add(@NotNull final LuminosityClass lumin, final int code, final double bv) {
+        table.putIfAbsent(lumin, new TreeMap<>());
+        table.get(lumin).put(code, bv);
     }
 
     public void write(@NotNull final OutputStream out) {
@@ -112,7 +110,7 @@ public final class SpectTable {
         if (!table.containsKey(lumin)) {
             return null;
         }
-        final NavigableMap<Integer, Double> bvs = table.get(lumin);
+        final NavigableMap<Integer, Double> bvs = getBVs(lumin);
         final int code = spect.getCode();
         if (bvs.containsKey(code)) {
             return bvs.get(code);
@@ -120,14 +118,8 @@ public final class SpectTable {
         final Integer x1 = bvs.floorKey(code);
         final Integer x2 = bvs.higherKey(code);
         if (x1 != null && x2 != null) {
-            return interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
+            return MathTools.interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
         }
         return null;
-    }
-
-    private static double interpolate(final double x1, final double y1, final double x2, final double y2, final double x) {
-        final double dx = x2 - x1;
-        final double dy = y2 - y1;
-        return dy / dx * (x - x1) + y1;
     }
 }

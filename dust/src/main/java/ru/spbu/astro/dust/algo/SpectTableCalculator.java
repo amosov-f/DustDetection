@@ -19,7 +19,7 @@ import java.util.*;
 public final class SpectTableCalculator {
     @NotNull
     public SpectTable calculate(final double outlierPart) {
-        final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
+        final SpectTable spectTable = new SpectTable("max-" + (int) (outlierPart * 100) + "%");
         final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
         spect2stars.put(LuminosityClass.III, new HashMap<>());
         spect2stars.put(LuminosityClass.V, new HashMap<>());
@@ -32,17 +32,16 @@ public final class SpectTableCalculator {
             }
         }
         for (final LuminosityClass lumin : spect2stars.keySet()) {
-            table.put(lumin, new TreeMap<>());
             for (final Integer key : spect2stars.get(lumin).keySet()) {
                 final List<Star> stars = spect2stars.get(lumin).get(key);
                 stars.sort(
                         (star1, star2) -> new Double(star1.getExtinction().getNSigma(3)).compareTo(star2.getExtinction().getNSigma(3))
                 );
                 final double ext = stars.get(Math.min((int) (outlierPart * stars.size()), stars.size() - 1)).getBVColor().getNSigma(3);
-                table.get(lumin).put(key, ext);
+                spectTable.add(lumin, key, ext);
             }
         }
-        return new SpectTable("max-" + (int) (outlierPart * 100) + "%", table);
+        return spectTable;
     }
 
     private static final int BIN = 3;

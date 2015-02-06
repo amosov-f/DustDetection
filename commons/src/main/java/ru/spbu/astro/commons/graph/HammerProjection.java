@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.func.SphericDistribution;
+import ru.spbu.astro.util.MathTools;
 import ru.spbu.astro.util.Value;
 
 import javax.swing.*;
@@ -97,19 +98,6 @@ public final class HammerProjection extends JWindow {
         return new Spheric(l, b);
     }
 
-    private static double normalize(final double x, final double min, final double max) {
-        double normalized = x;
-        if (normalized > max) {
-            normalized = max;
-        }
-        if (normalized < min) {
-            normalized = min;
-        }
-
-        final double d = max(abs(min), abs(max));
-        return d == 0 ? 0 : normalized / d;
-    }
-
     private static void removeExtremeValues(@NotNull final Collection<Double> values) {
         for (int i = 0; i < OUTLIERS; ) {
             if (values.size() > 2 && Collections.max(values) > 0) {
@@ -177,10 +165,10 @@ public final class HammerProjection extends JWindow {
                 if (f[x][y] == null) {
                     color = Color.BLACK;
                 } else {
-                    final double value = normalize(f[x][y].getValue(), minValue, maxValue);
+                    final double value = MathTools.normalize(f[x][y].getValue(), minValue, maxValue);
                     final double error;
                     if (mode == Mode.WITH_ERRORS) {
-                        error = normalize(f[x][y].getError(), 0, maxError);
+                        error = MathTools.normalize(f[x][y].getError(), 0, maxError);
                     } else {
                         error = 0;
                     }

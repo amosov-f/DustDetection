@@ -20,18 +20,13 @@ public final class Star {
     @NotNull
     private final Value bvColor;
 
-    public Star(final int id,
-                @NotNull final Spheric dir,
-                @NotNull final Value parallax,
-                final double vMag,
-                @NotNull final SpectType spectType,
-                @NotNull final Value bvColor) {
-        this.id = id;
-        this.dir = dir;
-        this.parallax = parallax;
-        this.vMag = vMag;
-        this.spectType = spectType;
-        this.bvColor = bvColor;
+    public Star(@NotNull final Builder builder) {
+        id = builder.id;
+        dir = builder.dir;
+        parallax = builder.parallax;
+        vMag = builder.vMag;
+        spectType = builder.spectType;
+        bvColor = builder.bvColor;
     }
 
     @NotNull
@@ -86,11 +81,6 @@ public final class Star {
     }
 
     @NotNull
-    public Star setSpectType(@NotNull final SpectType spectType) {
-        return new Star(id, dir, parallax, vMag, spectType, bvColor);
-    }
-
-    @NotNull
     public Value getBVColor() {
         return bvColor;
     }
@@ -99,8 +89,65 @@ public final class Star {
     @Override
     public String toString() {
         return String.format(
-                "(%d: l = %.3f, b = %.3f, pi = %.3f, dpi = %.3f)",
+                "(#%d: l = %.3f, b = %.3f, pi = %.3f, dpi = %.3f)",
                 id, dir.getL(), dir.getB(), parallax.getValue(), parallax.getError()
         );
+    }
+
+    public static final class Builder {
+        private final int id;
+        private Spheric dir;
+        private Value parallax;
+        private double vMag;
+        private SpectType spectType;
+        private Value bvColor;
+
+        public Builder(final int id) {
+            this.id = id;
+        }
+
+        public Builder(@NotNull final Star star) {
+            this(star.getId());
+            setDir(star.dir);
+            setParallax(star.parallax);
+            setVMag(star.vMag);
+            setSpectType(star.spectType);
+            setBVColor(star.bvColor);
+        }
+
+        @NotNull
+        public Builder setDir(@NotNull final Spheric dir) {
+            this.dir = dir;
+            return this;
+        }
+
+        @NotNull
+        public Builder setParallax(@NotNull final Value parallax) {
+            this.parallax = parallax;
+            return this;
+        }
+
+        @NotNull
+        public Builder setVMag(final double vMag) {
+            this.vMag = vMag;
+            return this;
+        }
+
+        @NotNull
+        public Builder setSpectType(@NotNull final SpectType spectType) {
+            this.spectType = spectType;
+            return this;
+        }
+
+        @NotNull
+        public Builder setBVColor(@NotNull final Value bvColor) {
+            this.bvColor = bvColor;
+            return this;
+        }
+
+        @NotNull
+        public Star build() {
+            return new Star(this);
+        }
     }
 }

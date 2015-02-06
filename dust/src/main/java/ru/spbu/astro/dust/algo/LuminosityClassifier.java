@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Catalogs;
 import ru.spbu.astro.commons.StarFilter;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -82,7 +82,7 @@ public final class LuminosityClassifier {
     }
 
     public static void main(@NotNull final String[] args) {
-        new LuminosityClassifier(Catalogues.HIPPARCOS_2007.getStars(), Mode.TEST);
+        new LuminosityClassifier(Catalogs.HIPPARCOS_2007.getStars(), Mode.TEST);
     }
 
     @NotNull

@@ -5,10 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectTable;
 
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * User: amosov-f
@@ -18,8 +15,9 @@ import java.util.TreeMap;
 public final class MinCombinator implements SpectTableCombinator {
     @NotNull
     @Override
-    public SpectTable combine(@NotNull SpectTable... spectTables) {
-        final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
+    public SpectTable combine(@NotNull final SpectTable... spectTables) {
+        final String name = "min(" + Joiner.on(',').join(Arrays.stream(spectTables).map(SpectTable::getName).toArray()) + ")";
+        final SpectTable combinedSpectTable = new SpectTable(name);
         for (final LuminosityClass lumin : LuminosityClass.values()) {
             boolean ok = true;
             for (final SpectTable spectTable : spectTables) {
@@ -29,7 +27,6 @@ public final class MinCombinator implements SpectTableCombinator {
             }
             if (ok) {
                 final NavigableMap<Integer, Double> bvs = new TreeMap<>(spectTables[0].getBVs(lumin));
-                table.put(lumin, bvs);
                 for (int i = 1; i < spectTables.length; i++) {
                     bvs.keySet().retainAll(spectTables[i].getBVs(lumin).keySet());
                     for (final int code : spectTables[i].getBVs(lumin).keySet()) {
@@ -38,9 +35,11 @@ public final class MinCombinator implements SpectTableCombinator {
                         }
                     }
                 }
+                for (final int code : bvs.keySet()) {
+                    combinedSpectTable.add(lumin, code, bvs.get(code));
+                }
             }
         }
-        final String name = "min(" + Joiner.on(',').join(Arrays.stream(spectTables).map(SpectTable::getName).toArray()) + ")";
-        return new SpectTable(name, table);
+        return combinedSpectTable;
     }
 }

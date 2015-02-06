@@ -10,7 +10,7 @@ import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Catalogs;
 import ru.spbu.astro.commons.StarFilter;
 
 import java.io.IOException;
@@ -101,7 +101,7 @@ public final class HRDiagram {
 
         System.out.println(SCALE * 0.01);
 
-        new HRDiagram(new StarFilter(Catalogues.HIPPARCOS_2007)
+        new HRDiagram(new StarFilter(Catalogs.HIPPARCOS_2007)
                 .mainLuminosityClasses()
                 .absoluteMagnitudeError(SCALE * 0.01)
                 .bvColorError(0.01).getStars());

@@ -2,8 +2,8 @@ package ru.spbu.astro.dust;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.commons.Catalogue;
-import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Catalog;
+import ru.spbu.astro.commons.Catalogs;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.dust.algo.LuminosityClassifier;
 
@@ -15,8 +15,8 @@ import java.util.function.Function;
  * Time: 19:03
  */
 public final class DustCatalogues {
-    public static final Catalogue HIPPARCOS_UPDATED = Catalogues.HIPPARCOS_2007.updateBy(new Function<Star, Star>() {
-        private final LuminosityClassifier classifier = new LuminosityClassifier(Catalogues.HIPPARCOS_2007.getStars());
+    public static final Catalog HIPPARCOS_UPDATED = Catalogs.update(Catalogs.HIPPARCOS_2007, new Function<Star, Star>() {
+        private final LuminosityClassifier classifier = new LuminosityClassifier(Catalogs.HIPPARCOS_2007.getStars());
 
         @Nullable
         @Override
@@ -24,7 +24,7 @@ public final class DustCatalogues {
             if (star.getSpectType().hasLumin()) {
                 return star;
             }
-            return star.setSpectType(star.getSpectType().setLumin(classifier.classify(star)));
+            return new Star.Builder(star).setSpectType(star.getSpectType().setLumin(classifier.classify(star))).build();
         }
     });
 

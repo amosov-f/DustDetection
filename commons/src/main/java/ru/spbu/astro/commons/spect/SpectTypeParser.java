@@ -2,7 +2,7 @@ package ru.spbu.astro.commons.spect;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Catalogs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,7 +111,7 @@ public final class SpectTypeParser {
     }
 
     public static void main(@NotNull final String[] args) {
-        Catalogues.HIPPARCOS_2007.getStars();
+        Catalogs.HIPPARCOS_2007.getStars();
         for (final String key : CACHE.keySet()) {
             System.out.println(key + " -> " + CACHE.get(key));
         }

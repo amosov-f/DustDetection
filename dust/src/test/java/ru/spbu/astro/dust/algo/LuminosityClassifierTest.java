@@ -2,7 +2,7 @@ package ru.spbu.astro.dust.algo;
 
 import org.junit.Before;
 import org.junit.Test;
-import ru.spbu.astro.commons.Catalogues;
+import ru.spbu.astro.commons.Catalogs;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 
@@ -16,12 +16,12 @@ public class LuminosityClassifierTest {
 
     @Before
     public void setUp() {
-        classifier = new LuminosityClassifier(Catalogues.HIPPARCOS_2007.getStars());
+        classifier = new LuminosityClassifier(Catalogs.HIPPARCOS_2007.getStars());
     }
 
     @Test
     public void test() {
-        final Star star = Catalogues.HIPPARCOS_2007.get(50765);
+        final Star star = Catalogs.HIPPARCOS_2007.get(50765);
         assertNotNull(star);
         assertNull(star.getSpectType().getLumin());
         assertEquals(LuminosityClass.V, classifier.classify(star));
