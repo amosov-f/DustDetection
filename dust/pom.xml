@@ -14,11 +14,15 @@
     <dependencies>
         <dependency>
             <groupId>ru.spbu.astro</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>commons</artifactId>
         </dependency>
         <dependency>
             <groupId>ru.spbu.astro</groupId>
             <artifactId>util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.spbu.astro</groupId>
+            <artifactId>healpix</artifactId>
         </dependency>
 
         <dependency>

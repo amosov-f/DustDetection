@@ -8,7 +8,7 @@ import ru.spbu.astro.commons.spect.SpectTable;
  * Date: 26.10.14
  * Time: 14:23
  */
-public interface SpectTableCombinator {
+public interface SpectTableCombiner {
     @NotNull
     SpectTable combine(@NotNull SpectTable... spectTables);
 }

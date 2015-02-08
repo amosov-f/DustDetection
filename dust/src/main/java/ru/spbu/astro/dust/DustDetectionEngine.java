@@ -2,7 +2,7 @@ package ru.spbu.astro.dust;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.StarFilter;
-import ru.spbu.astro.commons.func.HealpixDistribution;
+import ru.spbu.astro.healpix.func.HealpixDistribution;
 import ru.spbu.astro.commons.func.SphericDistribution;
 import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
@@ -14,7 +14,7 @@ public final class DustDetectionEngine {
 
     public static void main(@NotNull final String[] args) {
         final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(
-                new StarFilter(DustCatalogues.HIPPARCOS_UPDATED).parallaxRelativeError(0.25).getStars()
+                new StarFilter(DustCatalogs.HIPPARCOS_UPDATED).parallaxRelativeError(0.25).getStars()
         );
         final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);

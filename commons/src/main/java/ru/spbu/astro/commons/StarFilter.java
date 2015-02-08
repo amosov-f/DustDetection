@@ -65,7 +65,7 @@ public final class StarFilter {
 
     @NotNull
     public StarFilter existLuminosityClass() {
-        return filter(star -> star.getSpectType().getLumin() != null);
+        return filter(star -> star.getSpectType().hasLumin());
     }
 
     @NotNull

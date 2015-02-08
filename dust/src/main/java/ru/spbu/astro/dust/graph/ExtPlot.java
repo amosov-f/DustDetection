@@ -22,96 +22,7 @@ import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 @SuppressWarnings("MagicNumber")
 public final class ExtPlot {
     @NotNull
-    private XYSeries[] getSeries() {
-        final XYSeries series = new XYSeries("Кривая покраснения");
-        final XYSeries dustSeries = new XYSeries("Пылевые облака");
-
-        double r = 0;
-        double ext = 0;
-        for (; r < 90; r += 1) {
-            series.add(r, ext);
-            ext += 0.00025;
-        }
-
-        ext += 10 * 0.00025;
-
-        dustSeries.add(100, 0);
-        dustSeries.add(100, ext + 0.002);
-
-        ext += 10 * 0.00125;
-
-        for (r = 110; r < 140; r += 1) {
-            series.add(r, ext);
-            dustSeries.add(r, ext);
-            ext +=  0.00125;
-        }
-
-        ext += 10 * 0.00125;
-
-        dustSeries.add(150, ext - 0.002);
-        dustSeries.add(150, 0);
-
-        ext += 10 * 0.00025;
-
-        for (r = 160; r < 240; r += 1) {
-            series.add(r, ext);
-            ext +=  0.00025;
-        }
-
-        ext += 10 * 0.00025;
-
-        dustSeries.add(250, 0);
-        dustSeries.add(250, ext + 0.008);
-
-        ext += 10 * 0.00325;
-
-        for (r = 260; r < 265; r += 1) {
-            series.add(r, ext);
-            dustSeries.add(r, ext);
-            ext +=  0.00325;
-        }
-
-        ext += 10 * 0.00325;
-
-        dustSeries.add(275, ext - 0.007);
-        dustSeries.add(275, 0);
-
-        ext += 10 * 0.00025;
-
-        for (r = 285; r < 300; r += 1) {
-            series.add(r, ext);
-            ext +=  0.00025;
-        }
-
-
-        ext += 10 * 0.00025;
-
-        dustSeries.add(310, 0);
-        dustSeries.add(310, ext + 0.005);
-
-        ext += 10 * 0.00225;
-
-
-        for (r = 320; r < 340; r += 1) {
-            series.add(r, ext);
-            dustSeries.add(r, ext);
-            ext +=  0.00225;
-        }
-
-        ext += 10 * 0.00225;
-
-        dustSeries.add(350, ext - 0.005);
-        dustSeries.add(350, 0);
-
-        ext += 10 * 0.00025;
-
-        for (r = 360; r < 400; r += 1) {
-            series.add(r, ext);
-            ext +=  0.00025;
-        }
-
-        return new XYSeries[]{series, dustSeries};
-    }
+    private final ChartFrame frame;
 
     public ExtPlot() {
         final XYItemRenderer renderer = new XYSplineRenderer();
@@ -139,12 +50,107 @@ public final class ExtPlot {
             throw new RuntimeException(e);
         }
 
-        final ChartFrame frame = new ChartFrame("Идеальная кривая покраснения", chart);
+        frame = new ChartFrame("Идеальная кривая покраснения", chart);
         frame.pack();
-        frame.setVisible(true);
     }
 
     public static void main(@NotNull final String[] args) {
-        new ExtPlot();
+        new ExtPlot().show();
+    }
+
+    @NotNull
+    private XYSeries[] getSeries() {
+        final XYSeries series = new XYSeries("Кривая покраснения");
+        final XYSeries dustSeries = new XYSeries("Пылевые облака");
+
+        double r = 0;
+        double ext = 0;
+        for (; r < 90; r += 1) {
+            series.add(r, ext);
+            ext += 0.00025;
+        }
+
+        ext += 10 * 0.00025;
+
+        dustSeries.add(100, 0);
+        dustSeries.add(100, ext + 0.002);
+
+        ext += 10 * 0.00125;
+
+        for (r = 110; r < 140; r += 1) {
+            series.add(r, ext);
+            dustSeries.add(r, ext);
+            ext += 0.00125;
+        }
+
+        ext += 10 * 0.00125;
+
+        dustSeries.add(150, ext - 0.002);
+        dustSeries.add(150, 0);
+
+        ext += 10 * 0.00025;
+
+        for (r = 160; r < 240; r += 1) {
+            series.add(r, ext);
+            ext += 0.00025;
+        }
+
+        ext += 10 * 0.00025;
+
+        dustSeries.add(250, 0);
+        dustSeries.add(250, ext + 0.008);
+
+        ext += 10 * 0.00325;
+
+        for (r = 260; r < 265; r += 1) {
+            series.add(r, ext);
+            dustSeries.add(r, ext);
+            ext += 0.00325;
+        }
+
+        ext += 10 * 0.00325;
+
+        dustSeries.add(275, ext - 0.007);
+        dustSeries.add(275, 0);
+
+        ext += 10 * 0.00025;
+
+        for (r = 285; r < 300; r += 1) {
+            series.add(r, ext);
+            ext += 0.00025;
+        }
+
+
+        ext += 10 * 0.00025;
+
+        dustSeries.add(310, 0);
+        dustSeries.add(310, ext + 0.005);
+
+        ext += 10 * 0.00225;
+
+
+        for (r = 320; r < 340; r += 1) {
+            series.add(r, ext);
+            dustSeries.add(r, ext);
+            ext += 0.00225;
+        }
+
+        ext += 10 * 0.00225;
+
+        dustSeries.add(350, ext - 0.005);
+        dustSeries.add(350, 0);
+
+        ext += 10 * 0.00025;
+
+        for (r = 360; r < 400; r += 1) {
+            series.add(r, ext);
+            ext += 0.00025;
+        }
+
+        return new XYSeries[]{series, dustSeries};
+    }
+
+    private void show() {
+        frame.setVisible(true);
     }
 }

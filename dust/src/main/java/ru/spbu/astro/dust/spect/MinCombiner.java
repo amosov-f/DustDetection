@@ -12,7 +12,7 @@ import java.util.*;
  * Date: 16.11.14
  * Time: 0:05
  */
-public final class MinCombinator implements SpectTableCombinator {
+public final class MinCombiner implements SpectTableCombiner {
     @NotNull
     @Override
     public SpectTable combine(@NotNull final SpectTable... spectTables) {

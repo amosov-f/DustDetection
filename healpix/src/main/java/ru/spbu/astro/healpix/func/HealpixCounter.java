@@ -1,4 +1,4 @@
-package ru.spbu.astro.commons.func;
+package ru.spbu.astro.healpix.func;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Spheric;
@@ -6,16 +6,17 @@ import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.util.Value;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public final class HealpixCounter extends HealpixDistribution {
-    public HealpixCounter(@NotNull final Iterable<Spheric> dirs, final int nSide) {
+    public HealpixCounter(@NotNull final Collection<Spheric> dirs, final int nSide) {
         super(nSide);
-        Arrays.setAll(values, i -> new Value(0, 0));
+        Arrays.setAll(values, i -> Value.ZERO);
         for (final Spheric dir : dirs) {
-            final int pix = getPix(dir);
-            values[pix] = values[pix].add(new Value(1, 0));
+            final int pix = healpix.getPix(dir);
+            values[pix] = values[pix].add(Value.ONE);
         }
     }
 

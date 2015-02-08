@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>core</artifactId>
+    <artifactId>commons</artifactId>
 
     <dependencies>
         <dependency>
@@ -32,14 +32,6 @@
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>gov.fnal.eag.healpix</groupId>
-            <artifactId>healpix</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../lib/PixTools.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

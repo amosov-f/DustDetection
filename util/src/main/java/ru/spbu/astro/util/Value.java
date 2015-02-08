@@ -8,6 +8,7 @@ import static java.lang.Math.sqrt;
 
 public final class Value implements Comparable<Value> {
     public static final Value ZERO = new Value(0);
+    public static final Value ONE = new Value(1);
 
     private final double value;
     private final double error;

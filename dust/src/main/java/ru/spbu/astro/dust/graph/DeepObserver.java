@@ -3,7 +3,7 @@ package ru.spbu.astro.dust.graph;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
-import ru.spbu.astro.commons.func.HealpixBinaryDistribution;
+import ru.spbu.astro.healpix.func.HealpixBinaryDistribution;
 import ru.spbu.astro.commons.Catalog;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static ru.spbu.astro.dust.DustCatalogues.HIPPARCOS_UPDATED;
+import static ru.spbu.astro.dust.DustCatalogs.HIPPARCOS_UPDATED;
 
 /**
  * User: amosov-f

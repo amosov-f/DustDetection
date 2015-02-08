@@ -12,6 +12,7 @@
         <module>dust</module>
         <module>commons</module>
         <module>util</module>
+        <module>healpix</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -24,7 +25,12 @@
             </dependency>
             <dependency>
                 <groupId>ru.spbu.astro</groupId>
-                <artifactId>core</artifactId>
+                <artifactId>commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.spbu.astro</groupId>
+                <artifactId>healpix</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

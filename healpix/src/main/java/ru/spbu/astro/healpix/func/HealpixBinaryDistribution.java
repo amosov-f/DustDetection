@@ -1,4 +1,4 @@
-package ru.spbu.astro.commons.func;
+package ru.spbu.astro.healpix.func;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.util.Value;
@@ -18,7 +18,7 @@ public final class HealpixBinaryDistribution extends HealpixDistribution {
     @NotNull
     private static Value[] binaryValues(@NotNull final Value[] values, final double threshold) {
         final Value[] binaryValues = new Value[values.length];
-        Arrays.setAll(binaryValues, i -> values[i] != null ? values[i].getValue() >= threshold ? new Value(1) : new Value(0) : null);
+        Arrays.setAll(binaryValues, i -> values[i] != null ? values[i].getValue() >= threshold ? Value.ONE : Value.ZERO : null);
         return binaryValues;
     }
 }

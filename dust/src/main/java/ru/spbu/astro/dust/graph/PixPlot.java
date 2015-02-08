@@ -16,6 +16,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
+import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.util.Value;
 
 import java.awt.*;
@@ -31,6 +32,8 @@ public final class PixPlot {
     private final DustTrendCalculator dustTrendCalculator;
     @NotNull
     private final ChartFrame frame;
+    @NotNull
+    private final Healpix healpix = new Healpix(DustTrendCalculator.N_SIDE);
 
     public PixPlot(@NotNull final DustTrendCalculator dustTrendCalculator) {
         this.dustTrendCalculator = dustTrendCalculator;
@@ -93,7 +96,7 @@ public final class PixPlot {
         plot.setRangeZeroBaselineVisible(true);
 
         final JFreeChart chart = new JFreeChart(
-                "Покраснение в направлении " + dustTrendCalculator.getPixCenter(dustTrendCalculator.getPix(dir)),
+                "Покраснение в направлении " + healpix.getCenter(dir),
                 DEFAULT_TITLE_FONT,
                 plot,
                 true
@@ -108,6 +111,7 @@ public final class PixPlot {
         frame.getChartPanel().setChart(chart);
     }
 
+    @NotNull
     private XYIntervalSeries createXYIntegervalSeries(@NotNull final List<Star> stars, @NotNull final String name) {
         final XYIntervalSeries series = new XYIntervalSeries(name);
         for (final Star s : stars) {

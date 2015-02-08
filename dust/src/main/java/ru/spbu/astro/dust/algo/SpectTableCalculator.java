@@ -3,11 +3,10 @@ package ru.spbu.astro.dust.algo;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.dust.DustCatalogues;
-import ru.spbu.astro.dust.spect.MinCombinator;
 import ru.spbu.astro.commons.spect.SpectTable;
+import ru.spbu.astro.dust.DustCatalogs;
+import ru.spbu.astro.dust.spect.MinCombiner;
 
-import java.io.FileNotFoundException;
 import java.util.*;
 
 
@@ -17,33 +16,6 @@ import java.util.*;
  * Time: 21:12
  */
 public final class SpectTableCalculator {
-    @NotNull
-    public SpectTable calculate(final double outlierPart) {
-        final SpectTable spectTable = new SpectTable("max-" + (int) (outlierPart * 100) + "%");
-        final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
-        spect2stars.put(LuminosityClass.III, new HashMap<>());
-        spect2stars.put(LuminosityClass.V, new HashMap<>());
-        for (final Star star : DustCatalogues.HIPPARCOS_UPDATED.getStars()) {
-            final LuminosityClass lumin = star.getSpectType().getLumin();
-            if (spect2stars.containsKey(lumin)) {
-                final int key = key(star.getSpectType().getSpect().getCode());
-                spect2stars.get(lumin).putIfAbsent(key, new ArrayList<>());
-                spect2stars.get(lumin).get(key).add(star);
-            }
-        }
-        for (final LuminosityClass lumin : spect2stars.keySet()) {
-            for (final Integer key : spect2stars.get(lumin).keySet()) {
-                final List<Star> stars = spect2stars.get(lumin).get(key);
-                stars.sort(
-                        (star1, star2) -> new Double(star1.getExtinction().getNSigma(3)).compareTo(star2.getExtinction().getNSigma(3))
-                );
-                final double ext = stars.get(Math.min((int) (outlierPart * stars.size()), stars.size() - 1)).getBVColor().getNSigma(3);
-                spectTable.add(lumin, key, ext);
-            }
-        }
-        return spectTable;
-    }
-
     private static final int BIN = 3;
     private static final int B = 2;
 
@@ -61,8 +33,33 @@ public final class SpectTableCalculator {
         return key;
     }
 
-    public static void main(@NotNull final String[] args) throws FileNotFoundException {
-        final SpectTable spectTable = new MinCombinator().combine(SpectTable.TSVETKOV, new SpectTableCalculator().calculate(0.05));
+    public static void main(@NotNull final String[] args) {
+        final SpectTable spectTable = new MinCombiner().combine(SpectTable.TSVETKOV, new SpectTableCalculator().calculate(0.05));
         //spectTable.write(new FileOutputStream("src/main/resources/table/" + spectTable.getName() + ".txt"));
+    }
+
+    @NotNull
+    public SpectTable calculate(final double outlierPart) {
+        final SpectTable spectTable = new SpectTable("max-" + (int) (outlierPart * 100) + "%");
+        final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
+        spect2stars.put(LuminosityClass.III, new HashMap<>());
+        spect2stars.put(LuminosityClass.V, new HashMap<>());
+        for (final Star star : DustCatalogs.HIPPARCOS_UPDATED.getStars()) {
+            final LuminosityClass lumin = star.getSpectType().getLumin();
+            if (spect2stars.containsKey(lumin)) {
+                final int key = key(star.getSpectType().getSpect().getCode());
+                spect2stars.get(lumin).putIfAbsent(key, new ArrayList<>());
+                spect2stars.get(lumin).get(key).add(star);
+            }
+        }
+        for (final LuminosityClass lumin : spect2stars.keySet()) {
+            for (final Integer key : spect2stars.get(lumin).keySet()) {
+                final List<Star> stars = spect2stars.get(lumin).get(key);
+                stars.sort(Comparator.comparingDouble(star -> star.getExtinction().getNSigma(3)));
+                final double ext = stars.get(Math.min((int) (outlierPart * stars.size()), stars.size() - 1)).getBVColor().getNSigma(3);
+                spectTable.add(lumin, key, ext);
+            }
+        }
+        return spectTable;
     }
 }

@@ -9,7 +9,7 @@ import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.func.CloudDistribution;
 import ru.spbu.astro.commons.graph.HammerProjection;
-import ru.spbu.astro.dust.DustCatalogues;
+import ru.spbu.astro.dust.DustCatalogs;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -43,7 +43,7 @@ public final class DustCloudDetector {
 
     public static void main(@NotNull final String[] args) {
         final DustCloudDetector detector = new DustCloudDetector(
-                new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                new StarFilter(DustCatalogs.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
         final List<Cloud> clouds = detector.getClouds();
         LOGGER.info("#clouds: " + clouds.size());

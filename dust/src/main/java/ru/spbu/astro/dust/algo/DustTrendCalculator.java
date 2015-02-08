@@ -1,11 +1,10 @@
 package ru.spbu.astro.dust.algo;
 
-import gov.fnal.eag.healpix.PixTools;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.spbu.astro.commons.HealpixTools;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.util.Value;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.util.ml.SimpleRegression;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 public final class DustTrendCalculator {
     private static final Logger LOGGER = Logger.getLogger(DustTrendCalculator.class.getName());
 
-    private static final int N_SIDE = 18;
+    public static final int N_SIDE = 18;
 
     @NotNull
     private final List<List<Star>> inliers = new ArrayList<>();
@@ -33,26 +32,24 @@ public final class DustTrendCalculator {
     private final Value[] intercepts;
 
     @NotNull
-    private final PixTools pixTools;
+    private final Healpix healpix = new Healpix(N_SIDE);
 
     public DustTrendCalculator(@NotNull final List<Star> stars) {
         this(stars, false);
     }
 
     public DustTrendCalculator(@NotNull final List<Star> stars, final boolean includeIntercept) {
-        LOGGER.info("Number of stars: " + stars.size());
-
-        pixTools = new PixTools();
+        LOGGER.info("#stars = " + stars.size());
 
         final List<List<Star>> rings = new ArrayList<>();
-        for (int i = 0; i < HealpixTools.nPix(N_SIDE); i++) {
+        for (int i = 0; i < Healpix.nPix(N_SIDE); i++) {
             rings.add(new ArrayList<>());
         }
 
         final Map<Integer, Star> id2star = new HashMap<>();
         for (final Star star : stars) {
             id2star.put(star.getId(), star);
-            rings.get(getPix(star.getDir())).add(star);
+            rings.get(healpix.getPix(star.getDir())).add(star);
         }
 
         slopes = new Value[rings.size()];
@@ -87,33 +84,25 @@ public final class DustTrendCalculator {
 
     @Nullable
     public List<Star> getInlierStars(@NotNull final Spheric dir) {
-        return inliers.get(getPix(dir));
+        return inliers.get(healpix.getPix(dir));
     }
 
     @Nullable
     public List<Star> getOutlierStars(@NotNull final Spheric dir) {
-        return outliers.get(getPix(dir));
+        return outliers.get(healpix.getPix(dir));
     }
 
     @Nullable
     public Value getSlope(@NotNull final Spheric dir) {
-        return slopes[getPix(dir)];
+        return slopes[healpix.getPix(dir)];
     }
 
     @Nullable
     public Value getIntercept(@NotNull final Spheric dir) {
-        return intercepts[getPix(dir)];
-    }
-
-    public int getPix(@NotNull final Spheric dir) {
-        return (int) pixTools.ang2pix_ring(N_SIDE, dir.getPhi(), dir.getTheta());
+        return intercepts[healpix.getPix(dir)];
     }
 
     @NotNull
-    public Spheric getPixCenter(final int pix) {
-        return Spheric.valueOf(pixTools.pix2ang_ring(N_SIDE, (long) pix));
-    }
-
     @Override
     public String toString() {
         double dr = 0;
@@ -123,18 +112,18 @@ public final class DustTrendCalculator {
             }
         }
 
-        final StringBuilder s = new StringBuilder();
-        s.append("dr <= ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
-        s.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
+        final StringBuilder sb = new StringBuilder();
+        sb.append("dr <= ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
+        sb.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
         for (int i = 0; i < inliers.size(); ++i) {
-            final Spheric dir = getPixCenter(i);
+            final Spheric dir = healpix.getCenter(i);
             final Value k = slopes[i];
-            s.append(String.format(
+            sb.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
                     i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), inliers.get(i).size()
             ));
         }
-        return s.toString();
+        return sb.toString();
     }
 
 }

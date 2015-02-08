@@ -5,9 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
-import ru.spbu.astro.commons.func.HealpixCounter;
 import ru.spbu.astro.commons.graph.HammerProjection;
-import ru.spbu.astro.dust.DustCatalogues;
+import ru.spbu.astro.dust.DustCatalogs;
+import ru.spbu.astro.healpix.func.HealpixCounter;
 import ru.spbu.astro.util.PointsDistribution;
 import ru.spbu.astro.util.Value;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
@@ -19,6 +19,7 @@ import weka.core.neighboursearch.NearestNeighbourSearch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * User: amosov-f
@@ -107,11 +108,6 @@ public final class DustDetector {
     }
 
     @NotNull
-    public List<Vector3D> getDust() {
-        return dust;
-    }
-
-    @NotNull
     private static Instance instance(@NotNull final Vector3D p, final double ext, @NotNull final Instances instances) {
         return new DenseInstance(4) {{
             setValue(0, p.getX());
@@ -134,15 +130,17 @@ public final class DustDetector {
 
     public static void main(final String[] args) {
         final DustDetector detector = new DustDetector(
-                new StarFilter(DustCatalogues.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                new StarFilter(DustCatalogs.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
         );
 
-        final List<Spheric> dirs = new ArrayList<>();
-        for (final Vector3D p : detector.getDust()) {
-            dirs.add(new Spheric(p));
-        }
+        final List<Spheric> dirs = detector.getDust().stream().map(Spheric::new).collect(Collectors.toList());
 
         final HammerProjection hammerProjection = new HammerProjection(new HealpixCounter(dirs, 30));
         hammerProjection.setVisible(true);
+    }
+
+    @NotNull
+    public List<Vector3D> getDust() {
+        return dust;
     }
 }
