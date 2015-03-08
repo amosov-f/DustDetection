@@ -1,7 +1,7 @@
 package ru.spbu.astro.commons.graph;
 
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.Ints;
+import com.google.common.primitives.Doubles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFactory;
@@ -16,34 +16,41 @@ import org.jfree.chart.renderer.category.StackedBarRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
-import ru.spbu.astro.commons.Star;
-import ru.spbu.astro.commons.hist.StarHist;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.IntStream;
+import java.util.stream.DoubleStream;
 
 /**
  * User: amosov-f
  * Date: 09.01.15
  * Time: 2:45
  */
-public final class Histogram {
-    public <T extends Comparable<T>> Histogram(@NotNull final List<Star> stars, @NotNull final StarHist<T> counter) {
-        final Map<T, Integer> counts = counter.hist(stars);
-        final int count = IntStream.of(Ints.toArray(counts.values())).sum();
+public final class Histogram<T extends Comparable<T>> {
+    @NotNull
+    private final ChartFrame frame;
 
+    public Histogram(@NotNull final Map<T, Double> hist,
+                     @NotNull final String categoryLabel)
+    {
+        this(hist, categoryLabel, "Доля", true);
+    }
+    
+    public Histogram(@NotNull final Map<T, Double> hist, 
+                     @NotNull final String categoryLabel, 
+                     @NotNull final String valueLabel,
+                     final boolean percents) 
+    {
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        for (final T type : counts.keySet()) {
-            dataset.addValue(1.0 * counts.get(type) / count, "pizza", type);
+        for (final T type : hist.keySet()) {
+            dataset.addValue(hist.get(type), "pizza", type);
         }
 
         final JFreeChart chart = ChartFactory.createBarChart(
-                "Гистограмма",
-                counter.getName(),
-                "Доля",
+                null,
+                categoryLabel,
+                valueLabel,
                 dataset,
                 PlotOrientation.VERTICAL,
                 false,
@@ -65,11 +72,11 @@ public final class Histogram {
                 return null;
             }
 
-            @NotNull
+            @Nullable
             @Override
             public String generateLabel(@NotNull final CategoryDataset categoryDataset, final int i, final int i2) {
-                final T type = Iterables.get(counts.keySet(), i2);
-                return counts.get(type).toString();
+                final T type = Iterables.get(hist.keySet(), i2);
+                return percents ? null : String.format("%.2f", hist.get(type));
             }
         });
         renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER));
@@ -78,11 +85,16 @@ public final class Histogram {
         chart.getCategoryPlot().setRenderer(renderer);
 
         final NumberAxis rangeAxis = (NumberAxis) chart.getCategoryPlot().getRangeAxis();
-        rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
-        rangeAxis.setRange(0.0, 1.0);
+        if (percents) {
+            rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
+        }
+        rangeAxis.setRange(0.0, percents ? 1 : (1.1 * DoubleStream.of(Doubles.toArray(hist.values())).max().getAsDouble()));
 
-        final ChartFrame frame = new ChartFrame("Гистограмма", chart);
+        frame = new ChartFrame(null, chart);
         frame.pack();
+    }
+    
+    public void show() {
         frame.setVisible(true);
     }
 }

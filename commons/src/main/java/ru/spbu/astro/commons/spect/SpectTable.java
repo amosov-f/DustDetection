@@ -36,7 +36,7 @@ public final class SpectTable {
     }
 
     @NotNull
-    public static IntStream getCodeRange() {
+    public static IntStream codeRange() {
         return IntStream.range(MIN_CODE, MAX_CODE + 1);
     }
 

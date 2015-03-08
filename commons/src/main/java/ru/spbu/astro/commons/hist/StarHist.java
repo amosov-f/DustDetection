@@ -1,28 +1,57 @@
 package ru.spbu.astro.commons.hist;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: amosov-f
  * Date: 12.10.14
  * Time: 18:52
  */
-public interface StarHist<T extends Comparable<T>> {
+public abstract class StarHist<X extends Comparable<X>, Y extends Number> {
     @NotNull
-    Map<T, Integer> hist(@NotNull List<Star> stars);
+    private final String name;
+
+    protected StarHist(@NotNull final String name) {
+        this.name = name;
+    }
 
     @NotNull
-    String getName();
+    public final String getName() {
+        return name;
+    }
+
+    @Nullable
+    public abstract X getX(@NotNull final Star star);
+
+    @Nullable
+    public abstract Y getY(@NotNull final List<Star> stars);
 
     @NotNull
-    default Map<String, Integer> clean(@NotNull final Map<String, Integer> counts) {
-        final Map<String, Integer> cleanedCounts = new LinkedHashMap<>(counts);
-        counts.keySet().stream().filter(name -> counts.get(name) <= 1).forEach(cleanedCounts::remove);
-        return cleanedCounts;
+    public Map<X, Y> hist(@NotNull final List<Star> stars) {
+        final Map<X, List<Star>> bins = new TreeMap<>();
+        for (final Star star : stars) {
+            final X x = getX(star);
+            if (x != null) {
+                bins.putIfAbsent(x, new ArrayList<>());
+                bins.get(x).add(star);
+            }
+        }
+        final Map<X, Y> hist = getComparator() == null ? new TreeMap<>() : new TreeMap<>(getComparator());
+        for (final X x : bins.keySet()) {
+            final Y y = getY(bins.get(x));
+            if (y != null) {
+                hist.put(x, y);
+            }
+        }
+        return hist;
+    }
+    
+    @Nullable
+    protected Comparator<X> getComparator() {
+        return null;
     }
 }

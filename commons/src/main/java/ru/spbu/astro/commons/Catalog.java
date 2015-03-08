@@ -9,6 +9,7 @@ import ru.spbu.astro.util.Value;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static ru.spbu.astro.commons.Catalog.Parameter.*;
 
@@ -54,16 +55,22 @@ public final class Catalog {
 
     @NotNull
     public List<Star> getStars() {
+        return getAllStars().stream().filter(star -> star.getSpectType().toBV() != null).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public List<Star> getAllStars() {
         final List<Star> stars = new ArrayList<>();
         for (final Row row : id2row.values()) {
             final Star star = row.toStar();
-            if (star != null && star.getSpectType().toBV() != null) {
+            if (star != null) {
                 stars.add(row.toStar());
             }
         }
         LOGGER.info("Getting stars completed, #rows = " + id2row.size() + ", #stars = " + stars.size());
         return stars;
     }
+
 
     static final class Row {
         final int id;
@@ -250,4 +257,14 @@ public final class Catalog {
             }
         }
     }
+    
+//    public static void main(String[] args) {
+//        int count = 0;
+//        for (final Row row : Catalogs.HIPPARCOS_2007.id2row.values()) {
+//            if (row.get(BV_COLOR) != null) {
+//                count++;
+//            }
+//        }
+//        System.out.println(count + " " + (double) count / Catalogs.HIPPARCOS_2007.id2row.size());
+//    }
 }

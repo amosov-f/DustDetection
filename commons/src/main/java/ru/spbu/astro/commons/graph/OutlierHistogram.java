@@ -33,15 +33,15 @@ public class OutlierHistogram {
 
     public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars,
                                                       @NotNull final Predicate<Star> outlierFilter,
-                                                      @NotNull final StarHist<T> counter)
+                                                      @NotNull final StarHist<T, Integer> hist)
     {
         outliers = new StarFilter(stars).filter(outlierFilter).getStars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        final Map<T, Integer> outlierCounts = counter.hist(outliers);
+        final Map<T, Integer> outlierCounts = hist.hist(outliers);
         final int outlierCount = IntStream.of(Ints.toArray(outlierCounts.values())).sum();
-        final Map<T, Integer> counts = counter.hist(stars);
+        final Map<T, Integer> counts = hist.hist(stars);
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
 
         for (final T type : counts.keySet()) {
@@ -54,8 +54,8 @@ public class OutlierHistogram {
         final JFreeChart chart = ChartFactory.createBarChart(
                 String.format(
                         "%s\nОтрицательное покраснение у %d%% (%d/%d)",
-                        counter.getName(), 100 * outlierCount / count, outlierCount, count),
-                counter.getName(),
+                        hist.getName(), 100 * outlierCount / count, outlierCount, count),
+                hist.getName(),
                 "Доля",
                 dataset,
                 PlotOrientation.VERTICAL,

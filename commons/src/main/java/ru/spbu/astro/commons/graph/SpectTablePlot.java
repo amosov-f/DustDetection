@@ -13,7 +13,7 @@ import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectClass;
 import ru.spbu.astro.commons.spect.SpectTable;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * Time: 16:19
  */
 public final class SpectTablePlot {
-    private static final List<LuminosityClass> USED = Arrays.asList(LuminosityClass.III);
+    private static final List<LuminosityClass> USED = Collections.singletonList(LuminosityClass.III);
 
     public SpectTablePlot(@NotNull final List<SpectTable> tables) {
         final XYSeriesCollection dataset = new XYSeriesCollection();
@@ -47,7 +47,7 @@ public final class SpectTablePlot {
             }
         }
 
-        final List<String> spects = SpectTable.getCodeRange().mapToObj(code -> SpectClass.valueOf(code).toString()).collect(Collectors.toList());
+        final List<String> spects = SpectTable.codeRange().mapToObj(code -> SpectClass.valueOf(code).toString()).collect(Collectors.toList());
 
         final XYPlot plot = new XYPlot(
                 dataset,

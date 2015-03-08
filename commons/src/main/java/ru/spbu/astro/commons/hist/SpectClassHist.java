@@ -1,43 +1,31 @@
 package ru.spbu.astro.commons.hist;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.SpectClass;
-import ru.spbu.astro.commons.spect.SpectTable;
 
-import java.util.LinkedHashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * User: amosov-f
  * Date: 12.10.14
  * Time: 19:26
  */
-public final class SpectClassHist implements StarHist<String> {
+public final class SpectClassHist extends StarHist<String, Integer> {
     private final int bin;
 
     public SpectClassHist(final int bin) {
+        super("Спектральный класс");
         this.bin = bin;
     }
 
-    @NotNull
+    @Nullable
     @Override
-    public Map<String, Integer> hist(@NotNull final List<Star> stars) {
-        final Map<String, Integer> counts = new LinkedHashMap<>();
-        SpectTable.getCodeRange().forEach(code -> counts.put(key(code), 0));
-        for (final Star star : stars) {
-            final String key = key(star.getSpectType().getSpect().getCode());
-            if (counts.containsKey(key)) {
-                counts.put(key, counts.get(key) + 1);
-            }
-        }
-        return clean(counts);
-    }
-
-    @NotNull
-    private String key(final int code) {
-        final SpectClass spect = SpectClass.valueOf(code);
+    public String getX(@NotNull final Star star) {
+        final SpectClass spect = SpectClass.valueOf(star.getSpectType().getSpect().getCode());
         final String symbol = spect.getSymbol().name();
         final int number = spect.getDoubleNumber().intValue();
         int l = number / bin * bin;
@@ -48,9 +36,22 @@ public final class SpectClassHist implements StarHist<String> {
         return r == l + 1 ? symbol + l : symbol + l + "-" + r;
     }
 
-    @NotNull
+    @Nullable
     @Override
-    public String getName() {
-        return "Спектральный класс";
+    public Integer getY(@NotNull final List<Star> stars) {
+        return stars.size() > 1 ? stars.size() : null;
+    }
+
+    @Nullable
+    @Override
+    protected Comparator<String> getComparator() {
+        return new Comparator<String>() {
+            @Override
+            public int compare(@NotNull final String x1, @NotNull final String x2) {
+                final int compare = Objects.requireNonNull(SpectClass.TypeSymbol.parse(x1.charAt(0)))
+                        .compareTo(Objects.requireNonNull(SpectClass.TypeSymbol.parse(x2.charAt(0))));
+                return compare != 0 ? compare : x1.substring(1).compareTo(x2.substring(1));
+            }
+        };
     }
 }

@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class NegativeExtinctionHistogram extends OutlierHistogram {
     public <T extends Comparable<T>> NegativeExtinctionHistogram(@NotNull final List<Star> stars,
-                                                                 @NotNull final StarHist<T> counter)
+                                                                 @NotNull final StarHist<T, Integer> hist)
     {
-        super(stars, StarFilter.NEGATIVE_EXTINCTION, counter);
+        super(stars, StarFilter.NEGATIVE_EXTINCTION, hist);
     }
 }
