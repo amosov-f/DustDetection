@@ -25,10 +25,10 @@ public abstract class StarHist<X extends Comparable<X>, Y extends Number> {
     }
 
     @Nullable
-    public abstract X getX(@NotNull final Star star);
+    protected abstract X getX(@NotNull final Star star);
 
     @Nullable
-    public abstract Y getY(@NotNull final List<Star> stars);
+    protected abstract Y getY(@NotNull final List<Star> stars);
 
     @NotNull
     public Map<X, Y> hist(@NotNull final List<Star> stars) {

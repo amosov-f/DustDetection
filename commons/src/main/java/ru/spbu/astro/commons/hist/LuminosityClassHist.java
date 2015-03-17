@@ -19,13 +19,13 @@ public final class LuminosityClassHist extends StarHist<LuminosityClass, Integer
 
     @Nullable
     @Override
-    public LuminosityClass getX(@NotNull final Star star) {
+    protected LuminosityClass getX(@NotNull final Star star) {
         return star.getSpectType().getLumin();
     }
 
     @Nullable
     @Override
-    public Integer getY(@NotNull final List<Star> stars) {
+    protected Integer getY(@NotNull final List<Star> stars) {
         return stars.size() > 1 ? stars.size() : null;
     }
 }

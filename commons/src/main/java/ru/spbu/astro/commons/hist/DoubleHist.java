@@ -32,7 +32,7 @@ public abstract class DoubleHist<Y extends Number> extends StarHist<Double, Y> {
 
     @Nullable
     @Override
-    public Double getX(@NotNull final Star star) {
+    protected Double getX(@NotNull final Star star) {
         final Double x = f.apply(star);
         if (x == null) {
             return null;
