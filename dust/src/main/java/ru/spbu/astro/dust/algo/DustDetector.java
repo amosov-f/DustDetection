@@ -6,7 +6,7 @@ import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.graph.HammerProjection;
-import ru.spbu.astro.dust.DustCatalogs;
+import ru.spbu.astro.dust.Stars;
 import ru.spbu.astro.healpix.func.HealpixCounter;
 import ru.spbu.astro.util.PointsDistribution;
 import ru.spbu.astro.util.Value;
@@ -19,7 +19,6 @@ import weka.core.neighboursearch.NearestNeighbourSearch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * User: amosov-f
@@ -37,16 +36,16 @@ public final class DustDetector {
     @NotNull
     private final List<Vector3D> dust = new ArrayList<>();
 
-    public DustDetector(@NotNull final List<Star> stars) {
+    public DustDetector(@NotNull final Star[] stars) {
         LOGGER.info("Dust detection started!");
-        LOGGER.info("#stars = " + stars.size());
+        LOGGER.info("#stars = " + stars.length);
 
         final Instances instances = new Instances("knn", new ArrayList<Attribute>() {{
             add(new Attribute("x"));
             add(new Attribute("y"));
             add(new Attribute("z"));
             add(new Attribute("ext"));
-        }}, stars.size()) {{
+        }}, stars.length) {{
             setClassIndex(3);
         }};
 
@@ -130,13 +129,12 @@ public final class DustDetector {
 
     public static void main(final String[] args) {
         final DustDetector detector = new DustDetector(
-                new StarFilter(DustCatalogs.HIPPARCOS_UPDATED.getStars()).parallaxRelativeError(0.35).getStars()
+                StarFilter.of(Stars.HIPPARCOS_UPDATED).parallaxRelativeError(0.35).stars()
         );
 
-        final List<Spheric> dirs = detector.getDust().stream().map(Spheric::new).collect(Collectors.toList());
+        final Spheric[] dirs = detector.getDust().stream().map(Spheric::new).toArray(Spheric[]::new);
 
-        final HammerProjection hammerProjection = new HammerProjection(new HealpixCounter(dirs, 30));
-        hammerProjection.setVisible(true);
+        new HammerProjection(new HealpixCounter(dirs, 30)).setVisible(true);
     }
 
     @NotNull

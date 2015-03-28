@@ -9,7 +9,6 @@ import ru.spbu.astro.util.Value;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static ru.spbu.astro.commons.Catalog.Parameter.*;
 
@@ -54,12 +53,7 @@ public final class Catalog {
     }
 
     @NotNull
-    public List<Star> getStars() {
-        return getAllStars().stream().filter(star -> star.getSpectType().toBV() != null).collect(Collectors.toList());
-    }
-
-    @NotNull
-    public List<Star> getAllStars() {
+    public Star[] getStars() {
         final List<Star> stars = new ArrayList<>();
         for (final Row row : id2row.values()) {
             final Star star = row.toStar();
@@ -68,7 +62,7 @@ public final class Catalog {
             }
         }
         LOGGER.info("Getting stars completed, #rows = " + id2row.size() + ", #stars = " + stars.size());
-        return stars;
+        return stars.toArray(new Star[stars.size()]);
     }
 
 

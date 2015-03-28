@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.util.Split;
 
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -24,12 +23,12 @@ public class CountHist extends DoubleHist<Integer> {
 
     @Nullable
     @Override
-    public Integer getY(@NotNull final List<Star> stars) {
-        return stars.size();
+    public Integer getY(@NotNull final Star[] stars) {
+        return stars.length;
     }
 
     @NotNull
-    public Map<Double, Double> histShares(@NotNull final List<Star> stars) {
+    public Map<Double, Double> histShares(@NotNull final Star[] stars) {
         final Map<Double, Integer> counts = hist(stars);
         final Map<Double, Double> fracts = new TreeMap<>();
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();

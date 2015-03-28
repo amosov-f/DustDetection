@@ -11,12 +11,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @SuppressWarnings("MagicNumber")
-public class LuminosityClassifierTest {
-    private LuminosityClassifier classifier;
+public class FullLuminosityClassifierTest {
+    private FullLuminosityClassifier classifier;
 
     @Before
     public void setUp() {
-        classifier = new LuminosityClassifier(Catalogs.HIPPARCOS_2007.getStars());
+        classifier = new FullLuminosityClassifier(Catalogs.HIPPARCOS_2007.getStars());
     }
 
     @Test

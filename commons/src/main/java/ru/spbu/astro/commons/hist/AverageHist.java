@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.util.Split;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 
@@ -29,8 +29,8 @@ public final class AverageHist extends DoubleHist<Double> {
 
     @Nullable
     @Override
-    public Double getY(@NotNull final List<Star> stars) {
-        return stars.stream().flatMapToDouble(star -> {
+    public Double getY(@NotNull final Star[] stars) {
+        return Arrays.stream(stars).flatMapToDouble(star -> {
             final Double y = fy.apply(star);
             return y != null ? DoubleStream.of(y) : DoubleStream.empty();
         }).average().getAsDouble();

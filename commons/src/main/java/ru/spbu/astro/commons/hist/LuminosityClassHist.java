@@ -5,8 +5,6 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 
-import java.util.List;
-
 /**
  * User: amosov-f
  * Date: 12.10.14
@@ -25,7 +23,7 @@ public final class LuminosityClassHist extends StarHist<LuminosityClass, Integer
 
     @Nullable
     @Override
-    protected Integer getY(@NotNull final List<Star> stars) {
-        return stars.size() > 1 ? stars.size() : null;
+    protected Integer getY(@NotNull final Star[] stars) {
+        return stars.length > 1 ? stars.length : null;
     }
 }

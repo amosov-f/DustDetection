@@ -3,6 +3,11 @@ package ru.spbu.astro.healpix;
 import gov.fnal.eag.healpix.PixTools;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Spheric;
+import ru.spbu.astro.commons.Star;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
@@ -25,6 +30,20 @@ public final class Healpix {
 
     public static int nPix(final int nSide) {
         return TWELVE * nSide * nSide;
+    }
+    
+    public int nPix() {
+        return nPix(nSide);
+    }
+    
+    @NotNull
+    public Star[][] split(@NotNull final Star[] stars) {
+        final List<List<Star>> rings = new ArrayList<>();
+        for (int i = 0; i < nPix(); i++) {
+            rings.add(new ArrayList<>());
+        }
+        Arrays.stream(stars).forEach(star -> rings.get(getPix(star.getDir())).add(star));
+        return rings.stream().map(ring -> ring.toArray(new Star[ring.size()])).toArray(Star[][]::new);
     }
 
     public static int nSide(final int nPix) {

@@ -35,13 +35,28 @@ public final class HammerProjection extends JWindow {
     @NotNull
     private DirectionProcessor processor = dir -> {
     };
+    
+    @Nullable
+    private final Double min;
+    @Nullable
+    private final Double max;
 
     public HammerProjection(@NotNull final SphericDistribution distribution) {
         this(distribution, Mode.DEFAULT);
     }
 
     public HammerProjection(@NotNull final SphericDistribution distribution, @NotNull final Mode mode) {
+        this(distribution, null, null, mode);
+    }
+
+    public HammerProjection(@NotNull final SphericDistribution distribution, @Nullable final Double min, @Nullable final Double max) {
+        this(distribution, min, max, Mode.DEFAULT);
+    }
+
+    public HammerProjection(@NotNull final SphericDistribution distribution, @Nullable final Double min, @Nullable final Double max, @NotNull final Mode mode) {
         this.distribution = distribution;
+        this.min = min;
+        this.max = max;
         this.mode = mode;
         setSize(2 * SIZE, SIZE);
         addMouseListener(new MouseAdapter() {
@@ -55,7 +70,7 @@ public final class HammerProjection extends JWindow {
             }
         });
     }
-
+    
     @NotNull
     public static Point2D.Double toPlane(@NotNull final Spheric dir) {
         double l = dir.getL();
@@ -116,6 +131,12 @@ public final class HammerProjection extends JWindow {
         final Value[][] f = new Value[min(getWidth(), 2 * getHeight())][min(getHeight(), getWidth() / 2)];
 
         final Set<Double> values = new TreeSet<>();
+        if (min != null) {
+            values.add(min);
+        }
+        if (max != null) {
+            values.add(max);
+        }
         final Set<Double> errors = new TreeSet<>();
 
         for (int x = 0; x < f.length; ++x) {

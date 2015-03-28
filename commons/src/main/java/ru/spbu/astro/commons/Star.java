@@ -43,7 +43,7 @@ public final class Star {
     public Value getExtinction() {
         final Value bv = spectType.toBV();
         if (bv == null) {
-            throw new RuntimeException("Star #" + id + " hasn't B-V_{int}");
+            throw new RuntimeException("Star #" + id + " hasn't B-V_int");
         }
         return bvColor.subtract(bv);
     }

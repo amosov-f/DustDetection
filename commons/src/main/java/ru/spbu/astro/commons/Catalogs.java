@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * User: amosov-f
@@ -28,17 +27,5 @@ public final class Catalogs {
             result.add(new Catalog.Row(id, values));
         }
         return result;
-    }
-
-    @NotNull
-    public static Catalog update(@NotNull final Catalog catalog, @NotNull final Function<Star, Star> processor) {
-        final Catalog updatedCatalog = new Catalog();
-        for (final Catalog.Row row : catalog.id2row.values()) {
-            final Star star = row.toStar();
-            if (star != null) {
-                updatedCatalog.add(new Catalog.Row(processor.apply(star)));
-            }
-        }
-        return updatedCatalog;
     }
 }

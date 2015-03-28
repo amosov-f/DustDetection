@@ -7,6 +7,8 @@ import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.func.SphericDistribution;
 import ru.spbu.astro.util.Value;
 
+import java.util.Arrays;
+
 public class HealpixDistribution implements SphericDistribution {
     @NotNull
     protected final Value[] values;
@@ -20,6 +22,10 @@ public class HealpixDistribution implements SphericDistribution {
     public HealpixDistribution(@NotNull final Value[] values) {
         this.values = values;
         healpix = new Healpix(Healpix.nSide(values.length));
+    }
+    
+    public HealpixDistribution(@NotNull final double[] values) {
+        this(Arrays.stream(values).mapToObj(value -> new Value(value, 0)).toArray(Value[]::new));
     }
 
     @Nullable

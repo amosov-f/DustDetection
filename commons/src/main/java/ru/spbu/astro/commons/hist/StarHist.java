@@ -28,10 +28,10 @@ public abstract class StarHist<X extends Comparable<X>, Y extends Number> {
     protected abstract X getX(@NotNull final Star star);
 
     @Nullable
-    protected abstract Y getY(@NotNull final List<Star> stars);
+    protected abstract Y getY(@NotNull final Star[] stars);
 
     @NotNull
-    public Map<X, Y> hist(@NotNull final List<Star> stars) {
+    public Map<X, Y> hist(@NotNull final Star[] stars) {
         final Map<X, List<Star>> bins = new TreeMap<>();
         for (final Star star : stars) {
             final X x = getX(star);
@@ -42,7 +42,7 @@ public abstract class StarHist<X extends Comparable<X>, Y extends Number> {
         }
         final Map<X, Y> hist = getComparator() == null ? new TreeMap<>() : new TreeMap<>(getComparator());
         for (final X x : bins.keySet()) {
-            final Y y = getY(bins.get(x));
+            final Y y = getY(bins.get(x).stream().toArray(Star[]::new));
             if (y != null) {
                 hist.put(x, y);
             }

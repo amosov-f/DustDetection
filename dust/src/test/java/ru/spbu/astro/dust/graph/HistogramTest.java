@@ -21,8 +21,7 @@ public class HistogramTest {
                 new CountHist(
                         "Относительная ошибка в расстоянии", 
                         star -> star.getR().getRelativeError(), 
-                        new Split(0.1)).histShares(Catalogs.HIPPARCOS_2007.getStars()
-                ),
+                        new Split(0.1)).histShares(Catalogs.HIPPARCOS_2007.getStars()),
                 "Относительная ошибка в расстоянии"
         ).show();
         Thread.sleep(Long.MAX_VALUE);
@@ -36,7 +35,7 @@ public class HistogramTest {
                         star -> star.getR().getValue(), 
                         star -> star.getR().getRelativeError(), 
                         new Split(0, 1000, 10)
-                ).hist(Catalogs.HIPPARCOS_2007.getAllStars()), 
+                ).hist(Catalogs.HIPPARCOS_2007.getStars()),
                 "Расстояние [пк]", 
                 "Относительная ошибка в расстоянии",
                 true

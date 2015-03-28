@@ -1,17 +1,17 @@
 package ru.spbu.astro.commons.graph;
 
 import org.jetbrains.annotations.NotNull;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
-import ru.spbu.astro.commons.Star;
-import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.Catalogs;
+import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.spect.LuminosityClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,8 +28,10 @@ public final class HRDiagram {
     public static final double SCALE = (ABSOLUTE_MAGNITUDE_UPPER_BOUND - ABSOLUTE_MAGNITUDE_LOWER_BOUND) / (BV_COLOR_UPPER_BOUND - BV_COLOR_LOWER_BOUND);
 
     private static final double ERROR_VIEW_SHARE = 1;
+    
+    private final ChartFrame frame;
 
-    public HRDiagram(@NotNull final List<Star> stars) {
+    public HRDiagram(@NotNull final Star[] stars) {
         final EnumMap<LuminosityClass, List<Star>> lumin2stars = new EnumMap<>(LuminosityClass.class);
         for (final Star star : stars) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
@@ -62,16 +64,20 @@ public final class HRDiagram {
             dataset.addSeries(series);
         }
 
-        final JFreeChart chart = ChartFactory.createScatterPlot(
-                String.format("%d звезы", lumin2stars.values().stream().mapToInt(List::size).sum()),
-                "B-V [зв. вел.]",
-                "M [зв. вел.]",
+        final XYPlot plot = new XYPlot(
                 dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
+                new NumberAxis("B-V [зв. вел.]"),
+                new NumberAxis("M [зв. вел.]"),
+                new XYErrorRenderer()
+        );
+
+        final JFreeChart chart = new JFreeChart(
+                null,
+                JFreeChart.DEFAULT_TITLE_FONT,
+                plot,
                 true
         );
+        
 
         chart.getXYPlot().setRenderer(new XYErrorRenderer());
 
@@ -86,11 +92,18 @@ public final class HRDiagram {
         chart.getXYPlot().getRangeAxis().setLowerBound(ABSOLUTE_MAGNITUDE_LOWER_BOUND);
         chart.getXYPlot().getRangeAxis().setUpperBound(ABSOLUTE_MAGNITUDE_UPPER_BOUND);
 
-        final ChartFrame frame = new ChartFrame("Hershprung-Russel diagram", chart);
+        
+        
+        frame = new ChartFrame("Hershprung-Russel diagram", chart);
         frame.pack();
+    }
+    
+    public XYPlot getPlot() {
+        return frame.getChartPanel().getChart().getXYPlot();
+    }
+    
+    public void show() {
         frame.setVisible(true);
-
-//        ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 1200, 800);
     }
 
     public static void main(@NotNull final String[] args) throws IOException {
@@ -101,9 +114,9 @@ public final class HRDiagram {
 
         System.out.println(SCALE * 0.01);
 
-        new HRDiagram(new StarFilter(Catalogs.HIPPARCOS_2007)
+        new HRDiagram(StarFilter.of(Catalogs.HIPPARCOS_2007)
                 .mainLuminosityClasses()
                 .absoluteMagnitudeError(SCALE * 0.01)
-                .bvColorError(0.01).getStars());
+                .bvColorError(0.01).stars()).show();
     }
 }

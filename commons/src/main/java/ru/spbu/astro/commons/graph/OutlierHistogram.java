@@ -17,25 +17,26 @@ import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.commons.Star;
-import ru.spbu.astro.commons.hist.StarHist;
 import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.hist.StarHist;
 import ru.spbu.astro.util.Value;
 
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 public class OutlierHistogram {
     @NotNull
-    private final List<Star> outliers;
+    private final Star[] outliers;
+    @NotNull
+    private final ChartFrame frame;
 
-    public <T extends Comparable<T>> OutlierHistogram(@NotNull final List<Star> stars,
+    public <T extends Comparable<T>> OutlierHistogram(@NotNull final Star[] stars,
                                                       @NotNull final Predicate<Star> outlierFilter,
                                                       @NotNull final StarHist<T, Integer> hist)
     {
-        outliers = new StarFilter(stars).filter(outlierFilter).getStars();
+        outliers = StarFilter.of(stars).filter("outliers", outlierFilter).stars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -94,8 +95,11 @@ public class OutlierHistogram {
         rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
         rangeAxis.setRange(0.0, 1.0);
 
-        final ChartFrame frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
+        frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
         frame.pack();
+    }
+    
+    public void show() {
         frame.setVisible(true);
     }
 

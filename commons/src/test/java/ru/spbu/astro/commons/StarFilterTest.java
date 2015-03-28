@@ -7,8 +7,9 @@ import static org.junit.Assert.assertTrue;
 public class StarFilterTest {
     @Test
     public void test() throws Exception {
-        assertTrue(new StarFilter(Catalogs.HIPPARCOS_2007)
+        assertTrue(StarFilter.of(Catalogs.HIPPARCOS_2007)
+                .hasBVInt()
                 .negativeExtinction()
-                .filter(star -> star.getExtinction().getValue() >= 0).getStars().isEmpty());
+                .filter("ext > 0", star -> star.getExtinction().getValue() >= 0).stars().length == 0);
     }
 }

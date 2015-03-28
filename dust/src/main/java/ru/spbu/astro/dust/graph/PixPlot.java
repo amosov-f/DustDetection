@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.graph;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartUtilities;
@@ -22,8 +23,7 @@ import ru.spbu.astro.util.Value;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
@@ -47,8 +47,8 @@ public final class PixPlot {
     }
 
     public void plot(@NotNull final Spheric dir) {
-        final List<Star> baseStars = dustTrendCalculator.getInlierStars(dir);
-        final List<Star> outlierStars = dustTrendCalculator.getOutlierStars(dir);
+        final Star[] baseStars = dustTrendCalculator.getInlierStars(dir);
+        final Star[] outlierStars = dustTrendCalculator.getOutlierStars(dir);
         if (baseStars == null || outlierStars == null) {
             return;
         }
@@ -65,8 +65,7 @@ public final class PixPlot {
         final double a = slope.getValue();
         final double b = intercept.getValue();
 
-        final List<Star> stars = new ArrayList<>(baseStars);
-        stars.addAll(outlierStars);
+        final Star[] stars = ArrayUtils.addAll(baseStars, outlierStars);
 
         final XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection() {{
             addSeries(createXYIntegervalSeries(baseStars, "Звезды, по которым строится тренд"));
@@ -80,8 +79,8 @@ public final class PixPlot {
                 new XYErrorRenderer()
         );
 
-        final double r1 = b != 0 ? stars.stream().mapToDouble(s -> s.getR().getNSigma(-1)).min().getAsDouble() : 0;
-        final double r2 = stars.stream().mapToDouble(s -> s.getR().getNSigma(1)).max().getAsDouble();
+        final double r1 = b != 0 ? Arrays.stream(stars).mapToDouble(s -> s.getR().getNSigma(-1)).min().getAsDouble() : 0;
+        final double r2 = Arrays.stream(stars).mapToDouble(s -> s.getR().getNSigma(1)).max().getAsDouble();
 
         final XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(r1, a * r1 + b);
@@ -112,7 +111,7 @@ public final class PixPlot {
     }
 
     @NotNull
-    private XYIntervalSeries createXYIntegervalSeries(@NotNull final List<Star> stars, @NotNull final String name) {
+    private XYIntervalSeries createXYIntegervalSeries(@NotNull final Star[] stars, @NotNull final String name) {
         final XYIntervalSeries series = new XYIntervalSeries(name);
         for (final Star s : stars) {
             series.add(

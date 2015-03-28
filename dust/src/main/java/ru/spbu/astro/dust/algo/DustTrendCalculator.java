@@ -9,22 +9,15 @@ import ru.spbu.astro.util.Value;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.util.ml.SimpleRegression;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public final class DustTrendCalculator {
     private static final Logger LOGGER = Logger.getLogger(DustTrendCalculator.class.getName());
 
     public static final int N_SIDE = 18;
-
-    @NotNull
-    private final List<List<Star>> inliers = new ArrayList<>();
-    @NotNull
-    private final List<List<Star>> outliers = new ArrayList<>();
 
     @NotNull
     private final Value[] slopes;
@@ -34,40 +27,36 @@ public final class DustTrendCalculator {
     @NotNull
     private final Healpix healpix = new Healpix(N_SIDE);
 
-    public DustTrendCalculator(@NotNull final List<Star> stars) {
+    @NotNull
+    private final Star[][] inliers = new Star[healpix.nPix()][];
+    @NotNull
+    private final Star[][] outliers = new Star[healpix.nPix()][];
+
+    public DustTrendCalculator(@NotNull final Star[] stars) {
         this(stars, false);
     }
 
-    public DustTrendCalculator(@NotNull final List<Star> stars, final boolean includeIntercept) {
-        LOGGER.info("#stars = " + stars.size());
-
-        final List<List<Star>> rings = new ArrayList<>();
-        for (int i = 0; i < Healpix.nPix(N_SIDE); i++) {
-            rings.add(new ArrayList<>());
-        }
+    public DustTrendCalculator(@NotNull final Star[] stars, final boolean includeIntercept) {
+        LOGGER.info("#stars = " + stars.length);
+        
+        final Star[][] rings = healpix.split(stars);
 
         final Map<Integer, Star> id2star = new HashMap<>();
-        for (final Star star : stars) {
-            id2star.put(star.getId(), star);
-            rings.get(healpix.getPix(star.getDir())).add(star);
-        }
+        Arrays.stream(stars).forEach(star -> id2star.put(star.getId(), star));
+        
+        slopes = new Value[rings.length];
+        intercepts = new Value[rings.length];
 
-        slopes = new Value[rings.size()];
-        intercepts = new Value[rings.size()];
-
-        for (int pix = 0; pix < rings.size(); pix++) {
+        for (int pix = 0; pix < rings.length; pix++) {
             final SimpleRegression regression = new RansacLinearRegression(includeIntercept);
-            for (final Star star : rings.get(pix)) {
+            for (final Star star : rings[pix]) {
                 regression.add(star.getId(), star.getR(), star.getExtinction());
             }
             if (regression.train()) {
                 slopes[pix] = regression.getSlope();
                 intercepts[pix] = regression.getIntercept();
-                inliers.add(regression.getInliers().stream().map(id2star::get).collect(Collectors.toList()));
-                outliers.add(regression.getOutliers().stream().map(id2star::get).collect(Collectors.toList()));
-            } else {
-                inliers.add(null);
-                outliers.add(null);
+                inliers[pix] = regression.getInliers().stream().map(id2star::get).toArray(Star[]::new);
+                outliers[pix] = regression.getOutliers().stream().map(id2star::get).toArray(Star[]::new);
             }
         }
     }
@@ -83,13 +72,13 @@ public final class DustTrendCalculator {
     }
 
     @Nullable
-    public List<Star> getInlierStars(@NotNull final Spheric dir) {
-        return inliers.get(healpix.getPix(dir));
+    public Star[] getInlierStars(@NotNull final Spheric dir) {
+        return inliers[healpix.getPix(dir)];
     }
 
     @Nullable
-    public List<Star> getOutlierStars(@NotNull final Spheric dir) {
-        return outliers.get(healpix.getPix(dir));
+    public Star[] getOutlierStars(@NotNull final Spheric dir) {
+        return outliers[healpix.getPix(dir)];
     }
 
     @Nullable
@@ -106,7 +95,7 @@ public final class DustTrendCalculator {
     @Override
     public String toString() {
         double dr = 0;
-        for (final List<Star> ring : inliers) {
+        for (final Star[] ring : inliers) {
             for (final Star star : ring) {
                 dr = Math.max(dr, star.getR().getRelativeError());
             }
@@ -115,12 +104,12 @@ public final class DustTrendCalculator {
         final StringBuilder sb = new StringBuilder();
         sb.append("dr <= ").append((int) (100 * dr)).append("%, n_side = ").append(N_SIDE).append("\n");
         sb.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
-        for (int i = 0; i < inliers.size(); ++i) {
+        for (int i = 0; i < inliers.length; ++i) {
             final Spheric dir = healpix.getCenter(i);
             final Value k = slopes[i];
             sb.append(String.format(
                     "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
-                    i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), inliers.get(i).size()
+                    i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), inliers[i].length
             ));
         }
         return sb.toString();

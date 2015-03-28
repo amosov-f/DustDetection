@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectTable;
-import ru.spbu.astro.dust.DustCatalogs;
+import ru.spbu.astro.dust.Stars;
 import ru.spbu.astro.dust.spect.MinCombiner;
 
 import java.util.*;
@@ -44,7 +44,7 @@ public final class SpectTableCalculator {
         final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
         spect2stars.put(LuminosityClass.III, new HashMap<>());
         spect2stars.put(LuminosityClass.V, new HashMap<>());
-        for (final Star star : DustCatalogs.HIPPARCOS_UPDATED.getStars()) {
+        for (final Star star : Stars.HIPPARCOS_UPDATED) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
             if (spect2stars.containsKey(lumin)) {
                 final int key = key(star.getSpectType().getSpect().getCode());

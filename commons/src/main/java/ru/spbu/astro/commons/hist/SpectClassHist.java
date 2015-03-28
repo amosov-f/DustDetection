@@ -6,7 +6,6 @@ import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.SpectClass;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,8 +37,8 @@ public final class SpectClassHist extends StarHist<String, Integer> {
 
     @Nullable
     @Override
-    public Integer getY(@NotNull final List<Star> stars) {
-        return stars.size() > 1 ? stars.size() : null;
+    public Integer getY(@NotNull final Star[] stars) {
+        return stars.length > 1 ? stars.length : null;
     }
 
     @Nullable
