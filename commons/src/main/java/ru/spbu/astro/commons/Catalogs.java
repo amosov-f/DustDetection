@@ -12,14 +12,14 @@ import java.util.Map;
  * Time: 2:16
  */
 public final class Catalogs {
-    public static final Catalog HIPPARCOS_1997 = Catalog.read(Catalog.class.getResourceAsStream("/catalogue/hipparcos1997.txt"));
-    public static final Catalog HIPPARCOS_2007 = innerJoin(Catalog.read(Catalog.class.getResourceAsStream("/catalogue/hipparcos2007.txt")), HIPPARCOS_1997);
+    static final Catalog HIPPARCOS_1997 = Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos1997.txt"));
+    static final Catalog HIPPARCOS_2007 = innerJoin(Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos2007.txt")), HIPPARCOS_1997);
 
     private Catalogs() {
     }
 
     @NotNull
-    public static Catalog innerJoin(@NotNull final Catalog catalog1, @NotNull final Catalog catalog2) {
+    private static Catalog innerJoin(@NotNull final Catalog catalog1, @NotNull final Catalog catalog2) {
         final Catalog result = new Catalog();
         for (final int id : Sets.intersection(catalog1.id2row.keySet(), catalog2.id2row.keySet())) {
             final Map<Catalog.Parameter<?>, Object> values = new HashMap<>(catalog2.id2row.get(id).values);

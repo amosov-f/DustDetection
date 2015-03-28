@@ -4,14 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.util.Value;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.util.ml.SimpleRegression;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public final class DustTrendCalculator {
@@ -41,9 +40,6 @@ public final class DustTrendCalculator {
         
         final Star[][] rings = healpix.split(stars);
 
-        final Map<Integer, Star> id2star = new HashMap<>();
-        Arrays.stream(stars).forEach(star -> id2star.put(star.getId(), star));
-        
         slopes = new Value[rings.length];
         intercepts = new Value[rings.length];
 
@@ -55,8 +51,8 @@ public final class DustTrendCalculator {
             if (regression.train()) {
                 slopes[pix] = regression.getSlope();
                 intercepts[pix] = regression.getIntercept();
-                inliers[pix] = regression.getInliers().stream().map(id2star::get).toArray(Star[]::new);
-                outliers[pix] = regression.getOutliers().stream().map(id2star::get).toArray(Star[]::new);
+                inliers[pix] = Arrays.stream(regression.getInliers()).mapToObj(Stars.MAP_ALL::get).toArray(Star[]::new);
+                outliers[pix] = Arrays.stream(regression.getOutliers()).mapToObj(Stars.MAP_ALL::get).toArray(Star[]::new);
             }
         }
     }

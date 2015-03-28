@@ -3,9 +3,9 @@ package ru.spbu.astro.healpix.func;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
-import ru.spbu.astro.commons.Catalogs;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.healpix.Healpix;
 
@@ -29,7 +29,7 @@ public class HealpixDistributionTest {
     
     private void testBV(final double min, final double max) {
         final Healpix healpix = new Healpix(18);
-        final Star[] stars = StarFilter.of(Catalogs.HIPPARCOS_2007).stars();
+        final Star[] stars = StarFilter.of(Stars.ALL).stars();
         final Star[][] rings = healpix.split(stars);
         final double[] values = new double[healpix.nPix()];
         for (int i = 0; i < values.length; i++) {

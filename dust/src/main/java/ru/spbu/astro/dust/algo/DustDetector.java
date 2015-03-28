@@ -6,7 +6,7 @@ import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.graph.HammerProjection;
-import ru.spbu.astro.dust.Stars;
+import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.healpix.func.HealpixCounter;
 import ru.spbu.astro.util.PointsDistribution;
 import ru.spbu.astro.util.Value;
@@ -129,7 +129,7 @@ public final class DustDetector {
 
     public static void main(final String[] args) {
         final DustDetector detector = new DustDetector(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED).parallaxRelativeError(0.35).stars()
+                StarFilter.of(DustStars.ALL).parallaxRelativeError(0.35).stars()
         );
 
         final Spheric[] dirs = detector.getDust().stream().map(Spheric::new).toArray(Spheric[]::new);

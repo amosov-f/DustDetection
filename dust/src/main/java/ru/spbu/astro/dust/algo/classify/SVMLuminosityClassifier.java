@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.algo;
+package ru.spbu.astro.dust.algo.classify;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -7,9 +7,9 @@ import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import ru.spbu.astro.commons.Catalogs;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.graph.HRDiagram;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 import weka.classifiers.Evaluation;
@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 
 import static ru.spbu.astro.commons.graph.HRDiagram.*;
 
-public final class FullLuminosityClassifier implements LuminosityClassifier {
-    private static final Logger LOGGER = Logger.getLogger(FullLuminosityClassifier.class.getName());
+public final class SVMLuminosityClassifier implements LuminosityClassifier {
+    private static final Logger LOGGER = Logger.getLogger(SVMLuminosityClassifier.class.getName());
 
     private static final double BV_COLOR_ERROR_LIMIT = 0.01;
 
@@ -45,11 +45,11 @@ public final class FullLuminosityClassifier implements LuminosityClassifier {
     private final SMO classifier;
     
 
-    public FullLuminosityClassifier(@NotNull final Star[] stars) {
+    public SVMLuminosityClassifier(@NotNull final Star[] stars) {
         this(stars, Mode.DEFAULT);
     }
 
-    public FullLuminosityClassifier(@NotNull final Star[] stars, @NotNull final Mode mode) {
+    public SVMLuminosityClassifier(@NotNull final Star[] stars, @NotNull final Mode mode) {
         final Instances dataset = toInstances("dataset", StarFilter.of(stars)
                 .mainLuminosityClasses()
                 .absoluteMagnitudeError(SCALE * BV_COLOR_ERROR_LIMIT)
@@ -107,6 +107,7 @@ public final class FullLuminosityClassifier implements LuminosityClassifier {
     }
 
     @NotNull
+    @Override
     public LuminosityClass classify(@NotNull final Star star) {
         try {
             final int index = (int) classifier.classifyInstance(toInstances("predicted", new Star[]{star}).get(0));
@@ -121,14 +122,14 @@ public final class FullLuminosityClassifier implements LuminosityClassifier {
     }
 
     public static void main(@NotNull final String[] args) {
-        final Star[] allStars = StarFilter.of(Catalogs.HIPPARCOS_2007).mainLuminosityClasses().stars();
+        final Star[] allStars = StarFilter.of(Stars.ALL).mainLuminosityClasses().stars();
         final Star[] stars = StarFilter.of(allStars)
                 .absoluteMagnitudeError(SCALE * BV_COLOR_ERROR_LIMIT)
                 .bvColorError(BV_COLOR_ERROR_LIMIT)
                 .bvColor(BV_COLOR_LOWER_BOUND, 0.6)
 //                .bvColor(0.6, BV_COLOR_UPPER_BOUND)
                 .stars();
-        final FullLuminosityClassifier classifier = new FullLuminosityClassifier(stars, Mode.TEST);
+        final SVMLuminosityClassifier classifier = new SVMLuminosityClassifier(stars, Mode.TEST);
         
         final HRDiagram diagram = new HRDiagram(stars);
         final XYPlot plot = diagram.getPlot();

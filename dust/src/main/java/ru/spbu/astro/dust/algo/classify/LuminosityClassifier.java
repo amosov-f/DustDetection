@@ -1,4 +1,4 @@
-package ru.spbu.astro.dust.algo;
+package ru.spbu.astro.dust.algo.classify;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;

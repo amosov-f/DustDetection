@@ -2,6 +2,7 @@ package ru.spbu.astro.commons;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 import ru.spbu.astro.commons.spect.SpectType;
 import ru.spbu.astro.commons.spect.SpectTypeParser;
 import ru.spbu.astro.util.Value;
@@ -45,15 +46,16 @@ public final class Catalog {
     void add(@NotNull final Row row) {
         id2row.put(row.id, row);
     }
-
+    
+    @TestOnly
     @Nullable
-    public Star get(final int id) {
+    Star get(final int id) {
         final Row row = id2row.get(id);
         return row != null ? row.toStar() : null;
     }
 
     @NotNull
-    public Star[] getStars() {
+    Star[] getStars() {
         final List<Star> stars = new ArrayList<>();
         for (final Row row : id2row.values()) {
             final Star star = row.toStar();
@@ -74,23 +76,6 @@ public final class Catalog {
         Row(final int id, @NotNull final Map<Parameter<?>, Object> values) {
             this.id = id;
             this.values.putAll(values);
-        }
-
-        Row(@NotNull final Row row) {
-            this(row.id, row.values);
-        }
-
-        Row(@NotNull final Star star) {
-            id = star.getId();
-            values.put(LII, star.getDir().getL());
-            values.put(BII, star.getDir().getB());
-            values.put(PARALLAX, star.getParallax().getValue());
-            values.put(PARALLAX_ERROR, star.getParallax().getError());
-            values.put(VMAG, star.getVMag());
-            values.put(SPECT_TYPE, star.getSpectType());
-            values.put(BV_COLOR, star.getBVColor().getValue());
-            values.put(BV_COLOR_ERROR, star.getBVColor().getError());
-            values.put(NUMBER_COMPONENTS, 1);
         }
 
         @Nullable
@@ -251,14 +236,4 @@ public final class Catalog {
             }
         }
     }
-    
-//    public static void main(String[] args) {
-//        int count = 0;
-//        for (final Row row : Catalogs.HIPPARCOS_2007.id2row.values()) {
-//            if (row.get(BV_COLOR) != null) {
-//                count++;
-//            }
-//        }
-//        System.out.println(count + " " + (double) count / Catalogs.HIPPARCOS_2007.id2row.size());
-//    }
 }

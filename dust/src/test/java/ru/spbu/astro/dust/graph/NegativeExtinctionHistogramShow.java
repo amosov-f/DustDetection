@@ -6,7 +6,7 @@ import org.junit.Test;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.hist.CountHist;
 import ru.spbu.astro.commons.hist.SpectClassHist;
-import ru.spbu.astro.dust.Stars;
+import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.util.Split;
 
 import static ru.spbu.astro.commons.spect.LuminosityClass.III;
@@ -14,11 +14,11 @@ import static ru.spbu.astro.commons.spect.LuminosityClass.V;
 
 @Ignore
 @SuppressWarnings("MagicNumber")
-public class NegativeExtinctionHistogramTest {
+public class NegativeExtinctionHistogramShow {
     @Test
     public void histParallaxRelativeError() {
         new NegativeExtinctionHistogram(
-                Stars.HIPPARCOS_UPDATED,
+                DustStars.ALL,
                 new CountHist("Относительная ошибка в расстоянии", star -> star.getR().getRelativeError(), new Split(0.1))
         ).show();
     }
@@ -26,20 +26,20 @@ public class NegativeExtinctionHistogramTest {
     @Test
     public void histBVError() {
         new NegativeExtinctionHistogram(
-                Stars.HIPPARCOS_UPDATED,
+                DustStars.ALL,
                 new CountHist("Ошибка B-V", star -> star.getBVColor().getValue(), new Split(0, 2.3, 0.2))
         ).show();
     }
 
     @Test
     public void histSpectType() {
-        new NegativeExtinctionHistogram(Stars.HIPPARCOS_UPDATED, new SpectClassHist(5)).show();
+        new NegativeExtinctionHistogram(DustStars.ALL, new SpectClassHist(5)).show();
     }
 
     @Test
     public void histSpectTypeOfV() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED).luminosityClass(V).stars(),
+                StarFilter.of(DustStars.ALL).luminosityClass(V).stars(),
                 new SpectClassHist(5)
         ).show();
     }
@@ -47,7 +47,7 @@ public class NegativeExtinctionHistogramTest {
     @Test
     public void histSpectTypeOfIII() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED).luminosityClass(III).stars(),
+                StarFilter.of(DustStars.ALL).luminosityClass(III).stars(),
                 new SpectClassHist(5)
         ).show();
     }
@@ -55,7 +55,7 @@ public class NegativeExtinctionHistogramTest {
     @Test
     public void histBVErrorOfIIIOfM59() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED)
+                StarFilter.of(DustStars.ALL)
                         .luminosityClass(III)
                         .spectType(65, 69)
                         .stars(),
@@ -66,7 +66,7 @@ public class NegativeExtinctionHistogramTest {
     @Test
     public void histBVErrorOfIII() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED)
+                StarFilter.of(DustStars.ALL)
                         .luminosityClass(III)
                         .stars(),
                 new CountHist("Ошибка B-V у звезд III", star -> star.getBVColor().getValue(), new Split(0, 2.3, 0.2))
@@ -76,7 +76,7 @@ public class NegativeExtinctionHistogramTest {
     @Test
     public void histParallaxRelativeErrorOfIII() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED)
+                StarFilter.of(DustStars.ALL)
                         .luminosityClass(III).stars(),
                 new CountHist("Относительная ошибка в расстоянии у III", star -> star.getR().getRelativeError(), new Split(0.1))
         ).show();
@@ -85,7 +85,7 @@ public class NegativeExtinctionHistogramTest {
     @Test
     public void histParallaxRelativeErrorOfIIIOfM59() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED)
+                StarFilter.of(DustStars.ALL)
                         .luminosityClass(III)
                         .spectType(65, 69)
                         .stars(),

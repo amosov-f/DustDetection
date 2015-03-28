@@ -3,6 +3,7 @@ package ru.spbu.astro.commons;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -14,9 +15,9 @@ import static org.apache.commons.lang3.ArrayUtils.contains;
 
 public final class StarFilter {
     private static final Logger LOGGER = Logger.getLogger(StarFilter.class.getName());
-    
-    public static final Predicate<Star> NEGATIVE_EXTINCTION = star -> star.getExtinction().getNSigma(3) < 0;
 
+    public static final Predicate<Star> NEGATIVE_EXTINCTION = star -> star.getExtinction().getNSigma(3) < 0;
+    
     @NotNull
     private final String name;
     @NotNull
@@ -29,20 +30,16 @@ public final class StarFilter {
         this.stars = stars;
         this.history = new StarFilter[]{this};
     }
-    
+
     private StarFilter(@NotNull final String name, @NotNull final Star[] stars, @NotNull final StarFilter[] history) {
         this.name = name;
         this.stars = stars;
         this.history = ArrayUtils.add(history, this);
     }
-    
+
     @NotNull
-    public static StarFilter of(final Star[] stars) {
+    public static StarFilter of(@NotNull final Star[] stars) {
         return new StarFilter(stars);
-    } 
-    
-    public static StarFilter of(final Catalog catalog) {
-        return of(catalog.getStars());
     }
 
     @NotNull
@@ -53,7 +50,7 @@ public final class StarFilter {
     @NotNull
     public StarFilter bvColor(final double min, final double max) {
         return filter(
-                format("%.1f < B-V < %.1f]", min, max), 
+                format("%.1f < B-V < %.1f]", min, max),
                 star -> min <= star.getBVColor().getValue() && star.getBVColor().getValue() <= max
         );
     }
@@ -84,7 +81,7 @@ public final class StarFilter {
     @NotNull
     public StarFilter r(final double r1, final double r2) {
         return filter(
-                format("%.0f < r < %.0f", r1, r2), 
+                format("%.0f < r < %.0f", r1, r2),
                 star -> r1 <= star.getR().getValue() && star.getR().getValue() <= r2
         );
     }
@@ -93,7 +90,7 @@ public final class StarFilter {
     public StarFilter hasLuminosityClass() {
         return filter("has lumin", star -> star.getSpectType().hasLumin());
     }
-    
+
     @NotNull
     public StarFilter hasBVInt() {
         return filter("has B-V_int", star -> star.getSpectType().toBV() != null);
@@ -130,8 +127,8 @@ public final class StarFilter {
     @NotNull
     public StarFilter orderBy(@NotNull final Comparator<Star> comparator) {
         return new StarFilter(
-                comparator.toString(), 
-                Arrays.stream(stars).sorted(comparator).toArray(Star[]::new), 
+                comparator.toString(),
+                Arrays.stream(stars).sorted(comparator).toArray(Star[]::new),
                 this.history
         );
     }
@@ -146,16 +143,16 @@ public final class StarFilter {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        
+
         for (int i = 0; i < history.length; i++) {
             sb.append(history[i].name)
                     .append(": #")
                     .append(history[i].stars.length);
             if (i > 0) {
-                sb.append(" (").append(percents(history[i].stars.length, history[i - 1].stars.length));
+                sb.append(" (").append(TextUtils.percents(history[i].stars.length, history[i - 1].stars.length));
             }
             if (i > 1) {
-                sb.append(";").append(percents(history[i].stars.length, history[0].stars.length));
+                sb.append(";").append(TextUtils.percents(history[i].stars.length, history[0].stars.length));
             }
             if (i > 0) {
                 sb.append(")");
@@ -165,10 +162,5 @@ public final class StarFilter {
             }
         }
         return sb.toString();
-    }
-    
-    @NotNull
-    private static String percents(final int num, final int denum) {
-        return format("%.1f%%", 100.0 * num / denum);
     }
 }

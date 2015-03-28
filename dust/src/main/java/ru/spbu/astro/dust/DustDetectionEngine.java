@@ -14,7 +14,7 @@ public final class DustDetectionEngine {
 
     public static void main(@NotNull final String[] args) {
         final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(
-                StarFilter.of(Stars.HIPPARCOS_UPDATED).parallaxRelativeError(0.25).stars()
+                StarFilter.of(DustStars.ALL).parallaxRelativeError(0.25).stars()
         );
         final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
         final HammerProjection hammerProjection = new HammerProjection(f);

@@ -1,12 +1,14 @@
 package ru.spbu.astro.util.ml;
 
+import com.google.common.primitives.Ints;
 import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.jetbrains.annotations.NotNull;
+import ru.spbu.astro.util.ArrayTools;
 import ru.spbu.astro.util.Value;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,10 +24,9 @@ public final class RansacLinearRegression implements SimpleRegression {
     private final org.apache.commons.math3.stat.regression.SimpleRegression regression;
     @NotNull
     private final Map<Integer, Vector2D> points = new HashMap<>();
-    @NotNull
-    private final List<Integer> inliers = new ArrayList<>();
-    @NotNull
-    private final List<Integer> outliers = new ArrayList<>();
+
+    private int[] inliers;
+    private int[] outliers;
 
     public RansacLinearRegression(final boolean includeIntercept) {
         regression = new org.apache.commons.math3.stat.regression.SimpleRegression(includeIntercept);
@@ -38,26 +39,26 @@ public final class RansacLinearRegression implements SimpleRegression {
 
     @Override
     public boolean train() {
-        final List<Integer> ids = new ArrayList<>(points.keySet());
+        final int[] ids = Ints.toArray(points.keySet());
         if (!train(ids)) {
             return false;
         }
-        ids.sort((id1, id2) -> Double.compare(target(points.get(id1)), target(points.get(id2))));
-        final int split = (int) ((1 - OUTLIERS_PART) * ids.size());
-        inliers.addAll(ids.subList(0, split));
-        outliers.addAll(ids.subList(split, ids.size()));
+        ArrayTools.sort(ids, Comparator.comparingDouble(id -> target(points.get(id))));
+        final int split = (int) ((1 - OUTLIERS_PART) * ids.length);
+        inliers = Arrays.copyOf(ids, split);
+        outliers = Arrays.copyOfRange(ids, split, ids.length);
         return train(inliers);
     }
 
     @NotNull
     @Override
-    public List<Integer> getInliers() {
+    public int[] getInliers() {
         return inliers;
     }
 
     @NotNull
     @Override
-    public List<Integer> getOutliers() {
+    public int[] getOutliers() {
         return outliers;
     }
 
@@ -77,8 +78,8 @@ public final class RansacLinearRegression implements SimpleRegression {
         return Math.pow(regression.predict(p.getX()) - p.getY(), 2);
     }
 
-    private boolean train(@NotNull final List<Integer> ids) {
-        if (ids.size() < MIN_FOR_TREND) {
+    private boolean train(@NotNull final int[] ids) {
+        if (ids.length < MIN_FOR_TREND) {
             return false;
         }
         regression.clear();
