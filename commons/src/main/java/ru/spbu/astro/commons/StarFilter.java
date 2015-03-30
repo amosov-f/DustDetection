@@ -90,6 +90,11 @@ public final class StarFilter {
     public StarFilter hasLuminosityClass() {
         return filter("has lumin", star -> star.getSpectType().hasLumin());
     }
+    
+    @NotNull
+    public StarFilter noLumin() {
+        return filter("no lumin", star -> !star.getSpectType().hasLumin());
+    }
 
     @NotNull
     public StarFilter hasBVInt() {

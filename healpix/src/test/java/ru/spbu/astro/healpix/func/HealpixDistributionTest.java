@@ -19,22 +19,21 @@ import ru.spbu.astro.healpix.Healpix;
 public class HealpixDistributionTest {
     @Test
     public void testBVOver06() {
-        testBV(0.6, Double.MAX_VALUE);    
+        testBV(0.6, Double.POSITIVE_INFINITY);
     }
     
     @Test
     public void testBVBefore06() {
-        testBV(Double.MIN_VALUE, 0.6);
+        testBV(Double.NEGATIVE_INFINITY, 0.6);
     }
     
     private void testBV(final double min, final double max) {
         final Healpix healpix = new Healpix(18);
-        final Star[] stars = StarFilter.of(Stars.ALL).stars();
-        final Star[][] rings = healpix.split(stars);
+        final Star[][] rings = healpix.split(Stars.ALL);
         final double[] values = new double[healpix.nPix()];
         for (int i = 0; i < values.length; i++) {
             if (rings[i].length != 0) {
-                values[i] = 1.0 * StarFilter.of(rings[i]).bvColor(min, max).stars().length / rings[i].length;
+                values[i] = 1.0 * StarFilter.of(rings[i]).bvColor(min, max).noLumin().stars().length / rings[i].length;
             }
         }
         new HammerProjection(new HealpixDistribution(values), 0.0, 1.0).setVisible(true);

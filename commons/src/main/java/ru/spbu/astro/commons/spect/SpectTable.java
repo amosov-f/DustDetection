@@ -17,11 +17,23 @@ import java.util.stream.IntStream;
  * Date: 26.10.14
  * Time: 13:03
  */
-public final class SpectTable {
+public class SpectTable {
     private static final Logger LOGGER = Logger.getLogger(SpectTable.class.getName());
 
     public static final SpectTable TSVETKOV = read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
     public static final SpectTable SCHMIDT_KALER = read("schmidt-kaler", SpectTable.class.getResourceAsStream("/table/schmidt-kaler.txt"));
+    public static final SpectTable TSVETKOV_MID = new SpectTable("tsvetkov-mid") {
+        @Nullable
+        @Override
+        public Double getBV(@NotNull final SpectClass spect, @NotNull final LuminosityClass lumin) {
+            if (lumin != LuminosityClass.III_V) {
+                return TSVETKOV.getBV(spect, lumin);
+            }
+            final Double bvIII = TSVETKOV.getBV(spect, LuminosityClass.III);
+            final Double bvV = TSVETKOV.getBV(spect, LuminosityClass.V);
+            return bvIII != null && bvV != null ? (bvIII + bvV) / 2 : null;
+        }
+    };
 
     public static final int MIN_CODE = 5;
     public static final int MAX_CODE = 69;
@@ -42,7 +54,7 @@ public final class SpectTable {
 
     @NotNull
     public static SpectTable getInstance() {
-        return TSVETKOV;
+        return TSVETKOV_MID;
     }
 
     @NotNull

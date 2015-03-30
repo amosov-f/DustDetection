@@ -13,9 +13,9 @@ import ru.spbu.astro.dust.algo.classify.LuminosityClassifiers;
  * Time: 16:16
  */
 public final class DustStars {
-    public static final Star[] ALL = by(Stars.ALL, LuminosityClassifiers.SVM);
+    public static final Star[] ALL = classified(Stars.ALL, LuminosityClassifiers.SVM);
 
-    public static Star[] by(@NotNull final Star[] stars, @NotNull final LuminosityClassifier classifier) {
+    public static Star[] classified(@NotNull final Star[] stars, @NotNull final LuminosityClassifier classifier) {
         return StarFilter.of(classifier.classify(stars)).hasBVInt().stars();
     }
     

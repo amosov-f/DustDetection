@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import static ru.spbu.astro.commons.graph.HRDiagram.*;
 
-public final class SVMLuminosityClassifier implements LuminosityClassifier {
+final class SVMLuminosityClassifier implements LuminosityClassifier {
     private static final Logger LOGGER = Logger.getLogger(SVMLuminosityClassifier.class.getName());
 
     private static final double BV_COLOR_ERROR_LIMIT = 0.01;
