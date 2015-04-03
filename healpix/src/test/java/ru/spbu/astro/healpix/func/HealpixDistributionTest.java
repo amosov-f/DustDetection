@@ -39,6 +39,11 @@ public class HealpixDistributionTest {
         new HammerProjection(new HealpixDistribution(values), 0.0, 1.0).setVisible(true);
     }
 
+    @Test
+    public void testHasLumin() throws Exception {
+        new HammerProjection(new PredicateDistribution(18, Stars.ALL, star -> star.getSpectType().hasLumin()), 0.0, 1.0).setVisible(true);
+    }
+
     @After
     public void tearDown() throws Exception {
         Thread.sleep(Long.MAX_VALUE);

@@ -54,6 +54,16 @@ public final class StarFilter {
                 star -> min <= star.getBVColor().getValue() && star.getBVColor().getValue() <= max
         );
     }
+    
+    @NotNull
+    public StarFilter leftBVColor() {
+        return bvColor(Double.NEGATIVE_INFINITY, 0.6);
+    }
+    
+    @NotNull
+    public StarFilter rightBVColor() {
+        return bvColor(0.6, Double.POSITIVE_INFINITY);
+    }
 
     @NotNull
     public StarFilter absoluteMagnitude(final double min, final double max) {
@@ -107,18 +117,13 @@ public final class StarFilter {
     }
 
     @NotNull
-    public StarFilter luminosityClass(@NotNull final LuminosityClass lumin) {
-        return filter(lumin.toString(), star -> star.getSpectType().getLumin() == lumin);
-    }
-
-    @NotNull
-    public StarFilter luminosityClasses(@NotNull final LuminosityClass[] lumins) {
+    public StarFilter luminosityClass(@NotNull final LuminosityClass... lumins) {
         return filter(Arrays.toString(lumins), star -> contains(lumins, star.getSpectType().getLumin()));
     }
 
     @NotNull
     public StarFilter mainLuminosityClasses() {
-        return luminosityClasses(LuminosityClass.MAIN);
+        return luminosityClass(LuminosityClass.MAIN);
     }
 
     @NotNull

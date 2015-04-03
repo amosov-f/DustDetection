@@ -36,7 +36,7 @@ public final class Star {
 
     @NotNull
     public Value getR() {
-        return new Value(1000 / parallax.getValue(), 1000 * parallax.getError() / pow(parallax.getValue(), 2));
+        return Value.of(1000 / parallax.getValue(), 1000 * parallax.getError() / pow(parallax.getValue(), 2));
     }
 
     @NotNull
@@ -51,7 +51,7 @@ public final class Star {
     @NotNull
     @SuppressWarnings("MagicNumber")
     public Value getAbsoluteMagnitude() {
-        return new Value(
+        return Value.of(
                 vMag + 5 * log10(parallax.getValue()) - 10,
                 2.5 * log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))
         );

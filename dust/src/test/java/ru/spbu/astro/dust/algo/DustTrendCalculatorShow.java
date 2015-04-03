@@ -37,6 +37,12 @@ public class DustTrendCalculatorShow {
         testLeft(LuminosityClassifiers.SVM);
     }
 
+
+    @Test
+    public void testLeftCombining() {
+        testLeft(LuminosityClassifiers.COMBINING);
+    }
+
     @Test
     public void testRight() {
         final Star[] stars = StarFilter.of(Stars.ALL).bvColor(0.6, Double.POSITIVE_INFINITY).stars();

@@ -125,10 +125,10 @@ public final class Catalog {
 
             return new Star.Builder(id)
                     .setDir(new Spheric(lii, bii))
-                    .setParallax(new Value(parallax, parallaxError))
+                    .setParallax(Value.of(parallax, parallaxError))
                     .setVMag(vMag)
                     .setSpectType(spectType)
-                    .setBVColor(new Value(bvColor, bvColorError)).build();
+                    .setBVColor(Value.of(bvColor, bvColorError)).build();
         }
 
         @NotNull

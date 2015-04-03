@@ -27,7 +27,7 @@ public final class WeightedSimpleRegression implements SimpleRegression {
     @NotNull
     @Override
     public Value getSlope() {
-        return new Value(k);
+        return Value.of(k);
     }
 
     @NotNull

@@ -31,7 +31,9 @@ public class SpectTable {
             }
             final Double bvIII = TSVETKOV.getBV(spect, LuminosityClass.III);
             final Double bvV = TSVETKOV.getBV(spect, LuminosityClass.V);
-            return bvIII != null && bvV != null ? (bvIII + bvV) / 2 : null;
+            final double w1 = 202.0 / 1570;
+            final double w2 = 1 - w1;
+            return bvIII != null && bvV != null ? w1 * bvIII + w2 * bvV : null;
         }
     };
 

@@ -37,7 +37,7 @@ public final class CloudDistribution implements SphericDistribution {
     public Value get(@NotNull final Spheric dir) {
         for (int i = 0; i < clouds.size(); i++) {
             if (sphericBalls.get(i).contains(dir)) {
-                return new Value(clouds.get(i).getNumPoints());
+                return Value.of(clouds.get(i).getNumPoints());
             }
         }
         return Value.ZERO;

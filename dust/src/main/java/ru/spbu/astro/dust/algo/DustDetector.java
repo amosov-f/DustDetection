@@ -93,7 +93,7 @@ public final class DustDetector {
 
             final SimpleRegression regression = new RansacLinearRegression(true);
             for (final Instance instance : knn) {
-                regression.add(instance.hashCode(), new Value(point(instance).getNorm()), new Value(instance.value(3)));
+                regression.add(instance.hashCode(), Value.of(point(instance).getNorm()), Value.of(instance.value(3)));
             }
             if (!regression.train()) {
                 continue;

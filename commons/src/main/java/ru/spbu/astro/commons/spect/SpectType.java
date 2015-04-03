@@ -64,7 +64,7 @@ public final class SpectType {
             return null;
         }
         final double bv = DoubleStream.of(Doubles.toArray(bvs)).average().getAsDouble();
-        return new Value(bv, bvs.stream().mapToDouble(x -> Math.abs(x - bv)).max().getAsDouble());
+        return Value.of(bv, bvs.stream().mapToDouble(x -> Math.abs(x - bv)).max().getAsDouble());
     }
 
     @Nullable

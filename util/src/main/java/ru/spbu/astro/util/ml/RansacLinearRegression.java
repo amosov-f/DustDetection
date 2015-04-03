@@ -65,13 +65,13 @@ public final class RansacLinearRegression implements SimpleRegression {
     @NotNull
     @Override
     public Value getSlope() {
-        return new Value(regression.getSlope(), regression.getSlopeStdErr());
+        return Value.of(regression.getSlope(), regression.getSlopeStdErr());
     }
 
     @NotNull
     @Override
     public Value getIntercept() {
-        return new Value(regression.getIntercept(), regression.getInterceptStdErr());
+        return Value.of(regression.getIntercept(), regression.getInterceptStdErr());
     }
 
     private double target(@NotNull final Vector2D p) {

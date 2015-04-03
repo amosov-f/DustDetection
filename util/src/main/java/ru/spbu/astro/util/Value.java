@@ -7,19 +7,25 @@ import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
 public final class Value implements Comparable<Value> {
-    public static final Value ZERO = new Value(0);
-    public static final Value ONE = new Value(1);
+    public static final Value ZERO = of(0);
+    public static final Value ONE = of(1);
 
     private final double value;
     private final double error;
 
-    public Value(final double value) {
-        this(value, 0);
-    }
-
-    public Value(final double value, final double error) {
+    private Value(final double value, final double error) {
         this.value = value;
         this.error = error;
+    }
+
+    @NotNull
+    public static Value of(final double value) {
+        return new Value(value, 0);
+    }
+
+    @NotNull
+    public static Value of(final double value, final double error) {
+        return new Value(value, error);
     }
 
     public double getValue() {
@@ -40,12 +46,12 @@ public final class Value implements Comparable<Value> {
 
     @NotNull
     public Value add(@NotNull final Value value) {
-        return new Value(getValue() + value.getValue(), sqrt(pow(getError(), 2) + pow(value.getError(), 2)));
+        return Value.of(getValue() + value.getValue(), sqrt(pow(getError(), 2) + pow(value.getError(), 2)));
     }
 
     @NotNull
     public Value negate() {
-        return new Value(-getValue(), getError());
+        return Value.of(-getValue(), getError());
     }
 
     @NotNull

@@ -25,7 +25,7 @@ public class HealpixDistribution implements SphericDistribution {
     }
     
     public HealpixDistribution(@NotNull final double[] values) {
-        this(Arrays.stream(values).mapToObj(value -> new Value(value, 0)).toArray(Value[]::new));
+        this(Arrays.stream(values).mapToObj(value -> Value.of(value, 0)).toArray(Value[]::new));
     }
 
     @Nullable
