@@ -115,8 +115,8 @@ public final class HRDiagram {
         System.out.println(SCALE * 0.01);
 
         new HRDiagram(StarFilter.of(Stars.ALL)
-                .mainLuminosityClasses()
-                .absoluteMagnitudeError(SCALE * 0.01)
-                .bvColorError(0.01).stars()).show();
+                .mainLumin()
+                .absMagErr(SCALE * 0.01)
+                .bvErr(0.01).stars()).show();
     }
 }

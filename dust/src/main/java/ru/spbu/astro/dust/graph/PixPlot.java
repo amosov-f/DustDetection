@@ -3,7 +3,6 @@ package ru.spbu.astro.dust.graph;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -21,8 +20,6 @@ import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.util.Value;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
@@ -32,8 +29,6 @@ public final class PixPlot {
     private final DustTrendCalculator dustTrendCalculator;
     @NotNull
     private final ChartFrame frame;
-    @NotNull
-    private final Healpix healpix = new Healpix(DustTrendCalculator.N_SIDE);
 
     public PixPlot(@NotNull final DustTrendCalculator dustTrendCalculator) {
         this.dustTrendCalculator = dustTrendCalculator;
@@ -79,8 +74,8 @@ public final class PixPlot {
                 new XYErrorRenderer()
         );
 
-        final double r1 = b != 0 ? Arrays.stream(stars).mapToDouble(s -> s.getR().getNSigma(-1)).min().getAsDouble() : 0;
-        final double r2 = Arrays.stream(stars).mapToDouble(s -> s.getR().getNSigma(1)).max().getAsDouble();
+        final double r1 = b != 0 ? Arrays.stream(stars).mapToDouble(s -> s.getR().plusNSigma(-1)).min().getAsDouble() : 0;
+        final double r2 = Arrays.stream(stars).mapToDouble(s -> s.getR().plusNSigma(1)).max().getAsDouble();
 
         final XYSeries trendSeries = new XYSeries("Тренд");
         trendSeries.add(r1, a * r1 + b);
@@ -95,17 +90,17 @@ public final class PixPlot {
         plot.setRangeZeroBaselineVisible(true);
 
         final JFreeChart chart = new JFreeChart(
-                "Покраснение в направлении " + healpix.getCenter(dir),
+                "Покраснение в направлении " + new Healpix(dustTrendCalculator.getNSide()).getCenter(dir),
                 DEFAULT_TITLE_FONT,
                 plot,
                 true
         );
 
-        try {
-            ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         frame.getChartPanel().setChart(chart);
     }

@@ -15,6 +15,6 @@ public class NegativeExtinctionHistogram extends OutlierHistogram {
     public <T extends Comparable<T>> NegativeExtinctionHistogram(@NotNull final Star[] stars,
                                                                  @NotNull final StarHist<T, Integer> hist)
     {
-        super(stars, StarFilter.NEGATIVE_EXTINCTION, hist);
+        super(stars, StarFilter.NEG_EXT, hist);
     }
 }

@@ -43,7 +43,7 @@ public final class DustCloudDetector {
 
     public static void main(@NotNull final String[] args) {
         final DustCloudDetector detector = new DustCloudDetector(
-                StarFilter.of(DustStars.ALL).parallaxRelativeError(0.35).stars()
+                StarFilter.of(DustStars.ALL).piRelErr(0.35).stars()
         );
         final List<Cloud> clouds = detector.getClouds();
         LOGGER.info("#clouds: " + clouds.size());

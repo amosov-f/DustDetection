@@ -55,8 +55,8 @@ public final class SpectTableCalculator {
         for (final LuminosityClass lumin : spect2stars.keySet()) {
             for (final Integer key : spect2stars.get(lumin).keySet()) {
                 final List<Star> stars = spect2stars.get(lumin).get(key);
-                stars.sort(Comparator.comparingDouble(star -> star.getExtinction().getNSigma(3)));
-                final double ext = stars.get(Math.min((int) (outlierPart * stars.size()), stars.size() - 1)).getBVColor().getNSigma(3);
+                stars.sort(Comparator.comparingDouble(star -> star.getExtinction().plusNSigma(3)));
+                final double ext = stars.get(Math.min((int) (outlierPart * stars.size()), stars.size() - 1)).getBVColor().plusNSigma(3);
                 spectTable.add(lumin, key, ext);
             }
         }

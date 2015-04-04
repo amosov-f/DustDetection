@@ -3,6 +3,7 @@ package ru.spbu.astro.commons;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.TextUtils;
 
 import java.util.Arrays;
@@ -16,8 +17,11 @@ import static org.apache.commons.lang3.ArrayUtils.contains;
 public final class StarFilter {
     private static final Logger LOGGER = Logger.getLogger(StarFilter.class.getName());
 
-    public static final Predicate<Star> NEGATIVE_EXTINCTION = star -> star.getExtinction().getNSigma(3) < 0;
-    
+    public static final Filter<Star> HAS_EXT = Filter.by("has ext", star -> star.getSpectType().toBV() != null);
+    public static final Filter<Star> NEG_EXT = Filter.by("ext + 3sigma < 0", HAS_EXT.getPredicate().and(star -> star.getExtinction().plusNSigma(3) < 0));
+    public static final Filter<Star> HAS_LUMIN = Filter.by("has lumin", star -> star.getSpectType().hasLumin());
+    public static final Filter<Star> MAIN_LUMIN = byLumin(LuminosityClass.MAIN);
+
     @NotNull
     private final String name;
     @NotNull
@@ -38,97 +42,112 @@ public final class StarFilter {
     }
 
     @NotNull
+    public static Filter<Star> byLumin(@NotNull final LuminosityClass... lumins) {
+        return Filter.by(Arrays.toString(lumins), star -> contains(lumins, star.getSpectType().getLumin()));
+    }
+
+    @NotNull
+    public static Filter<Star> byBV(final double min, final double max) {
+        return Filter.by(
+                format("%.1f < B-V < %.1f", min, max),
+                star -> min <= star.getBVColor().getValue() && star.getBVColor().getValue() <= max
+        );
+    }
+
+    @NotNull
     public static StarFilter of(@NotNull final Star[] stars) {
         return new StarFilter(stars);
     }
 
     @NotNull
-    public StarFilter filter(@NotNull final String name, @NotNull final Predicate<Star> filter) {
+    public StarFilter apply(@NotNull final Filter<Star> filter) {
+        return apply(filter.getName(), filter.getPredicate());
+    }
+
+    @NotNull
+    private StarFilter apply(@NotNull final String name, @NotNull final Predicate<Star> filter) {
         return new StarFilter(name, Arrays.stream(stars).filter(filter).toArray(Star[]::new), this.history);
     }
 
     @NotNull
-    public StarFilter bvColor(final double min, final double max) {
-        return filter(
-                format("%.1f < B-V < %.1f]", min, max),
-                star -> min <= star.getBVColor().getValue() && star.getBVColor().getValue() <= max
-        );
-    }
-    
-    @NotNull
-    public StarFilter leftBVColor() {
-        return bvColor(Double.NEGATIVE_INFINITY, 0.6);
-    }
-    
-    @NotNull
-    public StarFilter rightBVColor() {
-        return bvColor(0.6, Double.POSITIVE_INFINITY);
+    public StarFilter bv(final double min, final double max) {
+        return apply(byBV(min, max));
     }
 
     @NotNull
-    public StarFilter absoluteMagnitude(final double min, final double max) {
-        return filter(format("%.1f < M < %.1f]", min, max), star -> {
+    public StarFilter leftBVColor() {
+        return bv(Double.NEGATIVE_INFINITY, 0.6);
+    }
+
+    @NotNull
+    public StarFilter rightBVColor() {
+        return bv(0.6, Double.POSITIVE_INFINITY);
+    }
+
+    @NotNull
+    public StarFilter absMag(final double min, final double max) {
+        return apply(format("%.1f < M < %.1f]", min, max), star -> {
             final double absoluteMagnitude = star.getAbsoluteMagnitude().getValue();
             return min <= absoluteMagnitude && absoluteMagnitude <= max;
         });
     }
 
     @NotNull
-    public StarFilter absoluteMagnitudeError(final double lim) {
-        return filter(format("dM < %.2f", lim), star -> star.getAbsoluteMagnitude().getError() < lim);
+    public StarFilter absMagErr(final double lim) {
+        return apply(format("dM < %.2f", lim), star -> star.getAbsoluteMagnitude().getError() < lim);
     }
 
     @NotNull
-    public StarFilter bvColorError(final double lim) {
-        return filter(format("dB-V < %.2f", lim), star -> star.getBVColor().getError() < lim);
+    public StarFilter bvErr(final double lim) {
+        return apply(format("dB-V < %.2f", lim), star -> star.getBVColor().getError() < lim);
     }
 
     @NotNull
-    public StarFilter parallaxRelativeError(final double lim) {
-        return filter(format("dPi < %.1f", lim), star -> star.getParallax().getRelativeError() < lim);
+    public StarFilter piRelErr(final double lim) {
+        return apply(format("dPi < %.1f", lim), star -> star.getParallax().getRelativeError() < lim);
     }
 
     @NotNull
     public StarFilter r(final double r1, final double r2) {
-        return filter(
+        return apply(
                 format("%.0f < r < %.0f", r1, r2),
                 star -> r1 <= star.getR().getValue() && star.getR().getValue() <= r2
         );
     }
 
     @NotNull
-    public StarFilter hasLuminosityClass() {
-        return filter("has lumin", star -> star.getSpectType().hasLumin());
+    public StarFilter hasLumin() {
+        return apply(HAS_LUMIN);
     }
-    
+
     @NotNull
     public StarFilter noLumin() {
-        return filter("no lumin", star -> !star.getSpectType().hasLumin());
+        return apply(HAS_LUMIN.negate());
     }
 
     @NotNull
-    public StarFilter hasBVInt() {
-        return filter("has B-V_int", star -> star.getSpectType().toBV() != null);
+    public StarFilter hasExt() {
+        return apply(HAS_EXT);
     }
 
     @NotNull
-    public StarFilter negativeExtinction() {
-        return filter("ext < 0", NEGATIVE_EXTINCTION);
+    public StarFilter negExt() {
+        return apply(NEG_EXT);
     }
 
     @NotNull
-    public StarFilter luminosityClass(@NotNull final LuminosityClass... lumins) {
-        return filter(Arrays.toString(lumins), star -> contains(lumins, star.getSpectType().getLumin()));
+    public StarFilter lumin(@NotNull final LuminosityClass... lumins) {
+        return apply(byLumin(lumins));
     }
 
     @NotNull
-    public StarFilter mainLuminosityClasses() {
-        return luminosityClass(LuminosityClass.MAIN);
+    public StarFilter mainLumin() {
+        return apply(MAIN_LUMIN);
     }
 
     @NotNull
     public StarFilter spectType(final double minCode, final double maxCode) {
-        return filter(format("%.0f < spect < %.0f", minCode, maxCode), star -> {
+        return apply(format("%.0f < spect < %.0f", minCode, maxCode), star -> {
             final double code = star.getSpectType().getSpect().getDoubleCode();
             return minCode <= code && code <= maxCode;
         });

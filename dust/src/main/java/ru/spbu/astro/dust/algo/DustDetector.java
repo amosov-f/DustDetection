@@ -129,7 +129,7 @@ public final class DustDetector {
 
     public static void main(final String[] args) {
         final DustDetector detector = new DustDetector(
-                StarFilter.of(DustStars.ALL).parallaxRelativeError(0.35).stars()
+                StarFilter.of(DustStars.ALL).piRelErr(0.35).stars()
         );
 
         final Spheric[] dirs = detector.getDust().stream().map(Spheric::new).toArray(Spheric[]::new);

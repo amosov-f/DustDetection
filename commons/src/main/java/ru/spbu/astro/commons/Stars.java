@@ -1,5 +1,7 @@
 package ru.spbu.astro.commons;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +13,13 @@ import java.util.Map;
  */
 public final class Stars {
     public static final Star[] ALL = Catalogs.HIPPARCOS_2007.getStars();
-    public static final Map<Integer, Star> MAP_ALL = new HashMap<Integer, Star>() {{
-        Arrays.stream(ALL).forEach(star -> put(star.getId(), star));
-    }};
+
+    @NotNull
+    public static Map<Integer, Star> map(@NotNull final Star[] stars) {
+        return new HashMap<Integer, Star>() {{
+            Arrays.stream(stars).forEach(star -> put(star.getId(), star));
+        }};
+    }
 
     private Stars() {
     }

@@ -40,18 +40,18 @@ public final class Value implements Comparable<Value> {
         return Math.abs(getError() / getValue());
     }
 
-    public double getNSigma(final int n) {
+    public double plusNSigma(final int n) {
         return value + n * error;
     }
 
     @NotNull
     public Value add(@NotNull final Value value) {
-        return Value.of(getValue() + value.getValue(), sqrt(pow(getError(), 2) + pow(value.getError(), 2)));
+        return of(getValue() + value.getValue(), sqrt(pow(getError(), 2) + pow(value.getError(), 2)));
     }
 
     @NotNull
     public Value negate() {
-        return Value.of(-getValue(), getError());
+        return of(-getValue(), getError());
     }
 
     @NotNull

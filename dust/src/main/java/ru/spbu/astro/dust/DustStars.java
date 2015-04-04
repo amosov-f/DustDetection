@@ -16,7 +16,7 @@ public final class DustStars {
     public static final Star[] ALL = classified(Stars.ALL, LuminosityClassifiers.SVM);
 
     public static Star[] classified(@NotNull final Star[] stars, @NotNull final LuminosityClassifier classifier) {
-        return StarFilter.of(classifier.classify(stars)).hasBVInt().stars();
+        return StarFilter.of(classifier.classify(stars)).hasExt().stars();
     }
     
     private DustStars() {

@@ -11,11 +11,14 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings("MagicNumber")
 public class DustTrendCalculatorRegressionTest {
+    private static final DustTrendCalculator DUST_TREND_CALCULATOR = new DustTrendCalculator(DustStars.ALL, 18);
+
     public static void main(@NotNull final String[] args) throws IOException {
         FileUtils.writeStringToFile(
                 new File("dust/src/test/resources/dust-trend-calculator.txt"),
-                new DustTrendCalculator(DustStars.ALL).toString()
+                DUST_TREND_CALCULATOR.toString()
         );
     }
 
@@ -23,7 +26,7 @@ public class DustTrendCalculatorRegressionTest {
     public void regression() throws IOException {
         assertEquals(
                 IOUtils.toString(getClass().getResourceAsStream("/dust-trend-calculator.txt")),
-                new DustTrendCalculator(DustStars.ALL).toString()
+                DUST_TREND_CALCULATOR.toString()
         );
     }
 }

@@ -8,11 +8,14 @@ import org.junit.Test;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.Stars;
+import ru.spbu.astro.commons.func.SphericDistribution;
 import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.dust.algo.classify.LuminosityClassifier;
 import ru.spbu.astro.dust.algo.classify.LuminosityClassifiers;
+import ru.spbu.astro.dust.graph.PixPlot;
 import ru.spbu.astro.healpix.func.HealpixDistribution;
+import ru.spbu.astro.healpix.func.SmoothedDistribution;
 
 /**
  * User: amosov-f
@@ -22,6 +25,20 @@ import ru.spbu.astro.healpix.func.HealpixDistribution;
 @Ignore
 @SuppressWarnings("MagicNumber")
 public class DustTrendCalculatorShow {
+    private static final int N_SIDE = 18;
+
+    @Test
+    public void main() throws Exception {
+        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(
+                StarFilter.of(DustStars.ALL).piRelErr(0.25).stars(), N_SIDE
+        );
+        final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
+        final HammerProjection hammerProjection = new HammerProjection(f);
+        final PixPlot pixPlot = new PixPlot(dustTrendCalculator);
+        hammerProjection.setProcessor(pixPlot::plot);
+        hammerProjection.setVisible(true);
+    }
+
     @Test
     public void testLeftIII() {
         testLeft(LuminosityClassifiers.LEFT_III);
@@ -45,7 +62,7 @@ public class DustTrendCalculatorShow {
 
     @Test
     public void testRight() {
-        final Star[] stars = StarFilter.of(Stars.ALL).bvColor(0.6, Double.POSITIVE_INFINITY).stars();
+        final Star[] stars = StarFilter.of(Stars.ALL).bv(0.6, Double.POSITIVE_INFINITY).stars();
         test(stars, LuminosityClassifiers.createSVM(stars));
     }
 
@@ -62,9 +79,15 @@ public class DustTrendCalculatorShow {
     @Test
     public void compareTest() throws Exception {
         Assert.assertEquals(
-                new DustTrendCalculator(DustStars.ALL).toString(), 
-                new DustTrendCalculator(DustStars.classified(Stars.ALL, LuminosityClassifiers.COMBINING)).toString()
+                new DustTrendCalculator(DustStars.ALL, N_SIDE).toString(),
+                new DustTrendCalculator(DustStars.classified(Stars.ALL, LuminosityClassifiers.COMBINING), N_SIDE).toString()
         );
+    }
+
+    @Test
+    public void testSmoothed() {
+        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
+        new HammerProjection(new SmoothedDistribution(64, new HealpixDistribution(calculator.getSlopes()), 2)).setVisible(true);
     }
 
     private void testLeft(@NotNull final LuminosityClassifier classifier) {
@@ -72,7 +95,7 @@ public class DustTrendCalculatorShow {
     }
     
     private void testBV(final double min, final double max, @NotNull final LuminosityClassifier classifier) {
-        final Star[] stars = StarFilter.of(Stars.ALL).bvColor(min, max).stars();
+        final Star[] stars = StarFilter.of(Stars.ALL).bv(min, max).stars();
         test(stars, classifier);
     }
     
@@ -81,7 +104,7 @@ public class DustTrendCalculatorShow {
     }
     
     private void test(@NotNull final Star[] stars) {
-        final DustTrendCalculator calculator = new DustTrendCalculator(stars);
+        final DustTrendCalculator calculator = new DustTrendCalculator(stars, N_SIDE);
         new HammerProjection(new HealpixDistribution(calculator.getSlopes())).setVisible(true);
     }
 

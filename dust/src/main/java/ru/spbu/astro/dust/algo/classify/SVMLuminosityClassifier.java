@@ -44,9 +44,9 @@ final class SVMLuminosityClassifier implements LuminosityClassifier {
 
     SVMLuminosityClassifier(@NotNull final Star[] stars, @NotNull final Mode mode) {
         final Instances dataset = toInstances("dataset", this.stars = StarFilter.of(stars)
-                .mainLuminosityClasses()
-                .absoluteMagnitudeError(SCALE * BV_COLOR_ERROR_LIMIT)
-                .bvColorError(BV_COLOR_ERROR_LIMIT).stars());
+                .mainLumin()
+                .absMagErr(SCALE * BV_COLOR_ERROR_LIMIT)
+                .bvErr(BV_COLOR_ERROR_LIMIT).stars());
 
         classifier = new SMO();
         try {

@@ -19,11 +19,11 @@ import org.jfree.ui.TextAnchor;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.hist.StarHist;
+import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.Value;
 
 import java.text.DecimalFormat;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 public class OutlierHistogram {
@@ -33,10 +33,10 @@ public class OutlierHistogram {
     private final ChartFrame frame;
 
     public <T extends Comparable<T>> OutlierHistogram(@NotNull final Star[] stars,
-                                                      @NotNull final Predicate<Star> outlierFilter,
+                                                      @NotNull final Filter<Star> outlierFilter,
                                                       @NotNull final StarHist<T, Integer> hist)
     {
-        outliers = StarFilter.of(stars).filter("outliers", outlierFilter).stars();
+        outliers = StarFilter.of(stars).apply(outlierFilter).stars();
 
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 

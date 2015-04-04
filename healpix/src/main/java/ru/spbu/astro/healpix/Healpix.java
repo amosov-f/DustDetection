@@ -18,10 +18,8 @@ import static java.lang.Math.sqrt;
  * Time: 0:36
  */
 public final class Healpix {
-    private static final int TWELVE = 12;
+    private static final PixTools PIX_TOOLS = PixTools.getInstance();
 
-    @NotNull
-    private final PixTools pixTools = new PixTools();
     private final int nSide;
 
     public Healpix(final int nSide) {
@@ -29,17 +27,22 @@ public final class Healpix {
     }
 
     public static int nPix(final int nSide) {
-        return TWELVE * nSide * nSide;
+        // noinspection MagicNumber
+        return 12 * nSide * nSide;
     }
     
-    public int nPix() {
+    public int getNPix() {
         return nPix(nSide);
+    }
+
+    public int getNSide() {
+        return nSide;
     }
     
     @NotNull
     public Star[][] split(@NotNull final Star[] stars) {
         final List<List<Star>> rings = new ArrayList<>();
-        for (int i = 0; i < nPix(); i++) {
+        for (int i = 0; i < getNPix(); i++) {
             rings.add(new ArrayList<>());
         }
         Arrays.stream(stars).forEach(star -> rings.get(getPix(star.getDir())).add(star));
@@ -47,20 +50,28 @@ public final class Healpix {
     }
 
     public static int nSide(final int nPix) {
-        return (int) round(sqrt((double) nPix / TWELVE));
+        // noinspection MagicNumber
+        return (int) round(sqrt(nPix / 12.0));
     }
 
     public int getPix(@NotNull final Spheric dir) {
-        return (int) pixTools.ang2pix_ring(nSide, dir.getPhi(), dir.getTheta());
+        return (int) PIX_TOOLS.ang2pix_ring(nSide, dir.getPhi(), dir.getTheta());
     }
 
     @NotNull
     public Spheric getCenter(final int pix) {
-        return Spheric.valueOf(pixTools.pix2ang_ring(nSide, pix));
+        return Spheric.valueOf(PIX_TOOLS.pix2ang_ring(nSide, pix));
     }
 
     @NotNull
     public Spheric getCenter(@NotNull final Spheric dir) {
         return getCenter(getPix(dir));
+    }
+
+    @NotNull
+    @Deprecated
+    public int[] getNeighbours(final int pix) {
+        // noinspection unchecked
+        return PIX_TOOLS.neighbours_nest(nSide, pix).stream().mapToInt(i -> ((Long) i).intValue()).toArray();
     }
 }
