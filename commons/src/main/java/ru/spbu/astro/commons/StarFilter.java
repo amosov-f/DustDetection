@@ -87,14 +87,14 @@ public final class StarFilter {
     @NotNull
     public StarFilter absMag(final double min, final double max) {
         return apply(format("%.1f < M < %.1f]", min, max), star -> {
-            final double absoluteMagnitude = star.getAbsoluteMagnitude().getValue();
+            final double absoluteMagnitude = star.getAbsMag().getValue();
             return min <= absoluteMagnitude && absoluteMagnitude <= max;
         });
     }
 
     @NotNull
     public StarFilter absMagErr(final double lim) {
-        return apply(format("dM < %.2f", lim), star -> star.getAbsoluteMagnitude().getError() < lim);
+        return apply(format("dM < %.2f", lim), star -> star.getAbsMag().getError() < lim);
     }
 
     @NotNull

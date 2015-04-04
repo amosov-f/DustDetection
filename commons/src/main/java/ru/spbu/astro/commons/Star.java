@@ -50,7 +50,7 @@ public final class Star {
 
     @NotNull
     @SuppressWarnings("MagicNumber")
-    public Value getAbsoluteMagnitude() {
+    public Value getAbsMag() {
         return Value.of(
                 vMag + 5 * log10(parallax.getValue()) - 10,
                 2.5 * log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))

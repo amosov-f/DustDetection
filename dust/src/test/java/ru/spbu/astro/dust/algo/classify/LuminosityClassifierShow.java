@@ -24,18 +24,20 @@ import static ru.spbu.astro.commons.graph.HRDiagram.*;
  * Time: 0:33
  */
 @Ignore
+@SuppressWarnings("MagicNumber")
 public class LuminosityClassifierShow {
     @Test
     public void testSVM() {
-        final Star[] stars = StarFilter.of(Stars.ALL).rightBVColor().stars();
+        final Star[] stars = StarFilter.of(Stars.ALL).mainLumin().stars();
         final SVMLuminosityClassifier classifier = new SVMLuminosityClassifier(stars, SVMLuminosityClassifier.Mode.TEST);
 
         final HRDiagram diagram = new HRDiagram(classifier.getStars());
         final XYPlot plot = diagram.getPlot();
         final XYSeriesCollection seriesCollection = new XYSeriesCollection();
-//        seriesCollection.addSeries(create("Разделяющая прямая", -2.8388, 0.5055, 1.0056)); // all
+//        seriesCollection.addSeries(create("Разделяющая прямая", -2.8388, 0.5055, 1.0056)); // all small errors
 //        seriesCollection.addSeries(create("Разделяющая прямая", -3.9761, 0.668, 1.377)); // > 0.6
-        seriesCollection.addSeries(create("Разделяющая прямая (new)", classifier.getA(), classifier.getB(), classifier.getC()));
+        seriesCollection.addSeries(create("Разделяющая прямая", -2.9876, 0.4526, 1.3547)); // all
+//        seriesCollection.addSeries(create("Разделяющая прямая", classifier.getA(), classifier.getB(), classifier.getC()));
         plot.setDataset(1, seriesCollection);
         final XYItemRenderer renderer = new SamplingXYLineRenderer();
         renderer.setSeriesStroke(0, new BasicStroke(3));

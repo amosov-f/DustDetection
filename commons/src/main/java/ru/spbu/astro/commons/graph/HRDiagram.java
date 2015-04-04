@@ -5,6 +5,7 @@ import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
@@ -49,8 +50,8 @@ public final class HRDiagram {
             for (final Star star : luminStars) {
                 final double bv = star.getBVColor().getValue();
                 final double dbv = star.getBVColor().getError();
-                final double M = star.getAbsoluteMagnitude().getValue();
-                final double dM = star.getAbsoluteMagnitude().getError();
+                final double M = star.getAbsMag().getValue();
+                final double dM = star.getAbsMag().getError();
 
                 if (Math.random() < ERROR_VIEW_SHARE) {
                     series.add(bv, bv - dbv, bv + dbv, M, M - dM, M + dM);
@@ -77,9 +78,11 @@ public final class HRDiagram {
                 plot,
                 true
         );
-        
 
-        chart.getXYPlot().setRenderer(new XYErrorRenderer());
+        final XYDotRenderer renderer = new XYDotRenderer();
+        renderer.setDotWidth(2);
+        renderer.setDotHeight(2);
+        chart.getXYPlot().setRenderer(renderer);
 
         chart.getXYPlot().getRangeAxis().setInverted(true);
 
