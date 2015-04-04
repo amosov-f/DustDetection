@@ -8,6 +8,8 @@ import ru.spbu.astro.commons.Star;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
@@ -41,10 +43,7 @@ public final class Healpix {
     
     @NotNull
     public Star[][] split(@NotNull final Star[] stars) {
-        final List<List<Star>> rings = new ArrayList<>();
-        for (int i = 0; i < getNPix(); i++) {
-            rings.add(new ArrayList<>());
-        }
+        final List<List<Star>> rings = IntStream.range(0, getNPix()).mapToObj(pix -> new ArrayList<Star>()).collect(Collectors.toList());
         Arrays.stream(stars).forEach(star -> rings.get(getPix(star.getDir())).add(star));
         return rings.stream().map(ring -> ring.toArray(new Star[ring.size()])).toArray(Star[][]::new);
     }
