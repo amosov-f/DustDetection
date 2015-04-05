@@ -29,7 +29,8 @@ public final class HRDiagram {
     public static final double SCALE = (ABSOLUTE_MAGNITUDE_UPPER_BOUND - ABSOLUTE_MAGNITUDE_LOWER_BOUND) / (BV_COLOR_UPPER_BOUND - BV_COLOR_LOWER_BOUND);
 
     private static final double ERROR_VIEW_SHARE = 1;
-    
+
+    @NotNull
     private final ChartFrame frame;
 
     public HRDiagram(@NotNull final Star[] stars) {

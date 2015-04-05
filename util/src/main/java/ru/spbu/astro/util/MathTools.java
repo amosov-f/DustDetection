@@ -18,7 +18,7 @@ public final class MathTools {
         return dy / dx * (x - x1) + y1;
     }
 
-    public static double normalize(final double x, final double min, final double max) {
+    public static double shrink(final double x, final double min, final double max) {
         double normalized = x;
         if (normalized > max) {
             normalized = max;

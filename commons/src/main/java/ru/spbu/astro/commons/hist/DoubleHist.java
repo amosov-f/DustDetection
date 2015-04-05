@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.util.Split;
+import ru.spbu.astro.util.TextUtils;
 
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -26,10 +26,6 @@ public abstract class DoubleHist<Y extends Number> extends StarHist<Double, Y> {
         this.split = split;
     }
 
-    private static double removeUnnecessaryDigits(final double x) {
-        return Double.valueOf(String.format(Locale.US, "%.2f", x));
-    }
-
     @Nullable
     @Override
     protected Double getX(@NotNull final Star star) {
@@ -40,7 +36,7 @@ public abstract class DoubleHist<Y extends Number> extends StarHist<Double, Y> {
         if (x < split.getMin() || split.getMax() < x) {
             return null;
         }
-        final double[] centers = Arrays.stream(split.getCenters()).map(DoubleHist::removeUnnecessaryDigits).toArray();
+        final double[] centers = Arrays.stream(split.getCenters()).map(TextUtils::removeUnnecessaryDigits).toArray();
         double best = centers[0];
         for (final double center : centers) {
             if (Math.abs(x - center) < Math.abs(x - best)) {

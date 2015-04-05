@@ -31,7 +31,7 @@ public class SpectTable {
             }
             final Double bvIII = TSVETKOV.getBV(spect, LuminosityClass.III);
             final Double bvV = TSVETKOV.getBV(spect, LuminosityClass.V);
-            final double w1 = 202.0 / 1570;
+            final double w1 = 0.114;
             final double w2 = 1 - w1;
             return bvIII != null && bvV != null ? w1 * bvIII + w2 * bvV : null;
         }
@@ -51,7 +51,7 @@ public class SpectTable {
 
     @NotNull
     public static IntStream codeRange() {
-        return IntStream.range(MIN_CODE, MAX_CODE + 1);
+        return IntStream.rangeClosed(MIN_CODE, MAX_CODE);
     }
 
     @NotNull

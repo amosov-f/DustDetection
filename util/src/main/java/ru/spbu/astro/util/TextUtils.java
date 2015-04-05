@@ -2,7 +2,7 @@ package ru.spbu.astro.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import static java.lang.String.format;
+import java.util.Locale;
 
 /**
  * User: amosov-f
@@ -14,9 +14,18 @@ public final class TextUtils {
 
     @NotNull
     public static String percents(final int num, final int denum) {
-        return format("%.1f%%", HUNDRED * num / denum);
+        return String.format("%.1f%%", HUNDRED * num / denum);
     }
-    
+
+    public static double removeUnnecessaryDigits(final double x) {
+        return Double.valueOf(String.format(Locale.US, "%.2f", x));
+    }
+
+    @NotNull
+    public static String format(@NotNull final String format, final double x) {
+        return String.valueOf(Double.parseDouble(String.format(Locale.US, format, x)));
+    }
+
     private TextUtils() {
     }
 }

@@ -17,27 +17,27 @@ import ru.spbu.astro.util.Filter;
  */
 @Ignore
 @SuppressWarnings("MagicNumber")
-public class HealpixDistributionTest {
+public class HealpixDistributionShow {
     @Test
-    public void testBVOver06() {
-        testBV(0.6, Double.POSITIVE_INFINITY);
+    public void showBVOver06() {
+        bvShow(0.6, Double.POSITIVE_INFINITY);
     }
     
     @Test
-    public void testBVBefore06() throws Exception {
-        testBV(Double.NEGATIVE_INFINITY, 0.6);
+    public void showBVBefore06() throws Exception {
+        bvShow(Double.NEGATIVE_INFINITY, 0.6);
     }
 
     @Test
-    public void testHasLumin() {
-        test(StarFilter.HAS_LUMIN);
+    public void hasLuminShow() {
+        show(StarFilter.HAS_LUMIN);
     }
     
-    private void testBV(final double min, final double max) {
-        test(StarFilter.byBV(min, max).and(StarFilter.HAS_LUMIN.negate()));
+    private void bvShow(final double min, final double max) {
+        show(StarFilter.byBV(min, max).and(StarFilter.HAS_LUMIN.negate()));
     }
 
-    private void test(@NotNull final Filter<Star> filter) {
+    private void show(@NotNull final Filter<Star> filter) {
         new HammerProjection(new PredicateDistribution(18, Stars.ALL, filter), 0.0, 1.0).setVisible(true);
     }
 

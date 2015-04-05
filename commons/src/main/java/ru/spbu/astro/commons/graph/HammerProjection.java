@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.func.SphericDistribution;
 import ru.spbu.astro.util.MathTools;
+import ru.spbu.astro.util.TextUtils;
 import ru.spbu.astro.util.Value;
 
 import javax.swing.*;
@@ -12,7 +13,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,11 +23,9 @@ import static java.lang.Math.*;
 public final class HammerProjection extends JWindow {
     private static final Logger LOGGER = Logger.getLogger(HammerProjection.class.getName());
 
-    private static final int PARALLEL_COUNT = 10;
-    private static final int MERIDIAN_COUNT = 24;
+    private static final int PARALLEL_COUNT = 6;
+    private static final int MERIDIAN_COUNT = 12;
     private static final int SIZE = 500;
-    private static final int REMOVE_LIMIT = 100;
-    private static final int OUTLIERS = 2;
     @NotNull
     private final SphericDistribution distribution;
     @NotNull
@@ -40,6 +38,10 @@ public final class HammerProjection extends JWindow {
     private final Double min;
     @Nullable
     private final Double max;
+
+    private double minValue;
+    private double maxValue;
+    private double maxError;
 
     public HammerProjection(@NotNull final SphericDistribution distribution) {
         this(distribution, Mode.DEFAULT);
@@ -83,7 +85,7 @@ public final class HammerProjection extends JWindow {
         final double denominator = sqrt(1 + cos(b) * cos(l / 2));
 
         final double x = -2 * cos(b) * sin(l / 2) / denominator;
-        final double y = -sin(b) / denominator;
+        final double y = sin(b) / denominator;
 
         return new Point2D.Double(x, y);
     }
@@ -113,30 +115,11 @@ public final class HammerProjection extends JWindow {
         return new Spheric(l, b);
     }
 
-    private static void removeExtremeValues(@NotNull final Collection<Double> values) {
-        for (int i = 0; i < OUTLIERS; ) {
-            if (values.size() > 2 && Collections.max(values) > 0) {
-                values.remove(Collections.max(values));
-                i++;
-            }
-            if (values.size() > 2 && Collections.min(values) < 0) {
-                values.remove(Collections.min(values));
-                i++;
-            }
-        }
-    }
-
     @Override
     public void paint(@NotNull final Graphics g) {
         final Value[][] f = new Value[min(getWidth(), 2 * getHeight())][min(getHeight(), getWidth() / 2)];
 
         final Set<Double> values = new TreeSet<>();
-        if (min != null) {
-            values.add(min);
-        }
-        if (max != null) {
-            values.add(max);
-        }
         final Set<Double> errors = new TreeSet<>();
 
         for (int x = 0; x < f.length; ++x) {
@@ -159,21 +142,19 @@ public final class HammerProjection extends JWindow {
             }
         }
 
-        /*if (values.size() > REMOVE_LIMIT) {
-            removeExtremeValues(values);
+        minValue = Collections.min(values);
+        if (min != null) {
+            minValue = min;
         }
-        if (errors.size() > REMOVE_LIMIT) {
-            removeExtremeValues(errors);
-        }*/
+        maxValue = Collections.max(values);
+        if (max != null) {
+            maxValue = max;
+        }
+        maxError = Collections.max(errors);
 
-        //if (minValue == 0) {
-        final double minValue = Collections.min(values);
-        //}
-        //if (maxValue == 0) {
-        final double maxValue = Collections.max(values);
-        //}
-
-        final double maxError = Collections.max(errors);
+        LOGGER.info("min value = " + minValue);
+        LOGGER.info("max value = " + maxValue);
+        LOGGER.info("max error = " + maxError);
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
@@ -181,32 +162,13 @@ public final class HammerProjection extends JWindow {
                 if (dir == null) {
                     continue;
                 }
-
-                final Color color;
-                if (f[x][y] == null) {
-                    color = Color.BLACK;
-                } else {
-                    final double value = MathTools.normalize(f[x][y].getValue(), minValue, maxValue);
-                    final double error;
-                    if (mode == Mode.WITH_ERRORS) {
-                        error = MathTools.normalize(f[x][y].getError(), 0, maxError);
-                    } else {
-                        error = 0;
-                    }
-
-                    if (value >= 0) {
-                        color = Color.getHSBColor(0, (float) value, (float) (1.0 - error));
-                    } else {
-                        color = Color.getHSBColor(240f / 360, (float) abs(value), (float) (1.0 - error));
-                    }
-                }
-
-                g.setColor(color);
+                g.setColor(color(f[x][y]));
                 g.drawLine(x, y, x, y);
             }
         }
 
         paintCircles(g);
+        paintRange(g);
     }
 
     public void setProcessor(@NotNull final DirectionProcessor processor) {
@@ -216,23 +178,83 @@ public final class HammerProjection extends JWindow {
     @SuppressWarnings("MagicNumber")
     private void paintCircles(@NotNull final Graphics g) {
         g.setColor(new Color(148, 167, 187));
-        for (double l = 0; l < 2 * PI; l += 2 * PI / MERIDIAN_COUNT) {
+        for (int i = 0; i < MERIDIAN_COUNT; i++) {
+            final double l = 2 * PI / MERIDIAN_COUNT * i;
             for (double b = -PI / 2; b < PI / 2; b += 0.001) {
                 final Point p = toWindow(toPlane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
+            final Point p = toWindow(toPlane(new Spheric(l, 0)));
+            g.drawString(round(toDegrees(l)) + "°", p.x + 2, p.y - 2);
         }
         for (double b = -PI / 2; b < PI / 2; b += 0.001) {
-            final Point p = toWindow(toPlane(new Spheric(PI - 0.00001, b)));
+            final Point p = toWindow(toPlane(new Spheric(PI + 0.000001, b)));
             g.drawLine(p.x, p.y, p.x, p.y);
         }
-
-        for (double b = -PI / 2; b < PI / 2; b += PI / PARALLEL_COUNT) {
+        for (int i = 0; i < PARALLEL_COUNT; i++) {
+            final double b = PI * (1.0 * i / PARALLEL_COUNT - 0.5);
             for (double l = 0; l < 2 * PI; l += 0.0001) {
                 final Point p = toWindow(toPlane(new Spheric(l, b)));
                 g.drawLine(p.x, p.y, p.x, p.y);
             }
+            final Point p = toWindow(toPlane(new Spheric(PI + 0.000001, b)));
+            if (b < 0) {
+                p.translate(0, g.getFontMetrics().getHeight() - 2);
+            } else {
+                p.translate(0, -2);
+            }
+            g.drawString(round(toDegrees(b)) + "°", p.x, p.y);
         }
+    }
+
+    private void paintRange(@NotNull final Graphics g) {
+        final String minText = TextUtils.format("%.4f", minValue);
+        final Font font = new Font("TimesRoman", Font.PLAIN, 12);
+        final FontMetrics metrics = g.getFontMetrics(font);
+        final int x1 = metrics.stringWidth(minText) / 2;
+        final int x2 = 280;
+        final int y1 = getHeight() - 10;
+        final int y2 = getHeight();
+        for (int x = x1; x <= x2; ++x) {
+            final Color color = color(Value.of(MathTools.interpolate(x1, minValue, x2, maxValue, x)));
+            g.setColor(color);
+            for (int y = y1; y <= y2; ++y) {
+                drawPoint(g, x, y);
+            }
+        }
+        g.setColor(Color.BLACK);
+        g.setFont(font);
+        g.drawString(minText, 0, y1 - 2);
+        final String zeroText = "0";
+        final int zeroX = (int) MathTools.interpolate(minValue, x1, maxValue, x2, 0) - metrics.stringWidth(zeroText) / 2;
+        if (metrics.stringWidth(minText) < zeroX) {
+            g.drawString(zeroText, zeroX, y1 - 2);
+        }
+        final String maxText = TextUtils.format("%.4f", maxValue);
+        g.drawString(maxText, x2 - metrics.stringWidth(maxText) / 2, y1 - 2);
+    }
+
+    @NotNull
+    private Color color(@Nullable final Value value) {
+        if (value == null) {
+            return Color.BLACK;
+        }
+        final double val = MathTools.shrink(value.getValue(), minValue, maxValue);
+        final double err;
+        if (mode == Mode.WITH_ERRORS) {
+            err = MathTools.shrink(value.getError(), 0, maxError);
+        } else {
+            err = 0;
+        }
+
+        if (val >= 0) {
+            return Color.getHSBColor(0, (float) val, (float) (1.0 - err));
+        }
+        return Color.getHSBColor(240f / 360, (float) abs(val), (float) (1.0 - err));
+    }
+
+    private void drawPoint(@NotNull final Graphics g, final int x, final int y) {
+        g.drawLine(x, y, x, y);
     }
 
     @NotNull
@@ -249,7 +271,7 @@ public final class HammerProjection extends JWindow {
     @NotNull
     public Point2D.Double fromWindow(@NotNull final Point p) {
         final double x = 2 * (p.getX() / getHeight() - 1);
-        final double y = 2 * (getHeight() - p.getY()) / getHeight() - 1;
+        final double y = 1 - 2 * p.getY() / getHeight();
 
         return new Point2D.Double(x, y);
     }

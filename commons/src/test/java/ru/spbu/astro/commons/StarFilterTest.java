@@ -30,12 +30,12 @@ public class StarFilterTest {
         assertEquals(41227, StarFilter.of(Stars.ALL).mainLumin().stars().length);
         assertEquals(20027, StarFilter.of(Stars.ALL).lumin(LuminosityClass.III).stars().length);
         assertEquals(21200, StarFilter.of(Stars.ALL).lumin(LuminosityClass.V).stars().length);
-        StarFilter.of(Stars.ALL)
+        assertEquals(2222, StarFilter.of(Stars.ALL)
                 .mainLumin()
-                .bv(Double.NEGATIVE_INFINITY, 0.7)
+                .bv(Double.NEGATIVE_INFINITY, 0.6)
                 .apply(Filter.by(
-                        "III as V",
-                        star -> -2.9876 * star.getBVColor().getValue() + 0.4526 * star.getAbsMag().getValue() + 1.3547 > 0)
-                ).lumin(LuminosityClass.III).stars();
+                                "III as V",
+                                star -> -2.9876 * star.getBVColor().getValue() + 0.4526 * star.getAbsMag().getValue() + 1.3547 > 0)
+                ).lumin(LuminosityClass.III).stars().length);
     }
 }
