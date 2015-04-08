@@ -47,10 +47,10 @@ public final class StarFilter {
     }
 
     @NotNull
-    public static Filter<Star> byBV(final double min, final double max) {
+    public static Filter<Star> byBV(final double minInclusive, final double maxExclusive) {
         return Filter.by(
-                format("%.1f < B-V < %.1f", min, max),
-                star -> min <= star.getBVColor().getValue() && star.getBVColor().getValue() <= max
+                format("%.1f < B-V < %.1f", minInclusive, maxExclusive),
+                star -> minInclusive <= star.getBVColor().getValue() && star.getBVColor().getValue() < maxExclusive
         );
     }
 
@@ -75,12 +75,12 @@ public final class StarFilter {
     }
 
     @NotNull
-    public StarFilter leftBVColor() {
+    public StarFilter leftBV() {
         return bv(Double.NEGATIVE_INFINITY, 0.6);
     }
 
     @NotNull
-    public StarFilter rightBVColor() {
+    public StarFilter rightBV() {
         return bv(0.6, Double.POSITIVE_INFINITY);
     }
 

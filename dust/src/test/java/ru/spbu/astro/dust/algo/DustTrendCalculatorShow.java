@@ -41,12 +41,12 @@ public class DustTrendCalculatorShow {
 
     @Test
     public void leftShow() {
-        show(StarFilter.of(DustStars.ALL).bv(Double.NEGATIVE_INFINITY, 0.6).stars());
+        show(StarFilter.of(DustStars.ALL).leftBV().stars());
     }
 
     @Test
     public void rightShow() {
-        show(StarFilter.of(DustStars.ALL).bv(0.6, Double.POSITIVE_INFINITY).stars());
+        show(StarFilter.of(DustStars.ALL).rightBV().stars());
     }
 
 
