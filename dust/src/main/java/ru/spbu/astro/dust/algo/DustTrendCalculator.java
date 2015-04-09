@@ -7,8 +7,8 @@ import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.util.Value;
-import ru.spbu.astro.util.ml.RansacLinearRegression;
 import ru.spbu.astro.util.ml.SimpleRegression;
+import ru.spbu.astro.util.ml.TheilSenWeightedRegression;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -49,7 +49,7 @@ public final class DustTrendCalculator {
         final Map<Integer, Star> id2star = Stars.map(stars);
 
         for (int pix = 0; pix < rings.length; pix++) {
-            final SimpleRegression regression = new RansacLinearRegression(includeIntercept);
+            final SimpleRegression regression = new TheilSenWeightedRegression();
             for (final Star star : rings[pix]) {
                 regression.add(star.getId(), star.getR(), star.getExtinction());
             }
