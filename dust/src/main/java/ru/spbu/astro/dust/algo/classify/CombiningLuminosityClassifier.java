@@ -21,6 +21,6 @@ public class CombiningLuminosityClassifier implements LuminosityClassifier {
     @NotNull
     @Override
     public LuminosityClass classify(@NotNull final Star star) {
-        return star.getBVColor().getValue() < 0.6 ? LuminosityClass.III_V : rightClassifier.classify(star);
+        return star.getBVColor().val() < 0.6 ? LuminosityClass.III_V : rightClassifier.classify(star);
     }
 }

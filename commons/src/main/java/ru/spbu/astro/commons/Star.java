@@ -31,12 +31,12 @@ public final class Star {
 
     @NotNull
     public Vector3D getCartesian() {
-        return dir.getVector().scalarMultiply(getR().getValue());
+        return dir.getVector().scalarMultiply(getR().val());
     }
 
     @NotNull
     public Value getR() {
-        return Value.of(1000 / parallax.getValue(), 1000 * parallax.getError() / pow(parallax.getValue(), 2));
+        return Value.of(1000 / parallax.val(), 1000 * parallax.err() / pow(parallax.val(), 2));
     }
 
     @NotNull
@@ -52,8 +52,8 @@ public final class Star {
     @SuppressWarnings("MagicNumber")
     public Value getAbsMag() {
         return Value.of(
-                vMag + 5 * log10(parallax.getValue()) - 10,
-                2.5 * log10((1 + parallax.getRelativeError()) / (1 - parallax.getRelativeError()))
+                vMag + 5 * log10(parallax.val()) - 10,
+                2.5 * log10((1 + parallax.relErr()) / (1 - parallax.relErr()))
         );
     }
 
@@ -90,7 +90,7 @@ public final class Star {
     public String toString() {
         return String.format(
                 "(#%d: l = %.3f, b = %.3f, pi = %.3f, dpi = %.3f)",
-                id, dir.getL(), dir.getB(), parallax.getValue(), parallax.getError()
+                id, dir.getL(), dir.getB(), parallax.val(), parallax.err()
         );
     }
 

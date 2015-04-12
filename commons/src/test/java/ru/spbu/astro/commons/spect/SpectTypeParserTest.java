@@ -5,8 +5,10 @@ import ru.spbu.astro.util.Value;
 
 import static org.junit.Assert.*;
 import static ru.spbu.astro.commons.spect.LuminosityClass.III;
+import static ru.spbu.astro.commons.spect.LuminosityClass.V;
 
-public class SpectTypeParserTest {
+@SuppressWarnings("MagicNumber")
+public final class SpectTypeParserTest {
     private static final double EPS = 1e-8;
 
     @Test
@@ -16,7 +18,7 @@ public class SpectTypeParserTest {
         assertEquals(III, type.getLumin());
         final Value bv = type.toBV();
         assertNotNull(bv);
-        assertEquals(1.450, bv.getValue(), EPS);
+        assertEquals(1.450, bv.val(), EPS);
     }
 
     @Test
@@ -46,5 +48,12 @@ public class SpectTypeParserTest {
         final SpectType type = SpectTypeParser.parse("B3/B4V");
         assertNotNull(type);
         assertEquals("B3/B4V", type.toString());
+    }
+
+    @Test
+    public void testIVV() throws Exception {
+        final SpectType type = SpectTypeParser.parse("F5IV/V");
+        assertNotNull(type);
+        assertEquals(V, type.getLumin());
     }
 }

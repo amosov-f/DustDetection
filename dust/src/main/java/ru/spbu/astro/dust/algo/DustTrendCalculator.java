@@ -4,61 +4,60 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.Star;
-import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.healpix.Healpix;
+import ru.spbu.astro.util.MathTools;
+import ru.spbu.astro.util.Point;
 import ru.spbu.astro.util.Value;
-import ru.spbu.astro.util.ml.SimpleRegression;
-import ru.spbu.astro.util.ml.TheilSenWeightedRegression;
+import ru.spbu.astro.util.ml.RansacLinearRegression;
+import ru.spbu.astro.util.ml.SlopeLinearRegression;
+import ru.spbu.astro.util.ml.WeightedMedianRegression;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public final class DustTrendCalculator {
     private static final Logger LOGGER = Logger.getLogger(DustTrendCalculator.class.getName());
 
+    private static final int MIN_FOR_TREND = 3;
+
+    @NotNull
+    private final Star[][] rings;
+
     @NotNull
     private final Value[] slopes;
     @NotNull
-    private final Value[] intercepts;
+    private final Value[] averages;
 
     @NotNull
     private final Healpix healpix;
 
-    @NotNull
-    private final Star[][] inliers;
-    @NotNull
-    private final Star[][] outliers;
-
     public DustTrendCalculator(@NotNull final Star[] stars, final int nSide) {
-        this(stars, nSide, false);
-    }
-
-    public DustTrendCalculator(@NotNull final Star[] stars, final int nSide, final boolean includeIntercept) {
         LOGGER.info("#stars = " + stars.length);
 
         healpix = new Healpix(nSide);
-        inliers = new Star[healpix.getNPix()][];
-        outliers = new Star[healpix.getNPix()][];
 
-        final Star[][] rings = healpix.split(stars);
+        rings = healpix.split(stars);
 
         slopes = new Value[rings.length];
-        intercepts = new Value[rings.length];
-
-        final Map<Integer, Star> id2star = Stars.map(stars);
+        averages = new Value[rings.length];
 
         for (int pix = 0; pix < rings.length; pix++) {
-            final SimpleRegression regression = new TheilSenWeightedRegression();
-            for (final Star star : rings[pix]) {
-                regression.add(star.getId(), star.getR(), star.getExtinction());
+            final Star[] ring = rings[pix];
+            if (ring.length == 0) {
+                continue;
             }
-            if (regression.train()) {
-                slopes[pix] = regression.getSlope();
-                intercepts[pix] = regression.getIntercept();
-                inliers[pix] = Arrays.stream(regression.getInliers()).mapToObj(id2star::get).toArray(Star[]::new);
-                outliers[pix] = Arrays.stream(regression.getOutliers()).mapToObj(id2star::get).toArray(Star[]::new);
+            averages[pix] = MathTools.average(Arrays.stream(ring).mapToDouble(star -> star.getExtinction().val()).toArray());
+            if (ring.length < MIN_FOR_TREND) {
+                continue;
             }
+//            final SlopeLinearRegression regression = RansacLinearRegression.train(
+//                    Arrays.stream(ring).collect(Collectors.toMap(Star::getId, DustTrendCalculator::point)), false
+//            );
+            final SlopeLinearRegression regression = new WeightedMedianRegression(
+                    Arrays.stream(ring).map(DustTrendCalculator::point).toArray(Point[]::new)
+            );
+            slopes[pix] = regression.getSlope();
         }
     }
 
@@ -72,18 +71,18 @@ public final class DustTrendCalculator {
     }
 
     @NotNull
-    public Value[] getIntercepts() {
-        return intercepts;
+    public Value[] getAverages() {
+        return averages;
     }
 
     @Nullable
     public Star[] getInlierStars(@NotNull final Spheric dir) {
-        return inliers[healpix.getPix(dir)];
+        return rings[healpix.getPix(dir)];
     }
 
     @Nullable
     public Star[] getOutlierStars(@NotNull final Spheric dir) {
-        return outliers[healpix.getPix(dir)];
+        return rings[healpix.getPix(dir)];
     }
 
     @Nullable
@@ -91,30 +90,36 @@ public final class DustTrendCalculator {
         return slopes[healpix.getPix(dir)];
     }
 
-    @Nullable
-    public Value getIntercept(@NotNull final Spheric dir) {
-        return intercepts[healpix.getPix(dir)];
+    @NotNull
+    private static Point point(@NotNull final Star star) {
+        return new Point(star.getR(), star.getExtinction());
     }
 
     @NotNull
     @Override
     public String toString() {
         double dr = 0;
-        for (final Star[] ring : inliers) {
+        for (final Star[] ring : rings) {
             for (final Star star : ring) {
-                dr = Math.max(dr, star.getR().getRelativeError());
+                dr = Math.max(dr, star.getR().relErr());
             }
         }
 
         final StringBuilder sb = new StringBuilder();
-        sb.append("dr <= ").append((int) (100 * dr)).append("%, n_side = ").append(healpix.getNSide()).append("\n");
-        sb.append("№\tl\t\t\tb\t\t\tk\t\tsigma_k\tn\n");
-        for (int i = 0; i < inliers.length; ++i) {
-            final Spheric dir = healpix.getCenter(i);
-            final Value k = slopes[i];
+        sb.append("n_side = ").append(healpix.getNSide()).append("\n");
+        sb.append("№\tl\t\t\tb\t\t\tn\tk\t\tmad_k\tk(mnk)\tsigma_k\tave\t\tsigma_ave\n");
+        for (int pix = 0; pix < rings.length; ++pix) {
+            final Spheric dir = healpix.getCenter(pix);
+            final Value k = slopes[pix];
+            final Value ave = averages[pix];
+            final Star[] ring = rings[pix];
+            final SlopeLinearRegression regression = RansacLinearRegression.train(
+                    Arrays.stream(ring).collect(Collectors.toMap(Star::getId, DustTrendCalculator::point)), false
+            );
+            final Value k1 = regression.getSlope();
             sb.append(String.format(
-                    "%d\t%f\t%f\t%.2f\t%.2f\t%d\n",
-                    i, dir.getL(), dir.getB(), 1000 * k.getValue(), 1000 * k.getError(), inliers[i].length
+                    "%d\t%f\t%f\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
+                    pix, dir.getL(), dir.getB(), rings[pix].length, 1000 * k.val(), 1000 * k.err(), 1000 * k1.val(), 1000 * k1.err(), ave.val(), ave.err()
             ));
         }
         return sb.toString();

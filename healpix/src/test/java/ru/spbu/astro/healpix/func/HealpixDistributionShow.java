@@ -32,7 +32,12 @@ public class HealpixDistributionShow {
     public void hasLuminShow() {
         show(StarFilter.HAS_LUMIN);
     }
-    
+
+    @Test
+    public void showMainLumin() throws Exception {
+        show(StarFilter.MAIN_LUMIN);
+    }
+
     private void bvShow(final double min, final double max) {
         show(StarFilter.byBV(min, max).and(StarFilter.HAS_LUMIN.negate()));
     }

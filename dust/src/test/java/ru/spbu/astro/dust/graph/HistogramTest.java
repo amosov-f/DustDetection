@@ -22,7 +22,7 @@ public class HistogramTest {
         new Histogram<>(
                 new CountHist(
                         "Относительная ошибка в расстоянии", 
-                        star -> star.getR().getRelativeError(), 
+                        star -> star.getR().relErr(),
                         new Split(0.1)).histShares(Stars.ALL),
                 "Относительная ошибка в расстоянии"
         ).show();
@@ -33,8 +33,8 @@ public class HistogramTest {
         new Histogram<>(
                 new AverageHist(
                         "Расстояние", 
-                        star -> star.getR().getValue(), 
-                        star -> star.getR().getRelativeError(), 
+                        star -> star.getR().val(),
+                        star -> star.getR().relErr(),
                         new Split(0, 1000, 10)
                 ).hist(Stars.ALL),
                 "Расстояние [пк]", 

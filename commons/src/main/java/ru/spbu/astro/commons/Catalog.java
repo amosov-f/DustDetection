@@ -17,7 +17,7 @@ public final class Catalog {
     private static final Logger LOGGER = Logger.getLogger(Catalog.class.getName());
 
     @NotNull
-    final Map<Integer, Row> id2row = new HashMap<>();
+    final Map<Integer, Row> id2row = new TreeMap<>();
 
     Catalog() {
     }

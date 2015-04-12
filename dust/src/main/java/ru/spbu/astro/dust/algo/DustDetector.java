@@ -8,10 +8,10 @@ import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.healpix.func.HealpixCounter;
+import ru.spbu.astro.util.Point;
 import ru.spbu.astro.util.PointsDistribution;
-import ru.spbu.astro.util.Value;
+import ru.spbu.astro.util.ml.LinearRegression;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
-import ru.spbu.astro.util.ml.SimpleRegression;
 import weka.core.*;
 import weka.core.neighboursearch.KDTree;
 import weka.core.neighboursearch.NearestNeighbourSearch;
@@ -19,6 +19,7 @@ import weka.core.neighboursearch.NearestNeighbourSearch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * User: amosov-f
@@ -53,7 +54,7 @@ public final class DustDetector {
         for (final Star star : stars) {
             final Vector3D p = star.getCartesian();
             points.add(p);
-            instances.add(instance(p, star.getExtinction().getValue(), instances));
+            instances.add(instance(p, star.getExtinction().val(), instances));
         }
 
         final NearestNeighbourSearch search;
@@ -91,14 +92,14 @@ public final class DustDetector {
                 continue;
             }
 
-            final SimpleRegression regression = new RansacLinearRegression(true);
-            for (final Instance instance : knn) {
-                regression.add(instance.hashCode(), Value.of(point(instance).getNorm()), Value.of(instance.value(3)));
-            }
-            if (!regression.train()) {
+            if (knn.size() < 3) {
                 continue;
             }
-            final double slope = regression.getSlope().getValue();
+            final LinearRegression regression = RansacLinearRegression.train(
+                    knn.stream().collect(Collectors.toMap(Object::hashCode, x -> new Point(point(x).getNorm(), x.value(3)))),
+                    false
+            );
+            final double slope = regression.getSlope().val();
             if (slope > THRESHOLD) {
                 dust.add(p);
             }

@@ -43,11 +43,12 @@ public class LuminosityClassifierShow {
         final XYSeriesCollection seriesCollection = new XYSeriesCollection();
 //        seriesCollection.addSeries(create("Разделяющая прямая", -2.8388, 0.5055, 1.0056)); // all small errors
 //        seriesCollection.addSeries(create("Разделяющая прямая", -3.9761, 0.668, 1.377)); // > 0.6
-        seriesCollection.addSeries(create("Разделяющая прямая", -2.9876, 0.4526, 1.3547)); // all
-//        seriesCollection.addSeries(create("Разделяющая прямая", classifier.getA(), classifier.getB(), classifier.getC()));
+//        seriesCollection.addSeries(create("Разделяющая прямая", -2.9876, 0.4526, 1.3547)); // all
+        seriesCollection.addSeries(create("Разделяющая прямая", -3.0752, 0.4485, 1.4793));    // all new
+//        seriesCollection.addSeries(create("Разделяющая прямая (new)", classifier.getA(), classifier.getB(), classifier.getC()));
         plot.setDataset(1, seriesCollection);
         plot.setDataset(2, theory());
-        plot.setRenderer(1, samplingRenderer(1));
+        plot.setRenderer(1, samplingRenderer(seriesCollection.getSeriesCount()));
         final XYItemRenderer renderer = samplingRenderer(2);
         renderer.setSeriesPaint(0, Color.CYAN);
         plot.setRenderer(2, renderer);

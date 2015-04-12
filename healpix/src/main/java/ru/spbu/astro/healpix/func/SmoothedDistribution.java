@@ -20,7 +20,7 @@ public final class SmoothedDistribution extends HealpixDistribution {
             Arrays.setAll(
                     copy,
                     pix -> Value.of(Arrays.stream(healpix.getNeighbours(pix))
-                            .mapToDouble(neib -> values[neib].getValue())
+                            .mapToDouble(neib -> values[neib].val())
                             .average()
                             .getAsDouble())
             );

@@ -69,14 +69,20 @@ public final class SpectType {
 
     @Nullable
     public LuminosityClass getLumin() {
-        if (!hasLumin()) {
-            return null;
+        for (final LuminosityClass mainLumin : LuminosityClass.MAIN) {
+            if (lumins.contains(mainLumin)) {
+                return mainLumin;
+            }
         }
-        return lumins.get(0);
+        return hasLumin() ? lumins.get(0) : null;
     }
 
     public boolean hasLumin() {
         return !lumins.isEmpty();
+    }
+
+    public boolean hasOneLumin() {
+        return lumins.size() == 1;
     }
 
     public SpectType setLumin(@NotNull final LuminosityClass lumin) {

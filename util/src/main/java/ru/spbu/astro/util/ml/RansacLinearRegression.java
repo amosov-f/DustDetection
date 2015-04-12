@@ -1,14 +1,16 @@
 package ru.spbu.astro.util.ml;
 
 import com.google.common.primitives.Ints;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.util.ArrayTools;
+import ru.spbu.astro.util.Point;
 import ru.spbu.astro.util.Value;
+import ru.spbu.astro.util.ml.target.MeanSquareError;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,50 +18,42 @@ import java.util.Map;
  * Date: 16.11.14
  * Time: 3:06
  */
-public final class RansacLinearRegression implements SimpleRegression {
+public final class RansacLinearRegression implements LinearRegression {
     private static final double OUTLIERS_PART = 0.1;
-    private static final int MIN_FOR_TREND = 3;
 
     @NotNull
-    private final org.apache.commons.math3.stat.regression.SimpleRegression regression;
+    private final SimpleRegression regression;
     @NotNull
-    private final Map<Integer, Vector2D> points = new HashMap<>();
+    private final int[] inliers;
+    @NotNull
+    private final int[] outliers;
 
-    private int[] inliers;
-    private int[] outliers;
-
-    public RansacLinearRegression(final boolean includeIntercept) {
-        regression = new org.apache.commons.math3.stat.regression.SimpleRegression(includeIntercept);
+    public RansacLinearRegression(@NotNull final SimpleRegression regression, @NotNull final int[] inliers, @NotNull final int[] outliers) {
+        this.regression = regression;
+        this.inliers = inliers;
+        this.outliers = outliers;
     }
 
-    @Override
-    public void add(final int id, @NotNull final Value x, @NotNull final Value y) {
-        points.put(id, new Vector2D(x.getValue(), y.getValue()));
-    }
-
-    @Override
-    public boolean train() {
+    @NotNull
+    public static RansacLinearRegression train(@NotNull final Map<Integer, Point> points, final boolean includeIntercept) {
         final int[] ids = Ints.toArray(points.keySet());
-        if (!train(ids)) {
-            return false;
+        final SimpleRegression regression = new SimpleRegression(includeIntercept);
+        for (final int id : points.keySet()) {
+            regression.addData(points.get(id).x().val(), points.get(id).y().val());
         }
-        ArrayTools.sort(ids, Comparator.comparingDouble(id -> target(points.get(id))));
+        regression.regress();
+        ArrayTools.sort(ids, Comparator.comparingDouble(id -> new MeanSquareError().value(
+                        new RansacLinearRegression(regression, ids, ArrayUtils.EMPTY_INT_ARRAY),
+                        points.get(id))
+        ));
         final int split = (int) ((1 - OUTLIERS_PART) * ids.length);
-        inliers = Arrays.copyOf(ids, split);
-        outliers = Arrays.copyOfRange(ids, split, ids.length);
-        return train(inliers);
-    }
-
-    @NotNull
-    @Override
-    public int[] getInliers() {
-        return inliers;
-    }
-
-    @NotNull
-    @Override
-    public int[] getOutliers() {
-        return outliers;
+        final int[] inliers = Arrays.copyOf(ids, split);
+        final int[] outliers = Arrays.copyOfRange(ids, split, ids.length);
+        regression.clear();
+        for (final int id : inliers) {
+            regression.addData(points.get(id).x().val(), points.get(id).y().val());
+        }
+        return new RansacLinearRegression(regression, inliers, outliers);
     }
 
     @NotNull
@@ -74,19 +68,13 @@ public final class RansacLinearRegression implements SimpleRegression {
         return Value.of(regression.getIntercept(), regression.getInterceptStdErr());
     }
 
-    private double target(@NotNull final Vector2D p) {
-        return Math.pow(regression.predict(p.getX()) - p.getY(), 2);
+    @NotNull
+    public int[] getInliers() {
+        return inliers;
     }
 
-    private boolean train(@NotNull final int[] ids) {
-        if (ids.length < MIN_FOR_TREND) {
-            return false;
-        }
-        regression.clear();
-        for (final int id : ids) {
-            regression.addData(points.get(id).getX(), points.get(id).getY());
-        }
-        regression.regress();
-        return true;
+    @NotNull
+    public int[] getOutliers() {
+        return outliers;
     }
 }

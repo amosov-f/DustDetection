@@ -19,7 +19,7 @@ public class NegativeExtinctionHistogramShow {
     public void histParallaxRelativeError() {
         new NegativeExtinctionHistogram(
                 DustStars.ALL,
-                new CountHist("Относительная ошибка в расстоянии", star -> star.getR().getRelativeError(), new Split(0.1))
+                new CountHist("Относительная ошибка в расстоянии", star -> star.getR().relErr(), new Split(0.1))
         ).show();
     }
 
@@ -27,7 +27,7 @@ public class NegativeExtinctionHistogramShow {
     public void histBVError() {
         new NegativeExtinctionHistogram(
                 DustStars.ALL,
-                new CountHist("Ошибка B-V", star -> star.getBVColor().getValue(), new Split(0, 2.3, 0.2))
+                new CountHist("Ошибка B-V", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
         ).show();
     }
 
@@ -59,7 +59,7 @@ public class NegativeExtinctionHistogramShow {
                         .lumin(III)
                         .spectType(65, 69)
                         .stars(),
-                new CountHist("Ошибка B-V у звезд III, M5-9", star -> star.getBVColor().getValue(), new Split(0, 2.3, 0.2))
+                new CountHist("Ошибка B-V у звезд III, M5-9", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
         ).show();
     }
 
@@ -69,7 +69,7 @@ public class NegativeExtinctionHistogramShow {
                 StarFilter.of(DustStars.ALL)
                         .lumin(III)
                         .stars(),
-                new CountHist("Ошибка B-V у звезд III", star -> star.getBVColor().getValue(), new Split(0, 2.3, 0.2))
+                new CountHist("Ошибка B-V у звезд III", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
         ).show();
     }
 
@@ -78,7 +78,7 @@ public class NegativeExtinctionHistogramShow {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.ALL)
                         .lumin(III).stars(),
-                new CountHist("Относительная ошибка в расстоянии у III", star -> star.getR().getRelativeError(), new Split(0.1))
+                new CountHist("Относительная ошибка в расстоянии у III", star -> star.getR().relErr(), new Split(0.1))
         ).show();
     }
 
@@ -89,7 +89,7 @@ public class NegativeExtinctionHistogramShow {
                         .lumin(III)
                         .spectType(65, 69)
                         .stars(),
-                new CountHist("Относительная ошибка в расстоянии у звезд III, M5-9", star -> star.getR().getRelativeError(), new Split(0.1))
+                new CountHist("Относительная ошибка в расстоянии у звезд III, M5-9", star -> star.getR().relErr(), new Split(0.1))
         ).show();
     }
 

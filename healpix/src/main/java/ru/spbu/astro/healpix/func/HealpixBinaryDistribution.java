@@ -18,7 +18,7 @@ public final class HealpixBinaryDistribution extends HealpixDistribution {
     @NotNull
     private static Value[] binaryValues(@NotNull final Value[] values, final double threshold) {
         final Value[] binaryValues = new Value[values.length];
-        Arrays.setAll(binaryValues, i -> values[i] != null ? values[i].getValue() >= threshold ? Value.ONE : Value.ZERO : null);
+        Arrays.setAll(binaryValues, i -> values[i] != null ? values[i].val() >= threshold ? Value.ONE : Value.ZERO : null);
         return binaryValues;
     }
 }

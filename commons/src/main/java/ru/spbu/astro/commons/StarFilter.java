@@ -43,14 +43,17 @@ public final class StarFilter {
 
     @NotNull
     public static Filter<Star> byLumin(@NotNull final LuminosityClass... lumins) {
-        return Filter.by(Arrays.toString(lumins), star -> contains(lumins, star.getSpectType().getLumin()));
+        return Filter.by(
+                Arrays.toString(lumins),
+                star -> star.getSpectType().hasOneLumin() && contains(lumins, star.getSpectType().getLumin())
+        );
     }
 
     @NotNull
     public static Filter<Star> byBV(final double minInclusive, final double maxExclusive) {
         return Filter.by(
-                format("%.1f < B-V < %.1f", minInclusive, maxExclusive),
-                star -> minInclusive <= star.getBVColor().getValue() && star.getBVColor().getValue() < maxExclusive
+                format("%.1f <= B-V < %.1f", minInclusive, maxExclusive),
+                star -> minInclusive <= star.getBVColor().val() && star.getBVColor().val() < maxExclusive
         );
     }
 
@@ -87,31 +90,31 @@ public final class StarFilter {
     @NotNull
     public StarFilter absMag(final double min, final double max) {
         return apply(format("%.1f < M < %.1f]", min, max), star -> {
-            final double absoluteMagnitude = star.getAbsMag().getValue();
+            final double absoluteMagnitude = star.getAbsMag().val();
             return min <= absoluteMagnitude && absoluteMagnitude <= max;
         });
     }
 
     @NotNull
     public StarFilter absMagErr(final double lim) {
-        return apply(format("dM < %.2f", lim), star -> star.getAbsMag().getError() < lim);
+        return apply(format("dM < %.2f", lim), star -> star.getAbsMag().err() < lim);
     }
 
     @NotNull
     public StarFilter bvErr(final double lim) {
-        return apply(format("dB-V < %.2f", lim), star -> star.getBVColor().getError() < lim);
+        return apply(format("dB-V < %.2f", lim), star -> star.getBVColor().err() < lim);
     }
 
     @NotNull
     public StarFilter piRelErr(final double lim) {
-        return apply(format("dPi < %.1f", lim), star -> star.getParallax().getRelativeError() < lim);
+        return apply(format("dPi < %.1f", lim), star -> star.getParallax().relErr() < lim);
     }
 
     @NotNull
     public StarFilter r(final double r1, final double r2) {
         return apply(
                 format("%.0f < r < %.0f", r1, r2),
-                star -> r1 <= star.getR().getValue() && star.getR().getValue() <= r2
+                star -> r1 <= star.getR().val() && star.getR().val() <= r2
         );
     }
 

@@ -28,16 +28,16 @@ public final class Value implements Comparable<Value> {
         return new Value(value, error);
     }
 
-    public double getValue() {
+    public double val() {
         return value;
     }
 
-    public double getError() {
+    public double err() {
         return error;
     }
 
-    public double getRelativeError() {
-        return Math.abs(getError() / getValue());
+    public double relErr() {
+        return Math.abs(err() / val());
     }
 
     public double plusNSigma(final int n) {
@@ -46,12 +46,12 @@ public final class Value implements Comparable<Value> {
 
     @NotNull
     public Value add(@NotNull final Value value) {
-        return of(getValue() + value.getValue(), sqrt(pow(getError(), 2) + pow(value.getError(), 2)));
+        return of(val() + value.val(), sqrt(pow(err(), 2) + pow(value.err(), 2)));
     }
 
     @NotNull
     public Value negate() {
-        return of(-getValue(), getError());
+        return of(-val(), err());
     }
 
     @NotNull
@@ -61,7 +61,7 @@ public final class Value implements Comparable<Value> {
 
     @Override
     public int compareTo(@NotNull final Value value) {
-        return new Double(getValue()).compareTo(value.getValue());
+        return new Double(val()).compareTo(value.val());
     }
 
     @Override
@@ -88,6 +88,6 @@ public final class Value implements Comparable<Value> {
     @NotNull
     @Override
     public String toString() {
-        return String.format("%.3f ± %d%%", getValue(), (int) Math.abs(100 * getError() / getValue()));
+        return String.format("%.3f ± %d%%", val(), (int) Math.abs(100 * err() / val()));
     }
 }

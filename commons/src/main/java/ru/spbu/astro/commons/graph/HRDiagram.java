@@ -10,14 +10,12 @@ import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.commons.Star;
-import ru.spbu.astro.commons.StarFilter;
-import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 
 public final class HRDiagram {
@@ -34,7 +32,7 @@ public final class HRDiagram {
     private final ChartFrame frame;
 
     public HRDiagram(@NotNull final Star[] stars) {
-        final EnumMap<LuminosityClass, List<Star>> lumin2stars = new EnumMap<>(LuminosityClass.class);
+        final Map<LuminosityClass, List<Star>> lumin2stars = new EnumMap<>(LuminosityClass.class);
         for (final Star star : stars) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
             if (lumin != null) {
@@ -49,10 +47,10 @@ public final class HRDiagram {
             final XYIntervalSeries series = new XYIntervalSeries(lumin);
 
             for (final Star star : luminStars) {
-                final double bv = star.getBVColor().getValue();
-                final double dbv = star.getBVColor().getError();
-                final double M = star.getAbsMag().getValue();
-                final double dM = star.getAbsMag().getError();
+                final double bv = star.getBVColor().val();
+                final double dbv = star.getBVColor().err();
+                final double M = star.getAbsMag().val();
+                final double dM = star.getAbsMag().err();
 
                 if (Math.random() < ERROR_VIEW_SHARE) {
                     series.add(bv, bv - dbv, bv + dbv, M, M - dM, M + dM);
@@ -108,19 +106,5 @@ public final class HRDiagram {
     
     public void show() {
         frame.setVisible(true);
-    }
-
-    public static void main(@NotNull final String[] args) throws IOException {
-        /*catalogue = new StarSelector(catalogue)
-                .selectByBVColor(1.525, 1.95)
-                .selectByAbsoluteMagnitude(4.5, 9.5)
-                .getCatalogue();*/
-
-        System.out.println(SCALE * 0.01);
-
-        new HRDiagram(StarFilter.of(Stars.ALL)
-                .mainLumin()
-                .absMagErr(SCALE * 0.01)
-                .bvErr(0.01).stars()).show();
     }
 }

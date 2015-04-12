@@ -112,7 +112,7 @@ public class OutlierHistogram {
             final Value ext = star.getExtinction();
             str.append(String.format(
                     "%d\t%s\t%.2f\t%.2f\n",
-                    star.getId(), star.getSpectType().toString(), ext.getValue(), star.getExtinction().getError()
+                    star.getId(), star.getSpectType().toString(), ext.val(), star.getExtinction().err()
             ));
         }
         return str.toString();

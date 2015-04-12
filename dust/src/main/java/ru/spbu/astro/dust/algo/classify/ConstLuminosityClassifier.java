@@ -33,7 +33,7 @@ public class ConstLuminosityClassifier implements LuminosityClassifier {
         @NotNull
         @Override
         public LuminosityClass classify(@NotNull final Star star) {
-            if (star.getBVColor().getValue() > DELIMETER) {
+            if (star.getBVColor().val() > DELIMETER) {
                 throw new UnsupportedOperationException();
             }
             return super.classify(star);

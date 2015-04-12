@@ -88,8 +88,8 @@ final class SVMLuminosityClassifier implements LuminosityClassifier {
         return new Instances(name, ATTRIBUTES, stars.length) {{
             setClassIndex(ATTRIBUTES.size() - 1);
             addAll(Arrays.stream(stars).map(star -> new DenseInstance(ATTRIBUTES.size()) {{
-                setValue(ATTRIBUTES.get(0), star.getBVColor().getValue());
-                setValue(ATTRIBUTES.get(1), star.getAbsMag().getValue());
+                setValue(ATTRIBUTES.get(0), star.getBVColor().val());
+                setValue(ATTRIBUTES.get(1), star.getAbsMag().val());
                 setValue(ATTRIBUTES.get(ATTRIBUTES.size() - 1), ArrayUtils.indexOf(LuminosityClass.MAIN, star.getSpectType().getLumin()));
             }}).collect(Collectors.toList()));
         }};

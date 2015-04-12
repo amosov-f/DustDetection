@@ -132,11 +132,11 @@ public final class HammerProjection extends JWindow {
                 f[x][y] = distribution.get(dir);
 
                 if (f[x][y] != null) {
-                    if (!Double.isNaN(f[x][y].getValue()) && !Double.isInfinite(f[x][y].getValue())) {
-                        values.add(f[x][y].getValue());
+                    if (!Double.isNaN(f[x][y].val()) && !Double.isInfinite(f[x][y].val())) {
+                        values.add(f[x][y].val());
                     }
-                    if (!Double.isNaN(f[x][y].getError()) && !Double.isInfinite(f[x][y].getError())) {
-                        errors.add(f[x][y].getError());
+                    if (!Double.isNaN(f[x][y].err()) && !Double.isInfinite(f[x][y].err())) {
+                        errors.add(f[x][y].err());
                     }
                 }
             }
@@ -239,10 +239,10 @@ public final class HammerProjection extends JWindow {
         if (value == null) {
             return Color.BLACK;
         }
-        final double val = MathTools.shrink(value.getValue(), minValue, maxValue);
+        final double val = MathTools.shrink(value.val(), minValue, maxValue);
         final double err;
         if (mode == Mode.WITH_ERRORS) {
-            err = MathTools.shrink(value.getError(), 0, maxError);
+            err = MathTools.shrink(value.err(), 0, maxError);
         } else {
             err = 0;
         }

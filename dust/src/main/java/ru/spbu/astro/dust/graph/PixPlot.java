@@ -49,16 +49,10 @@ public final class PixPlot {
         }
 
         final Value slope = dustTrendCalculator.getSlope(dir);
-        final Value intercept = dustTrendCalculator.getIntercept(dir);
         if (slope == null) {
             return;
         }
-        if (intercept == null) {
-            return;
-        }
 
-        final double a = slope.getValue();
-        final double b = intercept.getValue();
 
         final Star[] stars = ArrayUtils.addAll(baseStars, outlierStars);
 
@@ -74,17 +68,29 @@ public final class PixPlot {
                 new XYErrorRenderer()
         );
 
-        final double r1 = b != 0 ? Arrays.stream(stars).mapToDouble(s -> s.getR().plusNSigma(-1)).min().getAsDouble() : 0;
-        final double r2 = Arrays.stream(stars).mapToDouble(s -> s.getR().plusNSigma(1)).max().getAsDouble();
+        final double r = Arrays.stream(stars).mapToDouble(s -> s.getR().val()).max().getAsDouble();
 
-        final XYSeries trendSeries = new XYSeries("Тренд");
-        trendSeries.add(r1, a * r1 + b);
-        trendSeries.add(r2, a * r2 + b);
+        final XYSeries trend = new XYSeries("Тренд");
+        trend.add(0, 0);
+        trend.add(r, slope.val() * r);
 
-        plot.setDataset(1, new XYSeriesCollection(trendSeries));
+        final XYSeries maxTrend = new XYSeries("Тренд + sigma");
+        maxTrend.add(0, 0);
+        maxTrend.add(r, slope.plusNSigma(1) * r);
+
+        final XYSeries minTrend = new XYSeries("Тренд - sigma");
+        minTrend.add(0, 0);
+        minTrend.add(r, slope.plusNSigma(-1) * r);
+
+        final XYSeriesCollection seriesCollection = new XYSeriesCollection();
+        seriesCollection.addSeries(trend);
+        seriesCollection.addSeries(minTrend);
+        seriesCollection.addSeries(maxTrend);
+
+        plot.setDataset(1, seriesCollection);
 
         final XYItemRenderer renderer = new SamplingXYLineRenderer();
-        renderer.setSeriesStroke(0, new BasicStroke(3));
+        renderer.setStroke(new BasicStroke(3));
         plot.setRenderer(1, renderer);
 
         plot.setRangeZeroBaselineVisible(true);
@@ -110,12 +116,12 @@ public final class PixPlot {
         final XYIntervalSeries series = new XYIntervalSeries(name);
         for (final Star s : stars) {
             series.add(
-                    s.getR().getValue(),
-                    s.getR().getValue() - s.getR().getError(),
-                    s.getR().getValue() + s.getR().getError(),
-                    s.getExtinction().getValue(),
-                    s.getExtinction().getValue() - s.getExtinction().getError(),
-                    s.getExtinction().getValue() + s.getExtinction().getError()
+                    s.getR().val(),
+                    s.getR().val() - s.getR().err(),
+                    s.getR().val() + s.getR().err(),
+                    s.getExtinction().val(),
+                    s.getExtinction().val() - s.getExtinction().err(),
+                    s.getExtinction().val() + s.getExtinction().err()
             );
         }
         return series;
