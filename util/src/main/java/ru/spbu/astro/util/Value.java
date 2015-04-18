@@ -13,9 +13,29 @@ public final class Value implements Comparable<Value> {
     private final double value;
     private final double error;
 
+    public static final Filter<Value> TWO_SIGMA = nSigmaFilter(2);
+    public static final Filter<Value> THREE_SIGMA = nSigmaFilter(3);
+    public static final Filter<Value> POS_TWO_SIGMA = nSigmaPosFilter(2);
+    public static final Filter<Value> POS_THREE_SIGMA = nSigmaPosFilter(3);
+
     private Value(final double value, final double error) {
         this.value = value;
         this.error = error;
+    }
+
+    @NotNull
+    private static Filter<Value> nSigmaFilter(final int n) {
+        return Filter.by("|k| / sigma_k > " + n, x -> Math.abs(x.val()) > n * x.err());
+    }
+
+    @NotNull
+    private static Filter<Value> nSigmaPosFilter(final int n) {
+        return Filter.by("k / sigma_k > " + n, x -> x.val() > n * x.err());
+    }
+
+    @NotNull
+    public static Filter<Value> filterByErr(final double limit) {
+        return Filter.by("dk < " + limit, x -> x.err() < limit);
     }
 
     @NotNull

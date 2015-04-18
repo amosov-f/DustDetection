@@ -68,19 +68,19 @@ public final class PixPlot {
                 new XYErrorRenderer()
         );
 
-        final double r = Arrays.stream(stars).mapToDouble(s -> s.getR().val()).max().getAsDouble();
+        final double r = Arrays.stream(stars).mapToDouble(s -> s.getR().plusNSigma(1)).max().getAsDouble();
 
         final XYSeries trend = new XYSeries("Тренд");
         trend.add(0, 0);
         trend.add(r, slope.val() * r);
 
-        final XYSeries maxTrend = new XYSeries("Тренд + sigma");
+        final XYSeries maxTrend = new XYSeries("Тренд + 2 sigma");
         maxTrend.add(0, 0);
-        maxTrend.add(r, slope.plusNSigma(1) * r);
+        maxTrend.add(r, slope.plusNSigma(2) * r);
 
-        final XYSeries minTrend = new XYSeries("Тренд - sigma");
+        final XYSeries minTrend = new XYSeries("Тренд - 2 sigma");
         minTrend.add(0, 0);
-        minTrend.add(r, slope.plusNSigma(-1) * r);
+        minTrend.add(r, slope.plusNSigma(-2) * r);
 
         final XYSeriesCollection seriesCollection = new XYSeriesCollection();
         seriesCollection.addSeries(trend);

@@ -46,7 +46,7 @@ public final class RansacLinearRegression implements LinearRegression {
                         new RansacLinearRegression(regression, ids, ArrayUtils.EMPTY_INT_ARRAY),
                         points.get(id))
         ));
-        final int split = (int) ((1 - OUTLIERS_PART) * ids.length);
+        final int split = (int) Math.ceil((1 - OUTLIERS_PART) * ids.length);
         final int[] inliers = Arrays.copyOf(ids, split);
         final int[] outliers = Arrays.copyOfRange(ids, split, ids.length);
         regression.clear();

@@ -57,6 +57,10 @@ public final class Healpix {
         return (int) PIX_TOOLS.ang2pix_ring(nSide, dir.getPhi(), dir.getTheta());
     }
 
+    public double getPixArea() {
+        return 4 * Math.PI / getNPix();
+    }
+
     @NotNull
     public Spheric getCenter(final int pix) {
         return Spheric.valueOf(PIX_TOOLS.pix2ang_ring(nSide, pix));

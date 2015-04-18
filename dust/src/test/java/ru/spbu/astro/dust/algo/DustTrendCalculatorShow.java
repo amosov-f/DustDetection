@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.algo;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,6 +14,8 @@ import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.dust.graph.PixPlot;
 import ru.spbu.astro.healpix.func.HealpixDistribution;
 import ru.spbu.astro.healpix.func.SmoothedDistribution;
+import ru.spbu.astro.util.Filter;
+import ru.spbu.astro.util.Value;
 
 /**
  * User: amosov-f
@@ -29,34 +32,56 @@ public class DustTrendCalculatorShow {
 
     @Test
     public void main() throws Exception {
-        final DustTrendCalculator dustTrendCalculator = new DustTrendCalculator(
+        final DustTrendCalculator calculator = new DustTrendCalculator(
                 StarFilter.of(DustStars.ALL).piRelErr(0.25).stars(), N_SIDE
         );
-        final SphericDistribution f = new HealpixDistribution(dustTrendCalculator.getSlopes());
+        final SphericDistribution f = new HealpixDistribution(calculator.getSlopes());
+        System.out.println(calculator.getSlopes().length);
         final HammerProjection hammerProjection = new HammerProjection(f);
-        final PixPlot pixPlot = new PixPlot(dustTrendCalculator);
+        final PixPlot pixPlot = new PixPlot(calculator);
         hammerProjection.setProcessor(pixPlot::plot);
         hammerProjection.setVisible(true);
     }
 
     @Test
     public void showHasLumin() throws Exception {
-        show(StarFilter.of(Stars.ALL).hasExt().stars());
+        show(StarFilter.of(Stars.ALL).hasExt().stars(), null);
     }
 
     @Test
     public void leftShow() {
-        show(StarFilter.of(DustStars.ALL).leftBV().stars());
+        show(StarFilter.of(DustStars.ALL).leftBV().stars(), null);
     }
 
     @Test
     public void rightShow() {
-        show(StarFilter.of(DustStars.ALL).rightBV().stars());
+        show(StarFilter.of(DustStars.ALL).rightBV().stars(), null);
     }
 
     @Test
-    public void show() {
-        show(DustStars.ALL);
+    public void showAll() {
+        show(DustStars.ALL, null);
+    }
+
+    @Test
+    public void showTwoSigma() {
+        show(DustStars.ALL, Value.POS_TWO_SIGMA);
+    }
+
+    @Test
+    public void showErrLimit() {
+        show(DustStars.ALL, Value.filterByErr(0.00005));
+    }
+
+    @Test
+    public void showTwoSigmaOrErrLimit() throws Exception {
+        show(DustStars.ALL, Value.POS_TWO_SIGMA.or(Value.filterByErr(0.00005)));
+    }
+    
+    private void show(@NotNull final Star[] stars, @Nullable final Filter<Value> filter) {
+        final DustTrendCalculator calculator = new DustTrendCalculator(stars, N_SIDE);
+        new HammerProjection(new HealpixDistribution(calculator.getSlopes(), filter), MIN_VALUE, MAX_VALUE).setVisible(true);
+        System.out.println(calculator.toString(filter));
     }
 
     @Test
@@ -64,22 +89,11 @@ public class DustTrendCalculatorShow {
         final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
         new HammerProjection(new SmoothedDistribution(64, new HealpixDistribution(calculator.getSlopes()), 2)).setVisible(true);
     }
-    
-    private void show(@NotNull final Star[] stars) {
-        final DustTrendCalculator calculator = new DustTrendCalculator(stars, N_SIDE);
-        new HammerProjection(new HealpixDistribution(calculator.getSlopes()), MIN_VALUE, MAX_VALUE).setVisible(true);
-    }
 
     @Test
     public void showErrors() {
         final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
         new HammerProjection(new HealpixDistribution(calculator.getSlopes()), MIN_VALUE, MAX_VALUE, HammerProjection.Mode.WITH_ERRORS).setVisible(true);
-    }
-
-    @Test
-    public void showAverages() {
-        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
-        new HammerProjection(new HealpixDistribution(calculator.getAverages())).setVisible(true);
     }
 
     @After

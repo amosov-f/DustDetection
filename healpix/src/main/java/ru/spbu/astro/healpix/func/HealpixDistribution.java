@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.commons.Spheric;
 import ru.spbu.astro.commons.func.SphericDistribution;
+import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.Value;
 
 import java.util.Arrays;
@@ -20,12 +21,13 @@ public class HealpixDistribution implements SphericDistribution {
     }
 
     public HealpixDistribution(@NotNull final Value[] values) {
-        this.values = values;
-        healpix = new Healpix(Healpix.nSide(values.length));
+        this(values, null);
     }
-    
-    public HealpixDistribution(@NotNull final double[] values) {
-        this(Arrays.stream(values).mapToObj(value -> Value.of(value, 0)).toArray(Value[]::new));
+
+    public HealpixDistribution(@NotNull final Value[] values, @Nullable final Filter<Value> filter) {
+        this.values = new Value[values.length];
+        Arrays.setAll(this.values, pix -> filter == null || filter.getPredicate().test(values[pix]) ? values[pix] : null);
+        healpix = new Healpix(Healpix.nSide(values.length));
     }
 
     @Nullable

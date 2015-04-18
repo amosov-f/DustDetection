@@ -27,13 +27,23 @@ public final class Filter<T> {
     }
 
     @NotNull
+    public static <T> Filter<T> trueFilter() {
+        return by("all", t -> true);
+    }
+
+    @NotNull
     public Filter<T> negate() {
         return new Filter<>("not " + name, predicate.negate());
     }
 
     @NotNull
     public Filter<T> and(@NotNull final Filter<T> filter) {
-        return new Filter<>("(" + name + ") and (" + filter.name + ")", predicate.and(filter.getPredicate()));
+        return new Filter<>("(" + name + ") and (" + filter.name + ")", predicate.and(filter.predicate));
+    }
+
+    @NotNull
+    public Filter<T> or(@NotNull final Filter<T> filter) {
+        return new Filter<>("(" + name + ") or (" + filter.name + ")", predicate.or(filter.predicate));
     }
 
     @NotNull
@@ -44,5 +54,11 @@ public final class Filter<T> {
     @NotNull
     public Predicate<T> getPredicate() {
         return predicate;
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return getName();
     }
 }
