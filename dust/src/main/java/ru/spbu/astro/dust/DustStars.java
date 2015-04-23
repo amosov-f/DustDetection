@@ -21,4 +21,8 @@ public final class DustStars {
     
     private DustStars() {
     }
+
+    public static void main(String[] args) {
+        System.out.println(StarFilter.of(ALL).negExt().stars().length);
+    }
 }

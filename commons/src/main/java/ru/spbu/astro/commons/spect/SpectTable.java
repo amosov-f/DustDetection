@@ -56,7 +56,7 @@ public class SpectTable {
 
     @NotNull
     public static SpectTable getInstance() {
-        return TSVETKOV_MID;
+        return TSVETKOV;
     }
 
     @NotNull
@@ -135,5 +135,10 @@ public class SpectTable {
             return MathTools.interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("");
+        System.out.println();
     }
 }

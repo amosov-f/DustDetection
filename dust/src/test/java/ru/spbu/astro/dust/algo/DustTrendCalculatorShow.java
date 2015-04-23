@@ -17,6 +17,8 @@ import ru.spbu.astro.healpix.func.SmoothedDistribution;
 import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.Value;
 
+import java.util.Arrays;
+
 /**
  * User: amosov-f
  * Date: 28.03.15
@@ -82,6 +84,18 @@ public class DustTrendCalculatorShow {
         final DustTrendCalculator calculator = new DustTrendCalculator(stars, N_SIDE);
         new HammerProjection(new HealpixDistribution(calculator.getSlopes(), filter), MIN_VALUE, MAX_VALUE).setVisible(true);
         System.out.println(calculator.toString(filter));
+    }
+
+    @Test
+    public void bvTrendShow() {
+        final DustTrendCalculator calculator = new DustTrendCalculator(StarFilter.of(DustStars.ALL).leftBV().stars(), N_SIDE, Star::getBVColor, true);
+        new HammerProjection(new HealpixDistribution(calculator.getIntercepts())).setVisible(true);
+    }
+
+    @Test
+    public void showSNR() {
+        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
+        new HammerProjection(new HealpixDistribution(Arrays.stream(calculator.getSlopes()).mapToDouble(Value::snr).toArray())).setVisible(true);
     }
 
     @Test

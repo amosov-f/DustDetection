@@ -19,6 +19,9 @@ public final class Value implements Comparable<Value> {
     public static final Filter<Value> POS_THREE_SIGMA = nSigmaPosFilter(3);
 
     private Value(final double value, final double error) {
+        if (error < 0) {
+            throw new IllegalArgumentException("Error " + error + " is below zero!");
+        }
         this.value = value;
         this.error = error;
     }
@@ -58,6 +61,10 @@ public final class Value implements Comparable<Value> {
 
     public double relErr() {
         return Math.abs(err() / val());
+    }
+
+    public double snr() {
+        return val() / err();
     }
 
     public double plusNSigma(final int n) {

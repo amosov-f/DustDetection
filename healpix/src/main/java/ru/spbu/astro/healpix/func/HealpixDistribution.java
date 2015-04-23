@@ -30,6 +30,10 @@ public class HealpixDistribution implements SphericDistribution {
         healpix = new Healpix(Healpix.nSide(values.length));
     }
 
+    public HealpixDistribution(@NotNull final double[] values) {
+        this(Arrays.stream(values).mapToObj(Value::of).toArray(Value[]::new));
+    }
+
     @Nullable
     @Override
     public final Value get(@NotNull final Spheric dir) {

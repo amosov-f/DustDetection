@@ -8,11 +8,12 @@ import ru.spbu.astro.healpix.Healpix;
 import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.Point;
 import ru.spbu.astro.util.Value;
+import ru.spbu.astro.util.ml.LinearRegression;
 import ru.spbu.astro.util.ml.RansacLinearRegression;
-import ru.spbu.astro.util.ml.SlopeLinearRegression;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -27,24 +28,35 @@ public final class DustTrendCalculator {
     @NotNull
     private final Value[] slopes;
     @NotNull
+    private final Value[] intercepts;
+    @NotNull
     private final Healpix healpix;
+    @NotNull
+    private final Function<Star, Value> f;
 
     public DustTrendCalculator(@NotNull final Star[] stars, final int nSide) {
+        this(stars, nSide, Star::getExtinction, false);
+    }
+
+    public DustTrendCalculator(@NotNull final Star[] stars, final int nSide, @NotNull final Function<Star, Value> f, final boolean includeIntercept) {
         LOGGER.info("#stars = " + stars.length);
 
         healpix = new Healpix(nSide);
         rings = healpix.split(stars);
         slopes = new Value[rings.length];
+        intercepts = new Value[rings.length];
+        this.f = f;
 
         for (int pix = 0; pix < rings.length; pix++) {
             final Star[] ring = rings[pix];
             if (ring.length < MIN_FOR_TREND) {
                 continue;
             }
-            final SlopeLinearRegression regression = RansacLinearRegression.train(
-                    Arrays.stream(ring).collect(Collectors.toMap(Star::getId, DustTrendCalculator::point)), false
+            final LinearRegression regression = RansacLinearRegression.train(
+                    Arrays.stream(ring).collect(Collectors.toMap(Star::getId, this::toPoint)), includeIntercept
             );
             slopes[pix] = regression.getSlope();
+            intercepts[pix] = regression.getIntercept();
         }
     }
 
@@ -55,6 +67,11 @@ public final class DustTrendCalculator {
     @NotNull
     public Value[] getSlopes() {
         return slopes;
+    }
+
+    @NotNull
+    public Value[] getIntercepts() {
+        return intercepts;
     }
 
     @Nullable
@@ -73,8 +90,8 @@ public final class DustTrendCalculator {
     }
 
     @NotNull
-    private static Point point(@NotNull final Star star) {
-        return new Point(star.getR(), star.getExtinction());
+    private Point toPoint(@NotNull final Star star) {
+        return new Point(star.getR(), f.apply(star));
     }
 
     @Override
