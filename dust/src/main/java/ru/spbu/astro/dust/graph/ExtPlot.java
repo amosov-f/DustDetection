@@ -2,7 +2,6 @@ package ru.spbu.astro.dust.graph;
 
 import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -14,8 +13,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
-import java.io.File;
-import java.io.IOException;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
@@ -44,11 +41,11 @@ public final class ExtPlot {
 
         final JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", DEFAULT_TITLE_FONT, plot, true);
 
-        try {
-            ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        chart.getLegend().setItemFont(new Font("SansSerif", Font.PLAIN, 16));
 
         frame = new ChartFrame("Идеальная кривая покраснения", chart);
         frame.pack();

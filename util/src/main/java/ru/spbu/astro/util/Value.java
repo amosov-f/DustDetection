@@ -3,6 +3,8 @@ package ru.spbu.astro.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
@@ -86,6 +88,16 @@ public final class Value implements Comparable<Value> {
         return add(other.negate());
     }
 
+    @NotNull
+    public Value multiply(final double alpha) {
+        return of(value * 1000, error * 1000);
+    }
+
+    @NotNull
+    public static Value[] multiply(@NotNull final Value[] values, final double alpha) {
+        return Arrays.stream(values).map(v -> v != null ? v.multiply(alpha) : null).toArray(Value[]::new);
+    }
+
     @Override
     public int compareTo(@NotNull final Value value) {
         return new Double(val()).compareTo(value.val());
@@ -115,6 +127,6 @@ public final class Value implements Comparable<Value> {
     @NotNull
     @Override
     public String toString() {
-        return String.format("%.3f ± %d%%", val(), (int) Math.abs(100 * err() / val()));
+        return String.format("%.3f ± %.3f", val(), err());
     }
 }

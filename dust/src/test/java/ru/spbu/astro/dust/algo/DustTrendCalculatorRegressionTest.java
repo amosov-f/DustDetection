@@ -7,6 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.healpix.Healpix;
+import ru.spbu.astro.util.TextUtils;
 import ru.spbu.astro.util.Value;
 
 import java.io.File;
@@ -33,6 +34,12 @@ public class DustTrendCalculatorRegressionTest {
                 IOUtils.toString(getClass().getResourceAsStream("/dust-trend-calculator.txt")),
                 DUST_TREND_CALCULATOR.toString()
         );
+    }
+
+    @Test
+    @Ignore
+    public void printTable() throws Exception {
+        System.out.println(TextUtils.tex(DUST_TREND_CALCULATOR.toTable(null), 3, 1));
     }
 
     @Test

@@ -13,9 +13,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 import java.util.logging.Logger;
 
 import static java.lang.Math.*;
@@ -71,6 +71,7 @@ public final class HammerProjection extends JWindow {
                 }
             }
         });
+        setBackground(Color.WHITE);
     }
     
     @NotNull
@@ -119,8 +120,8 @@ public final class HammerProjection extends JWindow {
     public void paint(@NotNull final Graphics g) {
         final Value[][] f = new Value[min(getWidth(), 2 * getHeight())][min(getHeight(), getWidth() / 2)];
 
-        final Set<Double> values = new TreeSet<>();
-        final Set<Double> errors = new TreeSet<>();
+        final List<Double> values = new ArrayList<>();
+        final List<Double> errors = new ArrayList<>();
 
         for (int x = 0; x < f.length; ++x) {
             for (int y = 0; y < f[x].length; ++y) {
@@ -177,7 +178,8 @@ public final class HammerProjection extends JWindow {
 
     @SuppressWarnings("MagicNumber")
     private void paintCircles(@NotNull final Graphics g) {
-        g.setColor(new Color(148, 167, 187));
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 24));
+        g.setColor(new Color(117, 148, 187));
         for (int i = 0; i < MERIDIAN_COUNT; i++) {
             final double l = 2 * PI / MERIDIAN_COUNT * i;
             for (double b = -PI / 2; b < PI / 2; b += 0.001) {
@@ -207,13 +209,14 @@ public final class HammerProjection extends JWindow {
         }
     }
 
+    @SuppressWarnings("MagicNumber")
     private void paintRange(@NotNull final Graphics g) {
         final String minText = TextUtils.format("%.4f", minValue);
-        final Font font = new Font("TimesRoman", Font.PLAIN, 12);
+        final Font font = new Font("TimesRoman", Font.BOLD, 25);
         final FontMetrics metrics = g.getFontMetrics(font);
         final int x1 = metrics.stringWidth(minText) / 2;
-        final int x2 = 280;
-        final int y1 = getHeight() - 10;
+        final int x2 = 215;
+        final int y1 = getHeight() - 15;
         final int y2 = getHeight();
         for (int x = x1; x <= x2; ++x) {
             final Color color = color(Value.of(MathTools.interpolate(x1, minValue, x2, maxValue, x)));

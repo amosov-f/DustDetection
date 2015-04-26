@@ -21,10 +21,13 @@ import ru.spbu.astro.util.Value;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
 public final class PixPlot {
+    private static final Logger LOG = Logger.getLogger(PixPlot.class.getName());
+
     @NotNull
     private final DustTrendCalculator dustTrendCalculator;
     @NotNull
@@ -42,8 +45,8 @@ public final class PixPlot {
     }
 
     public void plot(@NotNull final Spheric dir) {
-        final Star[] baseStars = dustTrendCalculator.getInlierStars(dir);
-        final Star[] outlierStars = dustTrendCalculator.getOutlierStars(dir);
+        final Star[] baseStars = dustTrendCalculator.getInliers(dir);
+        final Star[] outlierStars = dustTrendCalculator.getOutliers(dir);
         if (baseStars == null || outlierStars == null) {
             return;
         }
@@ -52,9 +55,10 @@ public final class PixPlot {
         if (slope == null) {
             return;
         }
-
+        LOG.info("k_" + new Healpix(dustTrendCalculator.getNSide()).getPix(dir) + " = " + slope.multiply(1000));
 
         final Star[] stars = ArrayUtils.addAll(baseStars, outlierStars);
+        LOG.info("n = " + stars.length);
 
         final XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection() {{
             addSeries(createXYIntegervalSeries(baseStars, "Звезды, по которым строится тренд"));
@@ -74,18 +78,8 @@ public final class PixPlot {
         trend.add(0, 0);
         trend.add(r, slope.val() * r);
 
-        final XYSeries maxTrend = new XYSeries("Тренд + 2 sigma");
-        maxTrend.add(0, 0);
-        maxTrend.add(r, slope.plusNSigma(2) * r);
-
-        final XYSeries minTrend = new XYSeries("Тренд - 2 sigma");
-        minTrend.add(0, 0);
-        minTrend.add(r, slope.plusNSigma(-2) * r);
-
         final XYSeriesCollection seriesCollection = new XYSeriesCollection();
         seriesCollection.addSeries(trend);
-        seriesCollection.addSeries(minTrend);
-        seriesCollection.addSeries(maxTrend);
 
         plot.setDataset(1, seriesCollection);
 
@@ -101,6 +95,12 @@ public final class PixPlot {
                 plot,
                 true
         );
+
+        plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        chart.getLegend().setItemFont(new Font("SansSerif", Font.PLAIN, 16));
 
 //        try {
 //            ChartUtilities.saveChartAsPNG(new File("documents/presentation/buffer.png"), chart, 900, 600);

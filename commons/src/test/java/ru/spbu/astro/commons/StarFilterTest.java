@@ -37,5 +37,6 @@ public class StarFilterTest {
         assertEquals(1947, StarFilter.of(Stars.ALL).mainLumin().leftBV().lumin(LuminosityClass.III).stars().length);
         assertEquals(16681, StarFilter.of(Stars.ALL).mainLumin().rightBV().lumin(LuminosityClass.III).stars().length);
         assertEquals(49542, StarFilter.of(Stars.ALL).apply(StarFilter.HAS_LUMIN.negate()).stars().length);
+        assertEquals(39807, StarFilter.of(Stars.ALL).hasExt().mainLumin().stars().length);
     }
 }

@@ -12,6 +12,7 @@ import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -94,7 +95,11 @@ public final class HRDiagram {
         chart.getXYPlot().getRangeAxis().setLowerBound(ABSOLUTE_MAGNITUDE_LOWER_BOUND);
         chart.getXYPlot().getRangeAxis().setUpperBound(ABSOLUTE_MAGNITUDE_UPPER_BOUND);
 
-        
+        plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        chart.getLegend().setItemFont(new Font("SansSerif", Font.PLAIN, 16));
         
         frame = new ChartFrame("Hershprung-Russel diagram", chart);
         frame.pack();

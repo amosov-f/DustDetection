@@ -4,9 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.util.MathTools;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -137,8 +135,49 @@ public class SpectTable {
         return null;
     }
 
-    public static void main(String[] args) {
-        System.out.println("");
-        System.out.println();
+//    public static void main(String[] args) {
+//        final Scanner fin = new Scanner(SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
+//        fin.nextLine();
+//        final List<String[]> fields = new ArrayList<>();
+//        while (fin.hasNextLine()) {
+//            fields.add(fin.nextLine().trim().split("\\s+"));
+//        }
+//        for (int i = 0; i < fields.size() / 4; i++) {
+//            final String[] f1 = fields.get(i);
+//            final String[] f2 = fields.get(i + fields.size() / 4);
+//            final String[] f3 = fields.get(i + 2 * fields.size() / 4);
+//            final String[] f4 = fields.get(i + 3 * fields.size() / 4);
+//            System.out.println("                " + f1[0] + "    &    " + f1[1] + "    &    " + f1[2] + "    &    "
+//                    + f2[0] + "    &    " + f2[1] + "    &    " + f2[2] + "    &    "
+//                    + f3[0] + "    &    " + f3[1] + "    &    " + f3[2] + "    &    "
+//                    + f4[0] + "    &    " + f4[1] + "    &    " + f4[2] + "    \\\\");
+//        }
+//    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner fin = new Scanner(new FileInputStream("docs/articles/related/tables/III.TXT"));
+        final List<String[]> iii = new ArrayList<>();
+        while (fin.hasNextLine()) {
+            iii.add(Arrays.copyOfRange(fin.nextLine().trim().split("\\s+"), 1, 4));
+        }
+        fin = new Scanner(new FileInputStream("docs/articles/related/tables/V.TXT"));
+        final List<String[]> v = new ArrayList<>();
+        while (fin.hasNextLine()) {
+            v.add(Arrays.copyOfRange(fin.nextLine().trim().split("\\s+"), 1, 4));
+        }
+        final int k = 2;
+        for (int i = 0; i < iii.size() / k; i++) {
+            System.out.print("                    ");
+            for (int j = 0; j < k; j++) {
+                final String[] f1 = iii.get(i + j * iii.size() / k);
+                final String[] f2 = v.get(i + j * v.size() / k);
+                System.out.print(f1[0] + "    &    " + f1[1] + "    &    " + f1[2] + "    &    ");
+                System.out.print(f2[1] + "    &    " + f2[2]);
+                if (j != k - 1) {
+                    System.out.print("    &    ");
+                }
+            }
+            System.out.println("    \\\\");
+        }
     }
 }
