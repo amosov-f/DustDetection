@@ -100,7 +100,7 @@ public class DustTrendCalculatorShow {
         final String format = "png";
         ImageTools.saveAsPNG(hasExt, dir + "map-k-has-ext." + format);
         ImageTools.saveAsPNG(left, dir + "map-k-left." + format);
-        ImageTools.saveAsPNG(hasExt, dir + "map-k-right." + format);
+        ImageTools.saveAsPNG(right, dir + "map-k-right." + format);
         ImageTools.saveAsPNG(full, dir + "map-k." + format);
         ImageTools.saveAsPNG(twoSigma, dir + "map-k-2sigma." + format);
     }
