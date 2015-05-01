@@ -5,7 +5,6 @@ import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYAreaRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
@@ -36,8 +35,8 @@ public final class ExtPlot {
         plot.getDomainAxis().setTickLabelsVisible(false);
         plot.getRangeAxis().setTickLabelsVisible(false);
 
-        plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
-        plot.setRenderer(1, new XYAreaRenderer());
+//        plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
+//        plot.setRenderer(1, new XYAreaRenderer());
 
         final JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", DEFAULT_TITLE_FONT, plot, true);
 

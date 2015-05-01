@@ -53,7 +53,7 @@ public class DustTrendCalculatorShow {
     @Test
     public void main() throws Exception {
         final DustTrendCalculator calculator = new DustTrendCalculator(
-                DustStars.ALL, N_SIDE
+                StarFilter.of(DustStars.ALL).piRelErr(0.25).stars(), N_SIDE
         );
         final SphericDistribution f = new HealpixDistribution(calculator.getSlopes());
         System.out.println(calculator.getSlopes().length);
@@ -61,6 +61,7 @@ public class DustTrendCalculatorShow {
         final PixPlot pixPlot = new PixPlot(calculator);
         hammerProjection.setProcessor(pixPlot::plot);
         hammerProjection.setVisible(true);
+        Thread.sleep(Long.MAX_VALUE);
     }
 
     @Test

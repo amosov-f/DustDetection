@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.stream.IntStream;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
+import static java.lang.Math.*;
 
 /**
  * User: amosov-f
@@ -87,5 +86,9 @@ public final class MathTools {
         IntStream.range(0, v.length).forEach(i -> sortedValues.add(Pair.of(v[i], w[i])));
         Collections.sort(sortedValues, Comparator.comparingDouble(Pair::getLeft));
         return sortedValues;
+    }
+
+    public static double toHours(final double rad) {
+        return rad * 12 / PI;
     }
 }
