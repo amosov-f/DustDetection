@@ -87,6 +87,13 @@ public final class DustTrendCalculator {
         return inliers[healpix.getPix(dir)];
     }
 
+    @NotNull
+    public Star[] getInliers() {
+        final List<Star> stars = new ArrayList<>();
+        Arrays.stream(inliers).forEach(inliers -> stars.addAll(Arrays.asList(inliers)));
+        return stars.toArray(new Star[stars.size()]);
+    }
+
     @Nullable
     public Star[] getOutliers(@NotNull final Spheric dir) {
         return outliers[healpix.getPix(dir)];

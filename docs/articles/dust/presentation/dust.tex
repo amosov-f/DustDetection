@@ -1,6 +1,7 @@
 \documentclass[14pt, fleqn, xcolor={dvipsnames, table}]{beamer}
 \usepackage[T2A]{fontenc}
-\usepackage[utf8]{inputenc}
+\usepackage[cp1251]{inputenc}
+\inputencoding{cp1251}
 \usepackage[english,russian]{babel}
 \usepackage{amssymb,amsfonts,amsmath,mathtext}
 \usepackage{cite,enumerate,float,indentfirst}
@@ -29,13 +30,13 @@
   \leavevmode%
   \hbox{%
   \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
-    РђРјРѕСЃРѕРІ Р¤РµРґРѕСЂ, РЎРџР±Р“РЈ
+    Амосов Федор, СПбГУ
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
-    РЎР°РЅРєС‚-РџРµС‚РµСЂР±СѓСЂРі, 2014
+    Санкт-Петербург, 2015
   \end{beamercolorbox}%
   \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{}%
-  РЎС‚СЂ. \insertframenumber{} РёР· \inserttotalframenumber \hspace*{2ex}
+  Стр. \insertframenumber{} из \inserttotalframenumber \hspace*{2ex}
   \end{beamercolorbox}}%
   \vskip0pt%
 }
@@ -44,10 +45,12 @@
      \addtolength\displaywidth{-#1}}}
 \newcommand{\itemi}{\item[\checkmark]}
 
-\title{РћРїСЂРµРґРµР»РµРЅРёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РјРµР¶Р·РІРµР·РґРЅРѕРіРѕ РїРѕРіР»РѕС‰РµРЅРёСЏ СЃРІРµС‚Р° РїРѕ РґР°РЅРЅС‹Рј РєР°С‚Р°Р»РѕРіР° Hipparcos\\\small{}}
+\title{Определение параметров межзвездного поглощения света по данным каталога Hipparcos\\\small{}}
 \author[]{
     \small{
-        РђРјРѕСЃРѕРІ Р¤РµРґРѕСЂ, РЎРџР±Р“РЈ\\
+        Амосов Федор, СПбГУ\\
+        ~\\
+        Руководители: Витязев В.В., Цветков А.С., СПбГУ
     }
 }
 \date{}
@@ -59,183 +62,178 @@
         \small
     \end{frame}
     
-     \section{РџРѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РґР°С‡Рё} 
+    \section{Постановка задачи} 
 
-        \begin{frame}{РџРѕСЃС‚Р°РЅРѕРІРєР° Р·Р°РґР°С‡Рё}
-            Р”Р°РЅ Р·РІРµР·РґРЅС‹Р№ РєР°С‚Р°Р»РѕРі СЃ РґР°РЅРЅС‹РјРё Рѕ
+        \begin{frame}{Постановка задачи}
+            Построить карту градиентов покраснения звезд вдоль лучей зрения в окрестности Солнца \\
+            
+            Используемые данные:    \\
+            звездные каталоги Hipparcos и Hipnewcat    \\
+            ($98827$ звезд)
             \begin{itemize}
-                \item РїРѕР»РѕР¶РµРЅРёСЏС…
-                \item РїР°СЂР°Р»Р»Р°РєСЃР°С…
-                \item С„РѕС‚РѕРјРµС‚СЂРёРё
-                \item СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РєР»Р°СЃСЃР°С… Рё РєР»Р°СЃСЃР°С… СЃРІРµС‚РёРјРѕСЃС‚Рё
-            \end{itemize}  
-            Р—Р°РґР°С‡Р°
-            \begin{itemize}
-                \item РџРѕСЃС‚СЂРѕРёС‚СЊ С‚СЂРµС…РјРµСЂРЅСѓСЋ РєР°СЂС‚Сѓ РїС‹Р»РµРІС‹С… РѕР±Р»Р°РєРѕРІ 
-            \end{itemize}         
+                \item положения (Hipnewcat)
+                \item параллаксы (Hipnewcat)
+                \item фотометрия (Hipparcos)
+                \item спектральные классы и классы светимости (Hipparcos)
+            \end{itemize}
         \end{frame}
         
-        \begin{frame}{РљР°С‚Р°Р»РѕРі}
-            Р—РІРµР·РґРЅС‹Р№ РєР°С‚Р°Р»РѕРі СЃ РґР°РЅРЅС‹РјРё Рѕ
-            \begin{itemize}
-                \item РїРѕР»РѕР¶РµРЅРёСЏС…
-                \item РїР°СЂР°Р»Р»Р°РєСЃР°С…
-                \item С„РѕС‚РѕРјРµС‚СЂРёРё
-                \item СЃРїРµРєС‚СЂР°Р»СЊРЅС‹С… РєР»Р°СЃСЃР°С… Рё РєР»Р°СЃСЃР°С… СЃРІРµС‚РёРјРѕСЃС‚Рё
-            \end{itemize}  
-            $\Longrightarrow$ РєР°С‚Р°Р»РѕРі Hipparcos ($10^5$ Р·РІРµР·Рґ)
-        \end{frame}
-        
-        \begin{frame}{РџРѕРєСЂР°СЃРЅРµРЅРёРµ}
+        \begin{frame}{Межзвездное покраснение звезд}
             $$
                 E_{B - V} = (B - V)_{obs} - (B - V)_{int}
             $$
-            РџСЂРёРјРµСЂ РЅР° Р·РІРµР·РґРµ HIP 44800
+            Источники:
             \begin{itemize}
-                \item РЈ РЅРµРµ РІ РєР°С‚Р°Р»РѕРіРµ $(B - V)_{obs} = 0.535^m$
-                \item РљР»Р°СЃСЃ F7V, РїРѕСЌС‚РѕРјСѓ$^*$ $(B - V)_{int} = 0.493^m$
-                \item РџРѕРєСЂР°СЃРЅРµРЅРёРµ $0.535^m - 0.493^m = 0.042^m$
-                \item РњРµР¶РґСѓ РЅР°РјРё Рё Р·РІРµР·РґРѕР№ РїС‹Р»Рё РЅР° $0.042^m$
+                \item $(B - V)_{obs}$ --- каталог Hipnewcat
+                \item $(B - V)_{int}$ --- {\small J. Binney et al. <<Galactic Astronomy>>}
             \end{itemize}
+            
+            { \footnotesize
+                Пример (звезда HIP 44800),
+                \begin{itemize}
+                    \item У нее в каталоге $(B - V)_{obs} = 0.535^m$
+                    \item Класс F7V    
+                        \begin{tabular} {| c | c | c | c |}
+                            \hline
+                               &    $\cdots$    &    V    &    $\cdots$    \\
+                            \hline
+                            $\cdots$    &    &    &    \\
+                            \hline
+                            F7    &    &    0.493    &        \\
+                            \hline
+                            $\cdots$     &     &     &      \\
+                            \hline
+                        \end{tabular}
+                    поэтому $(B - V)_{int} = 0.493^m$
+                    \item Покраснение $0.535^m - 0.493^m = 0.042^m$
+                    \item Между нами и звездой пыли на $0.042^m$
+                \end{itemize}
+            }
+            
         \end{frame}    
-
-    \section{Р—Р°РІРёСЃРёРјРѕСЃС‚СЊ РїРѕРєСЂР°СЃРЅРµРЅРёСЏ РѕС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ}     
-    
-        \begin{frame}{РРґРµР°Р»СЊРЅР°СЏ РєСЂРёРІР°СЏ РїРѕРєСЂР°СЃРЅРµРЅРёСЏ}
+        
+    \section{Определение классов светимости} 
+                 
+        \begin{frame}{\large Классы светимости в каталоге Hipparcos}
             \begin{center}
-                \includegraphics[width=11cm]{ideal-1-no-tick.eps}
+                \includegraphics[width=11cm]{has-lumin.eps}    \\
+                49285 звезд имеют класс светимости
             \end{center}             
+        \end{frame}           
+        
+        \begin{frame}{Задача классификации звезд по классам светимости}
+            \begin{itemize}
+                \item Алгоритм классификации: метод опорных векторов (Support Vector Machines, SVM)
+                \item ПО: WEKA, Java--библиотека для ML
+                \item 
+                    \begin{minipage}{0.6\textwidth}
+        			        Факторы: показатель цвета, \\
+        			        абсолютная звездная величина
+                    \end{minipage}
+        		        \hfill
+        		        \begin{minipage}{0.3\textwidth}
+        			        \includegraphics[width=3.5cm]{gr-example.eps}
+        		        \end{minipage}
+                
+                \item Класс: класс светимости \\
+                III или V --- бинарный классификатор
+            \end{itemize}
+        \end{frame}        
+        
+        \begin{frame}{Классификатор}
+            \begin{center}
+                \includegraphics[width=9cm]{classify.eps}    \\
+                III, V класс --- 39807 звезд
+            \end{center}       
+            $$ -3.0752 \cdot (B - V) + 0.4485 \cdot M + 1.4793 = 0 $$      
         \end{frame}
         
-        \begin{frame}{РџС‹Р»РµРІС‹Рµ РѕР±Р»Р°РєР°}
+        \begin{frame}{Классификатор (продолжение)}
+            \begin{center}
+                \includegraphics[width=9cm]{main-lumin.eps}    \\
+                Обучающее множество на небесной сфере
+            \end{center} 
+            \begin{center}
+                \begin{tabular} {| c | c | c |}
+                    \hline
+                    Класс    &    Точность   &    Полнота     \\
+                    \hline
+                    III      &    95\%   &   89\%     \\
+                    \hline
+                    V        &    91\%   &    96\%         \\
+                    \hline
+                \end{tabular}
+            \end{center}
+        \end{frame}               
+
+    \section{Градиент покраснения по расстоянию}     
+        
+        \begin{frame}{Идеальная кривая покраснения}
             \begin{center}
                 \includegraphics[width=11cm]{ideal-2-no-tick.eps}
             \end{center}             
         \end{frame}
         
-        \begin{frame}{Р РµР°Р»СЊРЅРѕРµ РїРѕРєСЂР°СЃРЅРµРЅРёРµ}
+        \begin{frame}{Реальное покраснение}
             \begin{center}
                 \includegraphics[width=11cm]{real-1.eps}
             \end{center}             
         \end{frame}
         
-        \begin{frame}{Р РµР°Р»СЊРЅР°СЏ <<РєСЂРёРІР°СЏ>> РїРѕРєСЂР°СЃРЅРµРЅРёСЏ}
+        \begin{frame}{Реальная <<кривая>> покраснения}
             \begin{center}
-                \includegraphics[width=11cm]{real-2-k.eps}
+                \includegraphics[width=11cm]{real-2-k.eps}    \\
+                $E(r) = k r$, 10\% выбросов
             \end{center}             
         \end{frame}
         
-        \begin{frame}{<<Р’ СЃСЂРµРґРЅРµРј>>}
+    \section{Карты градиентов покраснения звезд}            
+        
+        \begin{frame}{Распределение градиентов покраснения без учета классификатора}
             \begin{center}
-                \includegraphics[width=11cm]{real-3-k.eps}
-            \end{center}             
+                \includegraphics[width=11cm]{map-k-has-ext.eps}    \\
+                44658 звезд
+            \end{center}
         \end{frame}        
         
-        \begin{frame}{РћС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Р№ С‚СЂРµРЅРґ}
+        \begin{frame}{Распределение градиентов покраснения с учетом классификатора}
             \begin{center}
-                \includegraphics[width=11cm]{real-4-k.eps}
+                \includegraphics[width=11cm]{map-k.eps}    \\     
+                94199 звезд
+            \end{center}
+        \end{frame}
+        
+        \begin{frame}{Дальность действия метода}
+            \begin{center}
+                \includegraphics[width=10cm]{r-hist.eps}    \\
+                Более 90\% звезд находятся ближе 500 пк
             \end{center}             
         \end{frame}
         
-    \section{РљР°СЂС‚С‹}            
-        
-        \begin{frame}{РљРѕСЌС„С„РёС†РёРµРЅС‚ $k$ ~~~~~~~~~~~~~~~~ $E_{B - V} = k r$}
+        \begin{frame}{Сравнение результатов с 2MASS}
             \begin{center}
-                \includegraphics[width=11cm]{map-k.eps}
+                \includegraphics[width=11cm]{HK-gam.eps} 
             \end{center}             
         \end{frame}
         
-        \begin{frame}{$k / \sigma_k > 2$}
-            \begin{center}
-                \includegraphics[width=11cm]{map-k-2sigma.eps}
-            \end{center}             
-        \end{frame}
+        \begin{frame}{Заключение}
         
-
-    \section{РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР°}                
-        
-        \begin{frame}{РџСЂРµРґРІР°СЂРёС‚РµР»СЊРЅР°СЏ РѕР±СЂР°Р±РѕС‚РєР°}
-            \begin{itemize}
-                \item Р’ СЂР°СЃС‡РµС‚ Р±РµСЂСѓС‚СЃСЏ $94199$ РёР· $118219$ Р·РІРµР·Рґ
-                \item Р Р°Р·Р±РёРµРЅРёРµ СЃС„РµСЂС‹ РЅР° $12 \cdot 18^2 = 3888$ СЂР°РІРЅРѕРІРµР»РёРєРёС… С‡Р°СЃС‚РµР№ Р°Р»РіРѕСЂРёС‚РјРѕРј Healpix
-                \item РўСЂРµРЅРґС‹ СЃС‚СЂРѕСЏС‚СЃСЏ РїРѕ 90\% СЂР°СЃС‡РµС‚РЅС‹С… Р·РІРµР·Рґ
-                \item Р Р°СЃС‡РµС‚ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёС… РєР»Р°СЃСЃРѕРІ СЃРІРµС‚РёРјРѕСЃС‚Рё
+            { \small
                 \begin{itemize}
-                    \item РЎРїРµРєС‚СЂР°Р»СЊРЅС‹Р№ РєР»Р°СЃСЃ, РєР»Р°СЃСЃ СЃРІРµС‚РёРјРѕСЃС‚Рё $\Longrightarrow (B - V)_{int}$
+                    \item Бинарный классификатор, предсказывающий III или V класс светимости для звезд,
+                    \item Классы светимости для 49542 звезд каталога Hipparcos с помощью бинарного классификатора,
+                    \item Покраснения для 94199 звезд каталога Hipparcos по показателю цвета $B - V$,
+                    \item Карта значений градиента покраснения,
+                    \item Статистическая надежность результатов для каждой площадки,
+                    \item Сравнение карт покраснения с аналогичными результатами, полученными по данным каталога 2MASS,
+                    \item Отрицательное покраснение у 11\% звезд
                 \end{itemize}
-            \end{itemize}
-        \end{frame}
-        
-        \begin{frame}{РќР°Р»РёС‡РёРµ РєР»Р°СЃСЃРѕРІ СЃРІРµС‚РёРјРѕСЃС‚Рё}
-            \begin{center}
-                \includegraphics[width=11cm]{has-lumin.eps}
-            \end{center}             
-        \end{frame}
-
-    \section{РћРїСЂРµРґРµР»РµРЅРёРµ РєР»Р°СЃСЃРѕРІ СЃРІРµС‚РёРјРѕСЃС‚Рё}                
-        
-        \begin{frame}{РћР±СѓС‡РµРЅРёРµ РєР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂР°}
-            \begin{center}
-                \includegraphics[width=4cm]{gr-example.eps}
-            \end{center}
-           
-            \begin{itemize}
-                \item Р¤Р°РєС‚РѕСЂС‹: РїРѕРєР°Р·Р°С‚РµР»СЊ С†РІРµС‚Р°, Р°Р±СЃРѕР»СЋС‚РЅР°СЏ Р·РІРµР·РґРЅР°СЏ РІРµР»РёС‡РёРЅР°
-                \item РљР»Р°СЃСЃ: РєР»Р°СЃСЃ СЃРІРµС‚РёРјРѕСЃС‚Рё III, РёР»Рё V
-                \item РђР»РіРѕСЂРёС‚Рј РєР»Р°СЃСЃРёС„РёРєР°С†РёРё: РјРµС‚РѕРґ РѕРїРѕСЂРЅС‹С… РІРµРєС‚РѕСЂРѕРІ (Support Vector Machines, SVM)
-            \end{itemize}
-        \end{frame}        
-        
-        \begin{frame}{РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ}
-            \begin{center}
-                \includegraphics[width=11cm]{classify.eps}
-            \end{center}             
-        \end{frame}
-        
-        \begin{frame}{РљР°С‡РµСЃС‚РІРѕ РєР»Р°СЃСЃРёС„РёРєР°С†РёРё}
-            Р РµР·СѓР»СЊС‚Р°С‚С‹ РєСЂРѕСЃСЃ--РІР°Р»РёРґР°С†РёРё РЅР° 10 С‡Р°СЃС‚СЏС…
-            \begin{center}
-            \begin{tabular} {| c | c | c | c |}
-                \hline
-                Р РµС€РµРЅРёРµ РєР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂР° $\rightarrow$   &    III   &    V    \\
-                \hline
-                III    &    16636    &    1992    \\
-                \hline
-                V       &    783    &    20396    \\
-                \hline
-            \end{tabular}
-            
-            ~\\~\\
-            
-            \begin{tabular} {| c | c | c | c |}
-                \hline
-                РљР»Р°СЃСЃ    &    РўРѕС‡РЅРѕСЃС‚СЊ   &    РџРѕР»РЅРѕС‚Р°    &    F1-РјРµСЂР°     \\
-                \hline
-                III      &    95\%   &   89\%    &    92\%     \\
-                \hline
-                V        &    91\%   &    96\%    &    93\%        \\
-                \hline
-            \end{tabular}
-            \end{center}
-        \end{frame}                  
-        
-        \begin{frame}{Р РµР·СѓР»СЊС‚Р°С‚}
-            \begin{center}
-                \includegraphics[width=11cm]{map-k.eps}
-            \end{center}             
-        \end{frame}
-        
-        \begin{frame}{Р§С‚Рѕ РґР°Р»СЊС€Рµ?}
-            \begin{center}
-                \includegraphics[width=10cm]{real-4-k.eps}
-            \end{center}  
-            $$E_{B - V} + 3 \sigma_{E_{B - V}} < 0$$
+            }
         \end{frame} 
         
-	
         \begin{frame}{Q\&A}
             \begin{center}
-                РЎРїР°СЃРёР±Рѕ Р·Р° РІРЅРёРјР°РЅРёРµ!\\
+                Спасибо за внимание!\\
                 \href{https://github.com/amosov-f/dust-detection}{github.com/amosov-f/dust-detection}
             \end{center}
         \end{frame}

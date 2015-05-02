@@ -3,10 +3,13 @@ package ru.spbu.astro.dust.graph;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
+import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.graph.Histogram;
 import ru.spbu.astro.commons.hist.AverageHist;
 import ru.spbu.astro.commons.hist.CountHist;
+import ru.spbu.astro.dust.DustStars;
+import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.util.Split;
 
 /**
@@ -40,6 +43,19 @@ public class HistogramTest {
                 "Расстояние [пк]", 
                 "Относительная ошибка в расстоянии",
                 true
+        ).show();
+    }
+
+    @Test
+    public void testDeep() throws Exception {
+        final Star[] stars = new DustTrendCalculator(DustStars.ALL, 18).getInliers();
+
+        new Histogram<>(
+                new CountHist(
+                        "Расстояние [пк]",
+                        star -> star.getR().val(),
+                        new Split(0, 1000, 10)).histShares(stars),
+                "Расстояние [пк]"
         ).show();
     }
 

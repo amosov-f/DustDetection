@@ -11,12 +11,14 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.labels.CategoryItemLabelGenerator;
 import org.jfree.chart.labels.ItemLabelAnchor;
 import org.jfree.chart.labels.ItemLabelPosition;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.StackedBarRenderer;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.TextAnchor;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.stream.DoubleStream;
@@ -76,19 +78,26 @@ public final class Histogram<T extends Comparable<T>> {
             @Override
             public String generateLabel(@NotNull final CategoryDataset categoryDataset, final int i, final int i2) {
                 final T type = Iterables.get(hist.keySet(), i2);
+                System.out.println(type + " " + hist.get(type));
                 return percents ? null : String.format("%.2f", hist.get(type));
             }
         });
         renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER));
         renderer.setBaseItemLabelsVisible(true);
 
-        chart.getCategoryPlot().setRenderer(renderer);
+        final CategoryPlot plot = chart.getCategoryPlot();
+        plot.setRenderer(renderer);
 
         final NumberAxis rangeAxis = (NumberAxis) chart.getCategoryPlot().getRangeAxis();
         if (percents) {
             rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
         }
         rangeAxis.setRange(0.0, percents ? 1 : (1.1 * DoubleStream.of(Doubles.toArray(hist.values())).max().getAsDouble()));
+
+        plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
+        plot.getRangeAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
 
         frame = new ChartFrame(null, chart);
         frame.pack();
