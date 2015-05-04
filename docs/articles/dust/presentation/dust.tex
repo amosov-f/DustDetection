@@ -6,6 +6,7 @@
 \usepackage{amssymb,amsfonts,amsmath,mathtext}
 \usepackage{cite,enumerate,float,indentfirst}
 \usepackage{cancel}
+\usepackage{multirow}
 \usepackage{color}
 \usepackage{hyperref}
 \hypersetup{colorlinks,urlcolor=NavyBlue}
@@ -203,11 +204,38 @@
             \end{center}
         \end{frame}
         
-        \begin{frame}{Дальность действия метода}
+        \begin{frame}{Дальнодействие метода}
             \begin{center}
                 \includegraphics[width=10cm]{r-hist.eps}    \\
                 Более 90\% звезд находятся ближе 500 пк
             \end{center}             
+        \end{frame}
+        
+        \begin{frame}{Пылевое облако в созвездии Льва}
+            \begin{center} \footnotesize
+                Направление $(l, b) = (220.26, 52.29)$
+                \begin{tabular} {| c | c | c | c | c |}
+                    \hline
+                    \multirow{2}{*}{радиус}    &    \multicolumn{2}{c|}{$r$ до 500 пк}     &    \multicolumn{2}{c|}{$\sigma_r$ до 30\%}      \\
+                    \cline{2-5}
+                        &    $n$    &    $k$    &    $n$   &    $k$    \\                
+                    \hline
+                    1.0$^\circ$    &    6    &    $1.03 \pm 0.15$    &    3    &    $0.85 \pm 0.34$    \\
+                    1.5$^\circ$    &    15    &    $0.94 \pm 0.12$    &    11    &    $0.80 \pm 0.13$    \\
+                    2.0$^\circ$    &    24    &    $0.53 \pm 0.14$    &    20    &    $0.48 \pm 0.14$    \\
+                    2.5$^\circ$    &    38    &    $0.49 \pm 0.11$    &    32    &    $0.53 \pm 0.10$    \\
+                    3.0$^\circ$    &    50    &    $0.50 \pm 0.07$    &    39    &    $0.53 \pm 0.10$     \\
+                    3.5$^\circ$    &    69    &    $0.54 \pm 0.06$    &    54    &    $0.69 \pm 0.06$        \\
+                    4.0$^\circ$    &    86    &    $0.55 \pm 0.05$    &    70    &    $0.69 \pm 0.06$    \\
+                    4.5$^\circ$    &    107    &    $0.47 \pm 0.04$    &    87    &    $0.65 \pm 0.05$    \\
+                    5.0$^\circ$    &    129    &    $0.44 \pm 0.04$    &    106    &    $0.65 \pm 0.05$    \\
+                    5.5$^\circ$    &    159    &    $0.39 \pm 0.04$    &    128    &    $0.61 \pm 0.04$    \\
+                    6.0$^\circ$    &    186    &    $0.44 \pm 0.03$    &    150    &    $0.60 \pm 0.04$    \\
+                    6.5$^\circ$    &    216    &    $0.40 \pm 0.03$    &    174    &    $0.58 \pm 0.03$    \\
+                    7.0$^\circ$    &    253    &    $0.37 \pm 0.03$    &    198    &    $0.55 \pm 0.03$    \\
+                    \hline
+                \end{tabular}
+            \end{center}
         \end{frame}
         
         \begin{frame}{Сравнение результатов с 2MASS}
@@ -218,13 +246,14 @@
         
         \begin{frame}{Заключение}
         
-            { \small
+            { \footnotesize
                 \begin{itemize}
                     \item Бинарный классификатор, предсказывающий III или V класс светимости для звезд,
                     \item Классы светимости для 49542 звезд каталога Hipparcos с помощью бинарного классификатора,
                     \item Покраснения для 94199 звезд каталога Hipparcos по показателю цвета $B - V$,
                     \item Карта значений градиента покраснения,
                     \item Статистическая надежность результатов для каждой площадки,
+                    \item Пылевое облако в созвездии Льва,
                     \item Сравнение карт покраснения с аналогичными результатами, полученными по данным каталога 2MASS,
                     \item Отрицательное покраснение у 11\% звезд
                 \end{itemize}

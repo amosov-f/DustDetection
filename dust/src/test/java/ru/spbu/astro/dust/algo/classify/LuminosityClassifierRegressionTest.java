@@ -1,7 +1,10 @@
 package ru.spbu.astro.dust.algo.classify;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Assert;
+import org.junit.Test;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.Stars;
@@ -16,12 +19,19 @@ import java.util.Locale;
  * Time: 0:55
  */
 public final class LuminosityClassifierRegressionTest {
-    private LuminosityClassifierRegressionTest() {
+    @Test
+    public void regression() throws Exception {
+        Assert.assertEquals(IOUtils.toString(getClass().getResourceAsStream("/predict-lumin.txt")), actual());
     }
 
     public static void main(@NotNull final String[] args) throws IOException {
+        FileUtils.writeStringToFile(new File("dust/src/test/resources/predict-lumin.txt"), actual());
+    }
+
+    @NotNull
+    private static String actual() {
         final Star[] stars = LuminosityClassifiers.SVM.classify(StarFilter.of(Stars.ALL).noLumin().stars());
-        FileUtils.writeStringToFile(new File("dust/src/test/resources/predict-lumin.txt"), toString(stars));
+        return toString(stars);
     }
 
     @NotNull
