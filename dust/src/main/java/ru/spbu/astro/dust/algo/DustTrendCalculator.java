@@ -1,5 +1,6 @@
 package ru.spbu.astro.dust.algo;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Spheric;
@@ -25,17 +26,9 @@ public final class DustTrendCalculator {
     @NotNull
     private final Star[][] rings;
     @NotNull
-    private final Star[][] inliers;
-    @NotNull
-    private final Star[][] outliers;
-    @NotNull
-    private final Value[] slopes;
-    @NotNull
-    private final Value[] intercepts;
+    private final Regression[] regressions;
     @NotNull
     private final Healpix healpix;
-    @NotNull
-    private final Function<Star, Value> f;
 
     public DustTrendCalculator(@NotNull final Star[] stars, final int nSide) {
         this(stars, nSide, Star::getExtinction, false);
@@ -46,25 +39,14 @@ public final class DustTrendCalculator {
 
         healpix = new Healpix(nSide);
         rings = healpix.split(stars);
-        inliers = new Star[rings.length][];
-        outliers = new Star[rings.length][];
-        slopes = new Value[rings.length];
-        intercepts = new Value[rings.length];
-        this.f = f;
+        regressions = new Regression[rings.length];
 
         for (int pix = 0; pix < rings.length; pix++) {
             final Star[] ring = rings[pix];
-            if (ring.length < MIN_FOR_TREND) {
-                continue;
+            if (ring.length >= MIN_FOR_TREND) {
+                regressions[pix] = new Regression(ring, f, includeIntercept);
             }
-            final RansacLinearRegression regression = RansacLinearRegression.train(
-                    Arrays.stream(ring).collect(Collectors.toMap(Star::getId, this::toPoint)), includeIntercept
-            );
-            slopes[pix] = regression.getSlope();
-            intercepts[pix] = regression.getIntercept();
-            final Map<Integer, Star> id2star = Stars.map(ring);
-            inliers[pix] = Arrays.stream(regression.getInliers()).mapToObj(id2star::get).toArray(Star[]::new);
-            outliers[pix] = Arrays.stream(regression.getOutliers()).mapToObj(id2star::get).toArray(Star[]::new);
+
         }
     }
 
@@ -72,41 +54,35 @@ public final class DustTrendCalculator {
         return healpix.getNSide();
     }
 
+    @Nullable
+    public Regression getRegression(@NotNull final Spheric dir) {
+        return regressions[healpix.getPix(dir)];
+    }
+
     @NotNull
     public Value[] getSlopes() {
-        return slopes;
+        return Arrays.stream(regressions)
+                .map(regression -> regression != null ? regression.getSlope() : null)
+                .toArray(Value[]::new);
     }
 
     @NotNull
     public Value[] getIntercepts() {
-        return intercepts;
-    }
-
-    @Nullable
-    public Star[] getInliers(@NotNull final Spheric dir) {
-        return inliers[healpix.getPix(dir)];
+        return Arrays.stream(regressions)
+                .map(regression -> regression != null ? regression.getIntercept() : null)
+                .toArray(Value[]::new);
     }
 
     @NotNull
     public Star[] getInliers() {
         final List<Star> stars = new ArrayList<>();
-        Arrays.stream(inliers).forEach(inliers -> stars.addAll(Arrays.asList(inliers)));
+        Arrays.stream(regressions).forEach(regression -> stars.addAll(Arrays.asList(regression.getInliers())));
         return stars.toArray(new Star[stars.size()]);
     }
 
     @Nullable
-    public Star[] getOutliers(@NotNull final Spheric dir) {
-        return outliers[healpix.getPix(dir)];
-    }
-
-    @Nullable
     public Value getSlope(@NotNull final Spheric dir) {
-        return slopes[healpix.getPix(dir)];
-    }
-
-    @NotNull
-    private Point toPoint(@NotNull final Star star) {
-        return new Point(star.getR(), f.apply(star));
+        return regressions[healpix.getPix(dir)].getSlope();
     }
 
     @Override
@@ -119,8 +95,9 @@ public final class DustTrendCalculator {
         final StringBuilder sb = new StringBuilder();
         sb.append("n_side = ").append(healpix.getNSide()).append(", n_pix = ").append(healpix.getNPix()).append('\n');
         if (slopeFilter != null) {
-            final int acceptedSlopesCount = (int) Arrays.stream(slopes)
-                    .filter(((Predicate<Value>) Objects::nonNull).and(slopeFilter.getPredicate()))
+            final int acceptedSlopesCount = (int) Arrays.stream(regressions)
+                    .filter(((Predicate<Regression>) Objects::nonNull)
+                            .and(regression -> slopeFilter.getPredicate().test(regression.getSlope())))
                     .count();
             sb.append("n_accepted_pix = ").append(acceptedSlopesCount);
             sb.append(" (").append(100 * acceptedSlopesCount / healpix.getNPix()).append("%)\n");
@@ -129,7 +106,7 @@ public final class DustTrendCalculator {
         sb.append("№\tl\t\t\tb\t\t\tn\tk\n");
         for (int pix = 0; pix < rings.length; ++pix) {
             final Spheric dir = healpix.getCenter(pix);
-            final Value k = slopes[pix];
+            final Value k = regressions[pix] != null ? regressions[pix].getSlope() : null;
             if (k != null && (slopeFilter == null || slopeFilter.getPredicate().test(k))) {
                 sb.append(String.format(
                         "%d\t%f\t%f\t%d\t%.2f ± %.2f\n",
@@ -145,7 +122,7 @@ public final class DustTrendCalculator {
         final List<Object[]> table = new ArrayList<>();
         for (int pix = 0; pix < rings.length; ++pix) {
             final Spheric dir = healpix.getCenter(pix);
-            final Value k = slopes[pix] != null ? slopes[pix].multiply(1000) : null;
+            final Value k = regressions[pix] != null ? regressions[pix].getSlope().multiply(1000) : null;
             if (k != null && (slopeFilter == null || slopeFilter.getPredicate().test(k))) {
                 table.add(new Object[]{
                         pix,
@@ -156,5 +133,64 @@ public final class DustTrendCalculator {
             }
         }
         return table.toArray(new Object[table.size()][]);
+    }
+
+    public static final class Regression {
+        @NotNull
+        private final Value slope;
+        @NotNull
+        private final Value intercept;
+        @NotNull
+        private final Star[] inliers;
+        @NotNull
+        private final Star[] outliers;
+        @NotNull
+        private final Function<Star, Value> f;
+
+        public Regression(@NotNull final Star[] stars) {
+            this(stars, Star::getExtinction, false);
+        }
+
+        public Regression(@NotNull final Star[] stars, @NotNull final Function<Star, Value> f, final boolean includeIntercept) {
+            this.f = f;
+            final RansacLinearRegression regression = RansacLinearRegression.train(
+                    Arrays.stream(stars).collect(Collectors.toMap(Star::getId, this::toPoint)), includeIntercept
+            );
+            slope = regression.getSlope();
+            intercept = regression.getIntercept();
+            final Map<Integer, Star> id2star = Stars.map(stars);
+            inliers = Arrays.stream(regression.getInliers()).mapToObj(id2star::get).toArray(Star[]::new);
+            outliers = Arrays.stream(regression.getOutliers()).mapToObj(id2star::get).toArray(Star[]::new);
+        }
+
+        @NotNull
+        public Value getSlope() {
+            return slope;
+        }
+
+        @NotNull
+        public Value getIntercept() {
+            return intercept;
+        }
+
+        @NotNull
+        public Star[] getStars() {
+            return ArrayUtils.addAll(inliers, outliers);
+        }
+
+        @NotNull
+        public Star[] getInliers() {
+            return inliers;
+        }
+
+        @NotNull
+        public Star[] getOutliers() {
+            return outliers;
+        }
+
+        @NotNull
+        private Point toPoint(@NotNull final Star star) {
+            return new Point(star.getR(), f.apply(star));
+        }
     }
 }

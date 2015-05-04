@@ -1,152 +1,112 @@
 package ru.spbu.astro.dust.graph;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
+import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYSplineRenderer;
+import org.jfree.data.xy.XYIntervalSeries;
+import org.jfree.data.xy.XYIntervalSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.dust.algo.DustTrendCalculator;
+import ru.spbu.astro.healpix.Healpix;
+import ru.spbu.astro.util.Value;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 import static org.jfree.chart.JFreeChart.DEFAULT_TITLE_FONT;
 
-@SuppressWarnings("MagicNumber")
-public final class ExtPlot {
+/**
+ * User: amosov-f
+ * Date: 03.05.15
+ * Time: 12:33
+ */
+public class ExtPlot {
+    private static final Logger LOG = Logger.getLogger(ExtPlot.class.getName());
+
     @NotNull
     private final ChartFrame frame;
 
     public ExtPlot() {
-        final XYItemRenderer renderer = new XYSplineRenderer();
-        renderer.setSeriesShape(0, new Ellipse2D.Double(0, 0, 0, 0));
-        renderer.setSeriesStroke(0, new BasicStroke(3));
-
-        final XYPlot plot = new XYPlot(
-                new XYSeriesCollection(getSeries()[0]),
-                new NumberAxis("Расстояние"),
-                new NumberAxis("Покраснение"),
-                renderer
-        );
-
-        plot.getDomainAxis().setTickLabelsVisible(false);
-        plot.getRangeAxis().setTickLabelsVisible(false);
-
-//        plot.setDataset(1, new XYSeriesCollection(getSeries()[1]));
-//        plot.setRenderer(1, new XYAreaRenderer());
-
-        final JFreeChart chart = new JFreeChart("Покраснение в некотором направлении", DEFAULT_TITLE_FONT, plot, true);
-
-        plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
-        plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
-        plot.getRangeAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
-        plot.getRangeAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));
-        chart.getLegend().setItemFont(new Font("SansSerif", Font.PLAIN, 16));
-
-        frame = new ChartFrame("Идеальная кривая покраснения", chart);
+        frame = new ChartFrame("Покраснение", null);
         frame.pack();
+        frame.setVisible(true);
     }
 
-    public static void main(@NotNull final String[] args) {
-        new ExtPlot().show();
+    public void plot(@NotNull final DustTrendCalculator.Regression regression, @Nullable final String title) {
+        final Star[] inliers = regression.getInliers();
+        final Star[] outliers = regression.getOutliers();
+
+        final Value slope = regression.getSlope();
+
+        LOG.info("k = " + slope.multiply(1000));
+
+        final Star[] stars = ArrayUtils.addAll(inliers, outliers);
+        LOG.info("n = " + stars.length);
+
+        final XYIntervalSeriesCollection starsDataset = new XYIntervalSeriesCollection() {{
+            addSeries(createXYIntegervalSeries(inliers, "Звезды, по которым строится тренд"));
+            addSeries(createXYIntegervalSeries(outliers, "Выбросы"));
+        }};
+
+        final XYPlot plot = new XYPlot(
+                starsDataset,
+                new NumberAxis("Расстояние [пк]"),
+                new NumberAxis("Покраснение [зв.вел.]"),
+                new XYErrorRenderer()
+        );
+
+        final double r = Arrays.stream(stars).mapToDouble(s -> s.getR().plusNSigma(1)).max().getAsDouble();
+
+        final XYSeries trend = new XYSeries("Тренд");
+        trend.add(0, 0);
+        trend.add(r, slope.val() * r);
+
+        final XYSeriesCollection seriesCollection = new XYSeriesCollection();
+        seriesCollection.addSeries(trend);
+
+        plot.setDataset(1, seriesCollection);
+
+        final XYItemRenderer renderer = new SamplingXYLineRenderer();
+        renderer.setStroke(new BasicStroke(3));
+        plot.setRenderer(1, renderer);
+
+        plot.setRangeZeroBaselineVisible(true);
+
+        final JFreeChart chart = new JFreeChart(title, DEFAULT_TITLE_FONT, plot, true);
+
+        final int fontSize = 16;
+        plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        plot.getRangeAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        plot.getRangeAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        chart.getLegend().setItemFont(new Font("SansSerif", Font.PLAIN, fontSize));
+
+        frame.getChartPanel().setChart(chart);
     }
 
     @NotNull
-    private XYSeries[] getSeries() {
-        final XYSeries series = new XYSeries("Кривая покраснения");
-        final XYSeries dustSeries = new XYSeries("Пылевые облака");
-
-        double r = 0;
-        double ext = 0;
-        for (; r < 90; r += 1) {
-            series.add(r, ext);
-            ext += 0.00025;
+    private XYIntervalSeries createXYIntegervalSeries(@NotNull final Star[] stars, @NotNull final String name) {
+        final XYIntervalSeries series = new XYIntervalSeries(name);
+        for (final Star s : stars) {
+            series.add(
+                    s.getR().val(),
+                    s.getR().val() - s.getR().err(),
+                    s.getR().val() + s.getR().err(),
+                    s.getExtinction().val(),
+                    s.getExtinction().val() - s.getExtinction().err(),
+                    s.getExtinction().val() + s.getExtinction().err()
+            );
         }
-
-        ext += 10 * 0.00025;
-
-        dustSeries.add(100, 0);
-        dustSeries.add(100, ext + 0.002);
-
-        ext += 10 * 0.00125;
-
-        for (r = 110; r < 140; r += 1) {
-            series.add(r, ext);
-            dustSeries.add(r, ext);
-            ext += 0.00125;
-        }
-
-        ext += 10 * 0.00125;
-
-        dustSeries.add(150, ext - 0.002);
-        dustSeries.add(150, 0);
-
-        ext += 10 * 0.00025;
-
-        for (r = 160; r < 240; r += 1) {
-            series.add(r, ext);
-            ext += 0.00025;
-        }
-
-        ext += 10 * 0.00025;
-
-        dustSeries.add(250, 0);
-        dustSeries.add(250, ext + 0.008);
-
-        ext += 10 * 0.00325;
-
-        for (r = 260; r < 265; r += 1) {
-            series.add(r, ext);
-            dustSeries.add(r, ext);
-            ext += 0.00325;
-        }
-
-        ext += 10 * 0.00325;
-
-        dustSeries.add(275, ext - 0.007);
-        dustSeries.add(275, 0);
-
-        ext += 10 * 0.00025;
-
-        for (r = 285; r < 300; r += 1) {
-            series.add(r, ext);
-            ext += 0.00025;
-        }
-
-
-        ext += 10 * 0.00025;
-
-        dustSeries.add(310, 0);
-        dustSeries.add(310, ext + 0.005);
-
-        ext += 10 * 0.00225;
-
-
-        for (r = 320; r < 340; r += 1) {
-            series.add(r, ext);
-            dustSeries.add(r, ext);
-            ext += 0.00225;
-        }
-
-        ext += 10 * 0.00225;
-
-        dustSeries.add(350, ext - 0.005);
-        dustSeries.add(350, 0);
-
-        ext += 10 * 0.00025;
-
-        for (r = 360; r < 400; r += 1) {
-            series.add(r, ext);
-            ext += 0.00025;
-        }
-
-        return new XYSeries[]{series, dustSeries};
-    }
-
-    private void show() {
-        frame.setVisible(true);
+        return series;
     }
 }

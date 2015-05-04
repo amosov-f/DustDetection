@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
@@ -90,7 +91,12 @@ public final class Value implements Comparable<Value> {
 
     @NotNull
     public Value multiply(final double alpha) {
-        return of(value * 1000, error * 1000);
+        return of(value * alpha, error * alpha);
+    }
+
+    @NotNull
+    public Value kilo() {
+        return multiply(1000);
     }
 
     @NotNull
@@ -127,6 +133,6 @@ public final class Value implements Comparable<Value> {
     @NotNull
     @Override
     public String toString() {
-        return String.format("%.3f ± %.3f", val(), err());
+        return String.format(Locale.US, "%.2f ± %.2f", val(), err());
     }
 }

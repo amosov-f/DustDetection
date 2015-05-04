@@ -12,7 +12,7 @@ import java.util.Map;
  * Time: 2:16
  */
 public final class Catalogs {
-    static final Catalog HIPPARCOS_1997 = Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos1997.txt"));
+    public static final Catalog HIPPARCOS_1997 = Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos1997.txt"));
     static final Catalog HIPPARCOS_2007 = innerJoin(Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos2007.txt")), HIPPARCOS_1997);
 
     private Catalogs() {

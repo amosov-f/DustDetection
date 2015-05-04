@@ -8,6 +8,7 @@ import ru.spbu.astro.util.TextUtils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -78,6 +79,14 @@ public final class StarFilter {
     }
 
     @NotNull
+    public StarFilter region(@NotNull final Spheric dir, final double r) {
+        return apply(
+                "around " + dir + " in " + format(Locale.US, "%.2f", Math.toDegrees(r)),
+                star -> dir.distance(star.getDir()) <= r
+        );
+    }
+
+    @NotNull
     public StarFilter leftBV() {
         return bv(Double.NEGATIVE_INFINITY, 0.6);
     }
@@ -116,6 +125,11 @@ public final class StarFilter {
                 format("%.0f < r < %.0f", r1, r2),
                 star -> r1 <= star.getR().val() && star.getR().val() <= r2
         );
+    }
+
+    @NotNull
+    public StarFilter r(final double r2) {
+        return r(0, r2);
     }
 
     @NotNull

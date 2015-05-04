@@ -53,7 +53,7 @@ public class DustTrendCalculatorShow {
     @Test
     public void main() throws Exception {
         final DustTrendCalculator calculator = new DustTrendCalculator(
-                StarFilter.of(DustStars.ALL).piRelErr(0.25).stars(), N_SIDE
+                StarFilter.of(DustStars.ALL).r(0, 500).stars(), 24
         );
         final SphericDistribution f = new HealpixDistribution(calculator.getSlopes());
         System.out.println(calculator.getSlopes().length);

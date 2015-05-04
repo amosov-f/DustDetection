@@ -34,7 +34,7 @@ import static ru.spbu.astro.commons.graph.HRDiagram.BV_COLOR_UPPER_BOUND;
 @SuppressWarnings("MagicNumber")
 public class LuminosityClassifierShow {
     @Test
-    public void show() throws IOException {
+    public void showLearn() throws IOException {
         final Star[] stars = StarFilter.of(Stars.ALL).mainLumin().stars();
         final SVMLuminosityClassifier classifier = new SVMLuminosityClassifier(stars, SVMLuminosityClassifier.Mode.TEST);
 
@@ -46,6 +46,23 @@ public class LuminosityClassifierShow {
 //        seriesCollection.addSeries(create("Разделяющая прямая", -2.9876, 0.4526, 1.3547)); // all
         seriesCollection.addSeries(create("Разделяющая прямая", -3.0752, 0.4485, 1.4793));    // all new
 //        seriesCollection.addSeries(create("Разделяющая прямая (new)", classifier.getA(), classifier.getB(), classifier.getC()));
+        plot.setDataset(1, seriesCollection);
+        plot.setDataset(2, theory());
+        plot.setRenderer(1, samplingRenderer(seriesCollection.getSeriesCount()));
+        final XYItemRenderer renderer = samplingRenderer(2);
+        renderer.setSeriesPaint(0, Color.CYAN);
+        plot.setRenderer(2, renderer);
+        plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+        diagram.show();
+    }
+
+    @Test
+    public void showPredicted() throws Exception {
+        final Star[] stars = LuminosityClassifiers.SVM.classify(StarFilter.of(Stars.ALL).noLumin().stars());
+        final HRDiagram diagram = new HRDiagram(stars);
+        final XYPlot plot = diagram.getPlot();
+        final XYSeriesCollection seriesCollection = new XYSeriesCollection();
+        seriesCollection.addSeries(create("Разделяющая прямая", -3.0752, 0.4485, 1.4793));
         plot.setDataset(1, seriesCollection);
         plot.setDataset(2, theory());
         plot.setRenderer(1, samplingRenderer(seriesCollection.getSeriesCount()));
