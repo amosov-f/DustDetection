@@ -13,6 +13,7 @@
 \usepackage{amsmath}
 \usepackage{multirow}
 \usepackage{longtable}
+\usepackage{hyperref}
 \DeclareMathOperator{\sign}{sign}
 
 \textwidth 16.5cm
@@ -297,6 +298,7 @@
                 \item  класс светимости (каталог Hipparcos)
             \end{itemize}
 
+Дополнительные сведения об используемых данных можно найти в работах \cite{tsv1}- \cite{tsv3}.
 
             %%%Для определения параметров межзвездного поглощения, необходимо иметь следующие данные о звездах,
 %%%            \begin{itemize}
@@ -619,7 +621,8 @@
             \item класс светимости.
         \end{itemize}
 
-        Электронная версия каталога доступна по адресу [ файл predict-lumin.txt].
+        Электронная версия каталога доступна по адресу \\
+        \href{https://github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/predict-lumin.txt}{github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/predict-lumin.txt}.
         %%%%%Не для всех звезд, имеющих класс светимости и прочие необходимые
 %%%%%        данное возможно рассчитать покраснение. Многие звезды имеют класс светимости,
 %%%%%        для которого нет данных о покраснении в таблице (\ref{int}),
@@ -765,7 +768,8 @@
                 \end{figure}
 
 Каталог значений градиента покраснения для центров 3888 площадок приведен в Приложении
-(таб.~\ref{table-k}). Электронная версия этого каталога доступна по адресу [файл table-k.txt]
+(таб.~\ref{table-k}). Электронная версия этого каталога доступна по адресу \\
+            \href{https://github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/predict-lumin.txt}{github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/table-k.txt}
 
 
         \subsection{Распределение коэффициента $k$ по небесной сфере}
@@ -1036,7 +1040,7 @@ $k/\sigma_k$=3 надежность результата составляет 99.87 процента (правило трех сиг
  На карте неба (рис.~\ref{skymap})   облако  в созвездии Льва (N5)  в отличие от облаков 1-4 из табл.\ref{new}
    расположено вдали от Млечного пути.
             Рассмотрим более детально эту ситуацию.
-             В качестве основного направления  на этого облако  возьмем  точку с координатами
+             В качестве основного направления  на это облако  возьмем  точку с координатами
              $(l, b) = (220.26, 52.29)$.
              Выбор именно такого направления обусловлен тем, что
              на сетке HEALPix с $N_{side} = 20$ центр пикселя с
@@ -1203,11 +1207,13 @@ B-V. Кроме того,  эти поправки слабо зависят    как от спектра звезд, так и от с
     Для V класса светимости  соответствующие характеристики  равны 91\% и 96\%.
     \item Для 49542 звезд калога HIPPARCOS с помощью бинарного классификатора определены
     классы светимости.
-    Электронная версия этого каталога доступна по адресу [файл predict-lumin.txt]
+    Электронная версия этого каталога доступна по адресу \\
+    \href{https://github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/predict-lumin.txt}{github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/predict-lumin.txt}
     \item Для 94199 звезд каталога HIPPARCOS определены покраснения звезд по показателю цвета $B - V$.
     \item Для звезд с расстояниями до 500 пк получена карта значений градиента покраснения в направлениях,
     определяемых центрами 3888  равновеликих площадок, построенных методом HealPix.
-    Электронная версия этого каталога доступна по адресу [файл table-k.txt]
+    Электронная версия этого каталога доступна по адресу \\
+    \href{https://github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/predict-lumin.txt}{github.com/amosov-f/dust-detector/blob/master/dust/src/test/resources/table-k.txt}
     \item Определена статистическая надежность результатов для каждой площадки.
     \item Произведено сравнение  карт покраснения, полученных нами в оптическом диапазоне,
      с аналогичными результатами, полученными в ближней инфракрасной области по данным каталога 2MASS.
@@ -1326,6 +1332,12 @@ B-V. Кроме того,  эти поправки слабо зависят    как от спектра звезд, так и от с
 \bibitem{knude99} J. Knude and E. Hog,
               Interstellar reddening from the Hipparcos and Tycho catalogues II. Nearby dust features at the NGP
              associated with approaching HI gas. Astron. Astrophys., 341, p. 451457 (1999).
+
+\bibitem{tsv1} Цветков А.С. Руководство по практической работе с каталогом Hipparcos, СПб.: СПбГУ, (2005).
+\bibitem{tsv2} Цветков А.С. Руководство по работе с каталогом TYCHO-2, СПб.: СПбГУ, (2006).
+\bibitem{tsv3} А. С. Цветков, А. В. Попов, А. А. Смирнов. Неточности в спектральной классификации
+ звезд каталога Tycho-2., ПАЖ, т.34, N1, с.1-11, (2008)
+
 \bibitem{smo} Hastie, T.; Tibshirani, R. \& Friedman, J. (2001),
         {\em The Elements of Statistical Learning} , Springer New York Inc. , New York, NY, USA .
 \bibitem{svm} V.N.Vapnik {\em The Nature of Statistical Learning Theory} 1995.
@@ -1336,9 +1348,11 @@ B-V. Кроме того,  эти поправки слабо зависят    как от спектра звезд, так и от с
  Princeton University Press. 533 p., 2014
 
 
-\bibitem{tycho} Hog E., Baessgen G., Bastian U., Egret D., Fabricius C., Grossmann V., Halbwachs J.L., Makarov V.V., Perryman M.A.C., Schwekendiek P., Wagner K., Wicenec A., "The Tycho Catalogue" (1997A\&A...323L..57H)
-\bibitem{photometry} van Leeuwen F., Evans D.W., Grenon M., Grossmann V., Mignard F., Perryman M.A.C.,
-        "The Hipparcos mission: photometric data." (1997A\&A...323L..61V)
+\bibitem{tycho} Hog E., Baessgen G., Bastian U., Egret D., Fabricius C., Grossmann V., Halbwachs J.L.,
+ Makarov V.V., Perryman M.A.C., Schwekendiek P., Wagner K., Wicenec A.,
+"The Tycho Catalogue"  Astron\& Astrophys, 323L,57H. 1997.
+%\bibitem{photometry} van Leeuwen F., Evans D.W., Grenon M., Grossmann V., Mignard F., Perryman M.A.C.,
+%        "The Hipparcos mission: photometric data." (1997A\&A...323L..61V)
 \bibitem{hipnewcat} Hipparcos, the New Reduction of the Raw Data van Leeuwen F.,Astron. Astrophys. 474, 653 (2007),
 \bibitem{tycho} Wright et al. {\em Tycho-2 Spectral Type Catalog} 2003: The Astronomical Journal
 \bibitem{xhip} Anderson, E.; Francis, Ch.
