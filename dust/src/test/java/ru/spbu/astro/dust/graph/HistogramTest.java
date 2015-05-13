@@ -59,6 +59,44 @@ public class HistogramTest {
         ).show();
     }
 
+    @Test
+    public void showBVObsErr() {
+        new Histogram<>(
+                new AverageHist("pizza", Star::getVMag, s -> s.getBVColor().err(), new Split(2, 13, 9)).hist(DustStars.ALL),
+                "Видимая зв. вел.",
+                "Ошибка B-V obs",
+                false
+        ).show();
+    }
+
+    @Test
+    public void showBVIntErr() {
+        new Histogram<>(
+                new AverageHist("pizza", Star::getVMag, s -> s.getSpectType().toBV().err(), new Split(2, 13, 9)).hist(DustStars.ALL),
+                "Видимая зв. вел.",
+                "Ошибка B-V int",
+                false
+        ).show();
+    }
+
+    @Test
+    public void showExtErr() {
+        new Histogram<>(
+                new AverageHist("pizza", Star::getVMag, s -> s.getExtinction().err(), new Split(2, 13, 9)).hist(DustStars.ALL),
+                "Видимая зв. вел.",
+                "Ошибка покраснения",
+                false
+        ).show();
+    }
+
+    @Test
+    public void showVMag() throws Exception {
+        new Histogram<>(
+                new CountHist("Расстояние [пк]", Star::getVMag, new Split(2, 13, 9)).histShares(DustStars.ALL),
+                "Видимая зв. вел."
+        ).show();
+    }
+
     @After
     public void tearDown() throws InterruptedException {
         Thread.sleep(Long.MAX_VALUE);

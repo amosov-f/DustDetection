@@ -1,14 +1,13 @@
 package ru.spbu.astro.commons.spect;
 
-import com.google.common.primitives.Doubles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbu.astro.util.MathTools;
 import ru.spbu.astro.util.Value;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.DoubleStream;
 
 public final class SpectType {
     @NotNull
@@ -51,10 +50,10 @@ public final class SpectType {
 
     @Nullable
     public Value toBV() {
-        final List<Double> bvs = new ArrayList<>();
+        final List<Value> bvs = new ArrayList<>();
         for (final SpectClass spect : spects) {
             for (final LuminosityClass lumin : lumins) {
-                final Double bv = SpectTable.getInstance().getBV(spect, lumin);
+                final Value bv = SpectTable.getInstance().getBV(spect, lumin);
                 if (bv != null) {
                     bvs.add(bv);
                 }
@@ -63,8 +62,10 @@ public final class SpectType {
         if (bvs.isEmpty()) {
             return null;
         }
-        final double bv = DoubleStream.of(Doubles.toArray(bvs)).average().getAsDouble();
-        return Value.of(bv, bvs.stream().mapToDouble(x -> Math.abs(x - bv)).max().getAsDouble());
+        if (Double.isNaN(MathTools.average(bvs.toArray(new Value[bvs.size()])).val())) {
+            System.out.println(bvs);
+        }
+        return MathTools.average(bvs.toArray(new Value[bvs.size()]));
     }
 
     @Nullable

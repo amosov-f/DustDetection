@@ -1,5 +1,7 @@
 package ru.spbu.astro.commons.spect;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,6 +49,10 @@ public final class SpectClass {
         return number;
     }
 
+    public boolean hasIntCode() {
+        return number == number.intValue();
+    }
+
     public int getNumber() {
         return number.intValue();
     }
@@ -57,6 +63,23 @@ public final class SpectClass {
 
     public double getDoubleCode() {
         return 10 * symbol.ordinal() + number;
+    }
+
+    @Override
+    public boolean equals(@Nullable final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final SpectClass that = (SpectClass) o;
+        return new EqualsBuilder().append(symbol, that.symbol).append(number, that.number).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(symbol).append(number).toHashCode();
     }
 
     @NotNull

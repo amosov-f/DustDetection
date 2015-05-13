@@ -19,8 +19,16 @@ public final class MathTools {
     private MathTools() {
     }
 
+    @NotNull
     public static Value average(@NotNull final double... x) {
         return Value.of(new Mean().evaluate(x),  new StandardDeviation().evaluate(x));
+    }
+
+    @NotNull
+    public static Value average(@NotNull final Value... x) {
+        final double min = Arrays.stream(x).mapToDouble(d -> d.plusNSigma(-1)).min().getAsDouble();
+        final double max = Arrays.stream(x).mapToDouble(d -> d.plusNSigma(1)).max().getAsDouble();
+        return Value.of((min + max) / 2, (max - min) / 2);
     }
 
     public static double interpolate(final double x1, final double y1, final double x2, final double y2, final double x) {

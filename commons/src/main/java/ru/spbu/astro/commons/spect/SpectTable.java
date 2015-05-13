@@ -3,6 +3,7 @@ package ru.spbu.astro.commons.spect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.util.MathTools;
+import ru.spbu.astro.util.Value;
 
 import java.io.*;
 import java.util.*;
@@ -20,20 +21,6 @@ public class SpectTable {
 
     public static final SpectTable TSVETKOV = read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
     public static final SpectTable SCHMIDT_KALER = read("schmidt-kaler", SpectTable.class.getResourceAsStream("/table/schmidt-kaler.txt"));
-    public static final SpectTable TSVETKOV_MID = new SpectTable("tsvetkov-mid") {
-        @Nullable
-        @Override
-        public Double getBV(@NotNull final SpectClass spect, @NotNull final LuminosityClass lumin) {
-            if (lumin != LuminosityClass.III_V) {
-                return TSVETKOV.getBV(spect, lumin);
-            }
-            final Double bvIII = TSVETKOV.getBV(spect, LuminosityClass.III);
-            final Double bvV = TSVETKOV.getBV(spect, LuminosityClass.V);
-            final double w1 = 0.114;
-            final double w2 = 1 - w1;
-            return bvIII != null && bvV != null ? w1 * bvIII + w2 * bvV : null;
-        }
-    };
 
     public static final int MIN_CODE = 5;
     public static final int MAX_CODE = 69;
@@ -118,22 +105,49 @@ public class SpectTable {
     }
 
     @Nullable
-    public Double getBV(@NotNull final SpectClass spect, @NotNull final LuminosityClass lumin) {
+    public Value getBV(@NotNull final SpectClass spect, @NotNull final LuminosityClass lumin) {
         if (!table.containsKey(lumin)) {
             return null;
         }
         final NavigableMap<Integer, Double> bvs = getBVs(lumin);
         final int code = spect.getCode();
-        if (bvs.containsKey(code)) {
-            return bvs.get(code);
-        }
-        final Integer x1 = bvs.floorKey(code);
+        final Integer x1;
         final Integer x2 = bvs.higherKey(code);
-        if (x1 != null && x2 != null) {
-            return MathTools.interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
+        final Double d1;
+        final Double d2;
+        final double val;
+        if (spect.hasIntCode() && bvs.containsKey(code)) {
+            x1 = bvs.lowerKey(code);
+            val = bvs.get(code);
+            d1 = x1 != null ? Math.abs(val - bvs.get(x1)) / 2 : null;
+            d2 = x2 != null ? Math.abs(bvs.get(x2) - val) / 2 : null;
+            if (d1 == null && d2 == null) {
+                return null;
+            }
+        } else {
+            x1 = bvs.floorKey(code);
+            if (x1 == null || x2 == null) {
+                return null;
+            }
+            val = MathTools.interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
+            d1 = Math.abs(val - bvs.get(x1));
+            d2 = Math.abs(bvs.get(x2) - val);
         }
-        return null;
+        return Value.of(val, Arrays.stream(new Double[]{d1, d2})
+                .filter(Objects::nonNull)
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .getAsDouble());
     }
+
+//    @NotNull
+//    private static Value bv(final int code, @NotNull final NavigableMap<Integer, Double> bvs) {
+//        final Integer x1 = bvs.lowerKey(code);
+//        final Integer x2 = bvs.higherKey(code);
+//        if (x1 != null) {
+//            x1
+//        }
+//    }
 
 //    public static void main(String[] args) {
 //        final Scanner fin = new Scanner(SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));

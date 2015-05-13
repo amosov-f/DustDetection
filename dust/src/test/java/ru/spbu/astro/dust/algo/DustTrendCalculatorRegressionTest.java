@@ -5,12 +5,21 @@ import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
+import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.commons.spect.SpectClass;
+import ru.spbu.astro.commons.spect.SpectTable;
 import ru.spbu.astro.dust.DustStars;
+import ru.spbu.astro.util.Filter;
+import ru.spbu.astro.util.MathTools;
 import ru.spbu.astro.util.TextUtils;
 import ru.spbu.astro.util.Value;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,5 +51,28 @@ public class DustTrendCalculatorRegressionTest {
     @Ignore
     public void showAcceptPositive() {
         assertEquals("", new DustTrendCalculator(DustStars.ALL, N_SIDE).toString(Value.POS_TWO_SIGMA));
+    }
+
+    @Test
+    public void testName() throws Exception {
+        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
+        final Star[] allStars = StarFilter.of(DustStars.ALL)
+                .r(250)
+                .apply(Filter.by("small gradient", s -> Math.abs(calculator.getSlope(s.getDir()).val()) <= 0.0001))
+                .stars();
+        final PrintWriter fout = new PrintWriter("pizza.txt");
+        for (final LuminosityClass lumin : LuminosityClass.MAIN) {
+            for (int code = 5; code < 70; code++) {
+                final SpectClass spect = SpectClass.valueOf(code);
+                final Star[] stars = StarFilter.of(allStars).spectType(spect).lumin(lumin).stars();
+                fout.print(lumin + "\t" + spect + "\t" + stars.length + "\t" + SpectTable.getInstance().getBV(spect, lumin).val());
+                if (stars.length != 0) {
+                    final Value bvObs = MathTools.average(Arrays.stream(stars).mapToDouble(s -> s.getBVColor().val()).toArray());
+                    fout.print("\t" + bvObs);
+                }
+                fout.println();
+            }
+        }
+        fout.close();
     }
 }

@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * User: amosov-f
@@ -12,6 +13,8 @@ import java.util.*;
  * Time: 18:52
  */
 public abstract class StarHist<X extends Comparable<X>, Y extends Number> {
+    private static final Logger LOG = Logger.getLogger(StarHist.class.getName());
+
     @NotNull
     private final String name;
 
@@ -42,7 +45,9 @@ public abstract class StarHist<X extends Comparable<X>, Y extends Number> {
         }
         final Map<X, Y> hist = getComparator() == null ? new TreeMap<>() : new TreeMap<>(getComparator());
         for (final X x : bins.keySet()) {
-            final Y y = getY(bins.get(x).stream().toArray(Star[]::new));
+            final Star[] binStars = bins.get(x).stream().toArray(Star[]::new);
+            final Y y = getY(binStars);
+            LOG.info(x + " -> " + y + " by " + binStars.length + " stars");
             if (y != null) {
                 hist.put(x, y);
             }

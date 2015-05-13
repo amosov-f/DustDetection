@@ -77,9 +77,7 @@ public final class Histogram<T extends Comparable<T>> {
             @Nullable
             @Override
             public String generateLabel(@NotNull final CategoryDataset categoryDataset, final int i, final int i2) {
-                final T type = Iterables.get(hist.keySet(), i2);
-                System.out.println(type + " " + hist.get(type));
-                return percents ? null : String.format("%.2f", hist.get(type));
+                return percents ? null : String.format("%.2f", hist.get(Iterables.get(hist.keySet(), i2)));
             }
         });
         renderer.setBasePositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12, TextAnchor.BOTTOM_CENTER));

@@ -3,6 +3,7 @@ package ru.spbu.astro.commons;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.commons.spect.SpectClass;
 import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.TextUtils;
 
@@ -168,6 +169,11 @@ public final class StarFilter {
             final double code = star.getSpectType().getSpect().getDoubleCode();
             return minCode <= code && code <= maxCode;
         });
+    }
+
+    @NotNull
+    public StarFilter spectType(@NotNull final SpectClass spect) {
+        return apply(spect.toString(), s -> s.getSpectType().getSpect().equals(spect));
     }
 
     @NotNull
