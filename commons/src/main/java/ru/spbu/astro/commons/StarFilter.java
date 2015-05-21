@@ -117,7 +117,7 @@ public final class StarFilter {
 
     @NotNull
     public StarFilter piRelErr(final double lim) {
-        return apply(format("dPi < %.1f", lim), star -> star.getParallax().relErr() < lim);
+        return apply("dPi < " + TextUtils.percents(lim), star -> star.getParallax().relErr() < lim);
     }
 
     @NotNull
@@ -149,6 +149,11 @@ public final class StarFilter {
     }
 
     @NotNull
+    public StarFilter extErr(final double lim) {
+        return apply("dExt < " + TextUtils.percents(lim), star -> star.getExtinction().err() < lim);
+    }
+
+    @NotNull
     public StarFilter negExt() {
         return apply(NEG_EXT);
     }
@@ -164,7 +169,7 @@ public final class StarFilter {
     }
 
     @NotNull
-    public StarFilter spectType(final double minCode, final double maxCode) {
+    public StarFilter spect(final double minCode, final double maxCode) {
         return apply(format("%.0f < spect < %.0f", minCode, maxCode), star -> {
             final double code = star.getSpectType().getSpect().getDoubleCode();
             return minCode <= code && code <= maxCode;
@@ -172,7 +177,7 @@ public final class StarFilter {
     }
 
     @NotNull
-    public StarFilter spectType(@NotNull final SpectClass spect) {
+    public StarFilter spect(@NotNull final SpectClass spect) {
         return apply(spect.toString(), s -> s.getSpectType().getSpect().equals(spect));
     }
 

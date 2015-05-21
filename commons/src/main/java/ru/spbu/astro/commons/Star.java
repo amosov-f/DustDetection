@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.SpectType;
 import ru.spbu.astro.util.Value;
 
+import java.util.Objects;
+
 import static java.lang.Math.log10;
 import static java.lang.Math.pow;
 
@@ -41,11 +43,7 @@ public final class Star {
 
     @NotNull
     public Value getExtinction() {
-        final Value bv = spectType.toBV();
-        if (bv == null) {
-            throw new RuntimeException("Star #" + id + " hasn't B-V_int");
-        }
-        return bvColor.subtract(bv);
+        return bvColor.subtract(Objects.requireNonNull(spectType.toBV(), "Star #" + id + " hasn't B-V_int"));
     }
 
     @NotNull

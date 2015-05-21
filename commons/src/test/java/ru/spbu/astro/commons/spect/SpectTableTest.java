@@ -1,8 +1,13 @@
 package ru.spbu.astro.commons.spect;
 
+import com.google.common.collect.Sets;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.util.Value;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
@@ -25,11 +30,30 @@ public final class SpectTableTest {
     }
 
     @Test
-    public void test() throws Exception {
-        assertEquals(Value.of(-0.26, 0.015), spectTable.getBV(requireNonNull(SpectClass.parse("B1")), LuminosityClass.III));
-        final Value bv = requireNonNull(spectTable.getBV(requireNonNull(SpectClass.parse("B0.5")), LuminosityClass.III));
+    public void testBV() throws Exception {
+        assertEquals(Value.of(-0.26, 0.01), spectTable.getBV(SpectClass.valueOf("B1"), LuminosityClass.III));
+        final Value bv = requireNonNull(spectTable.getBV(SpectClass.valueOf("B0.5"), LuminosityClass.III));
         assertEquals(-0.28, bv.val(), EPS);
-        assertEquals(0.02, bv.err(), EPS);
-        assertNull(spectTable.getBV(requireNonNull(SpectClass.parse("O4")), LuminosityClass.V));
+        assertEquals(0.01, bv.err(), EPS);
+        assertNull(spectTable.getBV(SpectClass.valueOf("O4"), LuminosityClass.V));
+    }
+
+    @Test
+    @Ignore
+    public void testDiff() throws FileNotFoundException {
+        final SpectTable table1 = SpectTable.STRIGEST;
+        final SpectTable table2 = SpectTable.BINNEY_MERRIFIELD;
+        final PrintWriter fout = new PrintWriter("docs/articles/dust/other/bv-err/bv-diff.txt");
+        for (final LuminosityClass lumin : LuminosityClass.MAIN) {
+            for (final int code : Sets.intersection(table1.getBVs(lumin).keySet(), table2.getBVs(lumin).keySet())) {
+                final SpectClass spect = SpectClass.valueOf(code);
+                final Value bv1 = table1.getBV(spect, lumin);
+                final Value bv2 = table2.getBV(spect, lumin);
+                if (bv1 != null && bv2 != null) {
+                    fout.println(String.format("%s\t%s\t%.2f", lumin, spect, bv1.val() - bv2.val()));
+                }
+            }
+        }
+        fout.close();
     }
 }

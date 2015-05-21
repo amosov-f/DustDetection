@@ -1,6 +1,7 @@
 package ru.spbu.astro.dust.spect;
 
 import com.google.common.base.Joiner;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectTable;
@@ -21,7 +22,7 @@ public final class MinCombiner implements SpectTableCombiner {
         for (final LuminosityClass lumin : LuminosityClass.values()) {
             boolean ok = true;
             for (final SpectTable spectTable : spectTables) {
-                if (!spectTable.getLumins().contains(lumin)) {
+                if (!ArrayUtils.contains(spectTable.getLumins(), lumin)) {
                     ok = false;
                 }
             }

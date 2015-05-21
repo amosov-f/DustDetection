@@ -50,13 +50,14 @@ public class DustTrendCalculatorRegressionTest {
     @Test
     @Ignore
     public void showAcceptPositive() {
-        assertEquals("", new DustTrendCalculator(DustStars.ALL, N_SIDE).toString(Value.POS_TWO_SIGMA));
+        assertEquals("", new DustTrendCalculator(DustStars.DR30, N_SIDE).toString(Value.POS_TWO_SIGMA));
     }
 
     @Test
+    @Ignore
     public void testName() throws Exception {
-        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
-        final Star[] allStars = StarFilter.of(DustStars.ALL)
+        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.DR30, N_SIDE);
+        final Star[] allStars = StarFilter.of(DustStars.DR30)
                 .r(250)
                 .apply(Filter.by("small gradient", s -> Math.abs(calculator.getSlope(s.getDir()).val()) <= 0.0001))
                 .stars();
@@ -64,7 +65,7 @@ public class DustTrendCalculatorRegressionTest {
         for (final LuminosityClass lumin : LuminosityClass.MAIN) {
             for (int code = 5; code < 70; code++) {
                 final SpectClass spect = SpectClass.valueOf(code);
-                final Star[] stars = StarFilter.of(allStars).spectType(spect).lumin(lumin).stars();
+                final Star[] stars = StarFilter.of(allStars).spect(spect).lumin(lumin).stars();
                 fout.print(lumin + "\t" + spect + "\t" + stars.length + "\t" + SpectTable.getInstance().getBV(spect, lumin).val());
                 if (stars.length != 0) {
                     final Value bvObs = MathTools.average(Arrays.stream(stars).mapToDouble(s -> s.getBVColor().val()).toArray());

@@ -26,7 +26,7 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histBVError() {
         new NegativeExtinctionHistogram(
-                DustStars.ALL,
+                DustStars.DR30,
                 new CountHist("Ошибка B-V", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
         ).show();
     }
@@ -39,7 +39,7 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histSpectTypeOfV() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(DustStars.ALL).lumin(V).stars(),
+                StarFilter.of(DustStars.DR30).lumin(V).stars(),
                 new SpectClassHist(5)
         ).show();
     }
@@ -47,7 +47,7 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histSpectTypeOfIII() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(DustStars.ALL).lumin(III).stars(),
+                StarFilter.of(DustStars.DR30).lumin(III).stars(),
                 new SpectClassHist(5)
         ).show();
     }
@@ -55,9 +55,9 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histBVErrorOfIIIOfM59() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(DustStars.ALL)
+                StarFilter.of(DustStars.DR30)
                         .lumin(III)
-                        .spectType(65, 69)
+                        .spect(65, 69)
                         .stars(),
                 new CountHist("Ошибка B-V у звезд III, M5-9", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
         ).show();
@@ -66,7 +66,7 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histBVErrorOfIII() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(DustStars.ALL)
+                StarFilter.of(DustStars.DR30)
                         .lumin(III)
                         .stars(),
                 new CountHist("Ошибка B-V у звезд III", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
@@ -76,8 +76,9 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histParallaxRelativeErrorOfIII() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(DustStars.ALL)
-                        .lumin(III).stars(),
+                StarFilter.of(DustStars.DR30)
+                        .lumin(III)
+                        .stars(),
                 new CountHist("Относительная ошибка в расстоянии у III", star -> star.getR().relErr(), new Split(0.1))
         ).show();
     }
@@ -85,9 +86,9 @@ public class NegativeExtinctionHistogramShow {
     @Test
     public void histParallaxRelativeErrorOfIIIOfM59() {
         new NegativeExtinctionHistogram(
-                StarFilter.of(DustStars.ALL)
+                StarFilter.of(DustStars.DR30)
                         .lumin(III)
-                        .spectType(65, 69)
+                        .spect(65, 69)
                         .stars(),
                 new CountHist("Относительная ошибка в расстоянии у звезд III, M5-9", star -> star.getR().relErr(), new Split(0.1))
         ).show();

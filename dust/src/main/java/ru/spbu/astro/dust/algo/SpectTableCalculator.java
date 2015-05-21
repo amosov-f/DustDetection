@@ -44,7 +44,7 @@ public final class SpectTableCalculator {
         final Map<LuminosityClass, Map<Integer, List<Star>>> spect2stars = new EnumMap<>(LuminosityClass.class);
         spect2stars.put(LuminosityClass.III, new HashMap<>());
         spect2stars.put(LuminosityClass.V, new HashMap<>());
-        for (final Star star : DustStars.ALL) {
+        for (final Star star : DustStars.DR30) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
             if (spect2stars.containsKey(lumin)) {
                 final int key = key(star.getSpectType().getSpect().getCode());

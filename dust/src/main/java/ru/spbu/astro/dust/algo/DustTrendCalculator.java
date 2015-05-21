@@ -109,7 +109,7 @@ public final class DustTrendCalculator {
             final Value k = regressions[pix] != null ? regressions[pix].getSlope() : null;
             if (k != null && (slopeFilter == null || slopeFilter.getPredicate().test(k))) {
                 sb.append(String.format(
-                        "%d\t%f\t%f\t%d\t%.2f ± %.2f\n",
+                        Locale.US, "%d\t%f\t%f\t%d\t%.2f ± %.2f\n",
                         pix, Math.toDegrees(dir.getL()), Math.toDegrees(dir.getB()), rings[pix].length, 1000 * k.val(), 1000 * k.err()
                 ));
             }

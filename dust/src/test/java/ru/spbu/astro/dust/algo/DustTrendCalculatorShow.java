@@ -13,13 +13,11 @@ import ru.spbu.astro.commons.graph.HammerProjection;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.dust.graph.PixPlot;
 import ru.spbu.astro.healpix.func.HealpixDistribution;
-import ru.spbu.astro.healpix.func.SmoothedDistribution;
 import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.ImageTools;
 import ru.spbu.astro.util.Value;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -52,9 +50,7 @@ public class DustTrendCalculatorShow {
 
     @Test
     public void main() throws Exception {
-        final DustTrendCalculator calculator = new DustTrendCalculator(
-                StarFilter.of(DustStars.ALL).r(0, 500).stars(), 24
-        );
+        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.DR30, N_SIDE);
         final SphericDistribution f = new HealpixDistribution(calculator.getSlopes());
         System.out.println(calculator.getSlopes().length);
         final HammerProjection hammerProjection = new HammerProjection(f);
@@ -111,29 +107,5 @@ public class DustTrendCalculatorShow {
         final DustTrendCalculator calculator = new DustTrendCalculator(stars, N_SIDE);
         System.out.println(calculator.toString(slopeFilter));
         return new HammerProjection(new HealpixDistribution(Value.multiply(calculator.getSlopes(), 1000), slopeFilter), MIN_VALUE, MAX_VALUE);
-    }
-
-    @Test
-    public void bvTrendShow() {
-        final DustTrendCalculator calculator = new DustTrendCalculator(StarFilter.of(DustStars.ALL).leftBV().stars(), N_SIDE, Star::getBVColor, true);
-        new HammerProjection(new HealpixDistribution(calculator.getIntercepts())).setVisible(true);
-    }
-
-    @Test
-    public void showSNR() {
-        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
-        new HammerProjection(new HealpixDistribution(Arrays.stream(calculator.getSlopes()).mapToDouble(Value::snr).toArray())).setVisible(true);
-    }
-
-    @Test
-    public void testSmoothed() {
-        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
-        new HammerProjection(new SmoothedDistribution(64, new HealpixDistribution(calculator.getSlopes()), 2)).setVisible(true);
-    }
-
-    @Test
-    public void showErrors() {
-        final DustTrendCalculator calculator = new DustTrendCalculator(DustStars.ALL, N_SIDE);
-        new HammerProjection(new HealpixDistribution(calculator.getSlopes()), MIN_VALUE, MAX_VALUE, HammerProjection.Mode.WITH_ERRORS).setVisible(true);
     }
 }

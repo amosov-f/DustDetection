@@ -17,13 +17,17 @@ import java.util.stream.IntStream;
  * Time: 13:03
  */
 public class SpectTable {
-    private static final Logger LOGGER = Logger.getLogger(SpectTable.class.getName());
+    private static final Logger LOG = Logger.getLogger(SpectTable.class.getName());
 
     public static final SpectTable TSVETKOV = read("tsvetkov", SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
     public static final SpectTable SCHMIDT_KALER = read("schmidt-kaler", SpectTable.class.getResourceAsStream("/table/schmidt-kaler.txt"));
+    public static final SpectTable STRIGEST = read("strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
+    public static final SpectTable BINNEY_MERRIFIELD = read("binney-merrifield", SpectTable.class.getResourceAsStream("/table/binney-merrifield.txt"));
 
     public static final int MIN_CODE = 5;
     public static final int MAX_CODE = 69;
+
+    private static final double BV_ERROR = 0.01;
 
     @NotNull
     private final String name;
@@ -62,7 +66,7 @@ public class SpectTable {
                 }
             }
         }
-        LOGGER.info("'" + name + "' + spect table loaded");
+        LOG.info("'" + name + "' + spect table loaded");
         return spectTable;
     }
 
@@ -95,8 +99,8 @@ public class SpectTable {
     }
 
     @NotNull
-    public List<LuminosityClass> getLumins() {
-        return new ArrayList<>(table.keySet());
+    public LuminosityClass[] getLumins() {
+        return table.keySet().toArray(new LuminosityClass[table.size()]);
     }
 
     @NotNull
@@ -111,87 +115,14 @@ public class SpectTable {
         }
         final NavigableMap<Integer, Double> bvs = getBVs(lumin);
         final int code = spect.getCode();
-        final Integer x1;
-        final Integer x2 = bvs.higherKey(code);
-        final Double d1;
-        final Double d2;
-        final double val;
         if (spect.hasIntCode() && bvs.containsKey(code)) {
-            x1 = bvs.lowerKey(code);
-            val = bvs.get(code);
-            d1 = x1 != null ? Math.abs(val - bvs.get(x1)) / 2 : null;
-            d2 = x2 != null ? Math.abs(bvs.get(x2) - val) / 2 : null;
-            if (d1 == null && d2 == null) {
-                return null;
-            }
-        } else {
-            x1 = bvs.floorKey(code);
-            if (x1 == null || x2 == null) {
-                return null;
-            }
-            val = MathTools.interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode());
-            d1 = Math.abs(val - bvs.get(x1));
-            d2 = Math.abs(bvs.get(x2) - val);
+            return Value.of(bvs.get(code), BV_ERROR);
         }
-        return Value.of(val, Arrays.stream(new Double[]{d1, d2})
-                .filter(Objects::nonNull)
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .getAsDouble());
-    }
-
-//    @NotNull
-//    private static Value bv(final int code, @NotNull final NavigableMap<Integer, Double> bvs) {
-//        final Integer x1 = bvs.lowerKey(code);
-//        final Integer x2 = bvs.higherKey(code);
-//        if (x1 != null) {
-//            x1
-//        }
-//    }
-
-//    public static void main(String[] args) {
-//        final Scanner fin = new Scanner(SpectTable.class.getResourceAsStream("/table/tsvetkov.txt"));
-//        fin.nextLine();
-//        final List<String[]> fields = new ArrayList<>();
-//        while (fin.hasNextLine()) {
-//            fields.add(fin.nextLine().trim().split("\\s+"));
-//        }
-//        for (int i = 0; i < fields.size() / 4; i++) {
-//            final String[] f1 = fields.get(i);
-//            final String[] f2 = fields.get(i + fields.size() / 4);
-//            final String[] f3 = fields.get(i + 2 * fields.size() / 4);
-//            final String[] f4 = fields.get(i + 3 * fields.size() / 4);
-//            System.out.println("                " + f1[0] + "    &    " + f1[1] + "    &    " + f1[2] + "    &    "
-//                    + f2[0] + "    &    " + f2[1] + "    &    " + f2[2] + "    &    "
-//                    + f3[0] + "    &    " + f3[1] + "    &    " + f3[2] + "    &    "
-//                    + f4[0] + "    &    " + f4[1] + "    &    " + f4[2] + "    \\\\");
-//        }
-//    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        Scanner fin = new Scanner(new FileInputStream("docs/articles/related/tables/III.TXT"));
-        final List<String[]> iii = new ArrayList<>();
-        while (fin.hasNextLine()) {
-            iii.add(Arrays.copyOfRange(fin.nextLine().trim().split("\\s+"), 1, 4));
+        final Integer x1 = bvs.floorKey(code);
+        final Integer x2 = bvs.higherKey(code);
+        if (x1 == null || x2 == null) {
+            return null;
         }
-        fin = new Scanner(new FileInputStream("docs/articles/related/tables/V.TXT"));
-        final List<String[]> v = new ArrayList<>();
-        while (fin.hasNextLine()) {
-            v.add(Arrays.copyOfRange(fin.nextLine().trim().split("\\s+"), 1, 4));
-        }
-        final int k = 2;
-        for (int i = 0; i < iii.size() / k; i++) {
-            System.out.print("                    ");
-            for (int j = 0; j < k; j++) {
-                final String[] f1 = iii.get(i + j * iii.size() / k);
-                final String[] f2 = v.get(i + j * v.size() / k);
-                System.out.print(f1[0] + "    &    " + f1[1] + "    &    " + f1[2] + "    &    ");
-                System.out.print(f2[1] + "    &    " + f2[2]);
-                if (j != k - 1) {
-                    System.out.print("    &    ");
-                }
-            }
-            System.out.println("    \\\\");
-        }
+        return Value.of(MathTools.interpolate(x1, bvs.get(x1), x2, bvs.get(x2), spect.getDoubleCode()), BV_ERROR);
     }
 }

@@ -62,7 +62,7 @@ public class HistogramTest {
     @Test
     public void showBVObsErr() {
         new Histogram<>(
-                new AverageHist("pizza", Star::getVMag, s -> s.getBVColor().err(), new Split(2, 13, 9)).hist(DustStars.ALL),
+                new AverageHist("pizza", Star::getVMag, s -> s.getBVColor().err(), new Split(2, 13, 9)).hist(Stars.ALL),
                 "Видимая зв. вел.",
                 "Ошибка B-V obs",
                 false
@@ -72,7 +72,7 @@ public class HistogramTest {
     @Test
     public void showBVIntErr() {
         new Histogram<>(
-                new AverageHist("pizza", Star::getVMag, s -> s.getSpectType().toBV().err(), new Split(2, 13, 9)).hist(DustStars.ALL),
+                new AverageHist("pizza", Star::getVMag, s -> s.getSpectType().toBV().err(), new Split(2, 13, 9)).hist(Stars.ALL),
                 "Видимая зв. вел.",
                 "Ошибка B-V int",
                 false
@@ -92,7 +92,7 @@ public class HistogramTest {
     @Test
     public void showVMag() throws Exception {
         new Histogram<>(
-                new CountHist("Расстояние [пк]", Star::getVMag, new Split(2, 13, 9)).histShares(DustStars.ALL),
+                new CountHist("Расстояние [пк]", Star::getVMag, new Split(2, 13, 9)).histShares(Stars.ALL),
                 "Видимая зв. вел."
         ).show();
     }

@@ -19,7 +19,12 @@ public final class TextUtils {
 
     @NotNull
     public static String percents(final int num, final int denum) {
-        return String.format("%.1f%%", HUNDRED * num / denum);
+        return percents((double) num / denum);
+    }
+
+    @NotNull
+    public static String percents(final double share) {
+        return String.format("%.1f%%", HUNDRED * share);
     }
 
     public static double removeUnnecessaryDigits(final double x) {

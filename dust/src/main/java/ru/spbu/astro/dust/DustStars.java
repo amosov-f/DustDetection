@@ -1,10 +1,8 @@
 package ru.spbu.astro.dust;
 
-import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.Stars;
-import ru.spbu.astro.dust.algo.classify.LuminosityClassifier;
 import ru.spbu.astro.dust.algo.classify.LuminosityClassifiers;
 
 /**
@@ -12,17 +10,9 @@ import ru.spbu.astro.dust.algo.classify.LuminosityClassifiers;
  * Date: 28.03.15
  * Time: 16:16
  */
-public final class DustStars {
-    public static final Star[] ALL = classified(Stars.ALL, LuminosityClassifiers.SVM);
+public enum DustStars {
+    ;
 
-    public static Star[] classified(@NotNull final Star[] stars, @NotNull final LuminosityClassifier classifier) {
-        return StarFilter.of(classifier.classify(stars)).hasExt().stars();
-    }
-    
-    private DustStars() {
-    }
-
-    public static void main(String[] args) {
-        System.out.println(StarFilter.of(ALL).negExt().stars().length);
-    }
+    public static final Star[] ALL = StarFilter.of(LuminosityClassifiers.SVM.classify(Stars.ALL)).hasExt().stars();
+    public static final Star[] DR30 = StarFilter.of(ALL).piRelErr(0.3).stars();
 }

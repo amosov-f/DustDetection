@@ -5,6 +5,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * User: amosov-f
  * Date: 13.11.14
@@ -16,7 +18,7 @@ public final class SpectClass {
     @NotNull
     private final Double number;
 
-    SpectClass(@NotNull final TypeSymbol symbol, @NotNull final Double number) {
+    private SpectClass(@NotNull final TypeSymbol symbol, @NotNull final Double number) {
         this.symbol = symbol;
         this.number = number;
     }
@@ -32,6 +34,11 @@ public final class SpectClass {
         } catch (NumberFormatException ignored) {
             return null;
         }
+    }
+
+    @NotNull
+    public static SpectClass valueOf(@NotNull final String str) {
+        return Objects.requireNonNull(parse(str));
     }
 
     @NotNull

@@ -22,7 +22,8 @@ public final class SpectType {
     SpectType(@NotNull final List<SpectClass> spects,
               @NotNull final Relation spectsRelation,
               @NotNull final List<LuminosityClass> lumins,
-              @NotNull final Relation luminsRelation) {
+              @NotNull final Relation luminsRelation)
+    {
         this.spects = spects;
         this.spectsRelation = spectsRelation;
         this.lumins = lumins;
@@ -61,9 +62,6 @@ public final class SpectType {
         }
         if (bvs.isEmpty()) {
             return null;
-        }
-        if (Double.isNaN(MathTools.average(bvs.toArray(new Value[bvs.size()])).val())) {
-            System.out.println(bvs);
         }
         return MathTools.average(bvs.toArray(new Value[bvs.size()]));
     }

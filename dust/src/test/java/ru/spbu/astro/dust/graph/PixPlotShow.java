@@ -20,7 +20,7 @@ public class PixPlotShow {
     @Test
     public void lionShow() throws Exception {
         final Spheric lion = new Spheric(Math.toRadians(220.26), Math.toRadians(52.29));
-        final Star[] stars = StarFilter.of(DustStars.ALL).r(500).stars();
+        final Star[] stars = StarFilter.of(DustStars.DR30).stars();
         final Star[] stars2 = StarFilter.of(DustStars.ALL).piRelErr(0.3).stars();
         for (double r = 1; r <= 10; r += 0.5) {
             final DustTrendCalculator.Regression regression = new DustTrendCalculator.Regression(StarFilter.of(stars).region(lion, Math.toRadians(r)).stars());

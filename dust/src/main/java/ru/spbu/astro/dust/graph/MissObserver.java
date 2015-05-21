@@ -16,7 +16,7 @@ import ru.spbu.astro.healpix.func.HealpixCounter;
 public final class MissObserver {
     public static void main(@NotNull final String[] args) {
         final SphericDistribution f = new HealpixCounter(
-                StarFilter.of(DustStars.ALL).negExt().stars(),
+                StarFilter.of(DustStars.DR30).negExt().stars(),
                 18
         );
         new HammerProjection(f).setVisible(true);

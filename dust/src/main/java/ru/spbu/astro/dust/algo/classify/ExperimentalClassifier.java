@@ -6,11 +6,9 @@ import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.dust.algo.DustTrendCalculator;
-import ru.spbu.astro.util.Filter;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.SMO;
+import weka.classifiers.meta.Bagging;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -32,16 +30,15 @@ import java.util.stream.Collectors;
 final class ExperimentalClassifier implements LuminosityClassifier {
     private static final Logger LOGGER = Logger.getLogger(ExperimentalClassifier.class.getName());
 
-    private static DustTrendCalculator calculator;
 
     private static final List<StarAttribute> STAR_ATTRIBUTES = Arrays.asList(
             new StarAttribute("bv color", star -> star.getBVColor().val()),
             new StarAttribute("mag", star -> star.getAbsMag().val()),
-            new StarAttribute("res", star -> star.getBVColor().val() - calculator.getSlope(star.getDir()).val() * star.getR().val())
+//            new StarAttribute("res", star -> star.getBVColor().val() - calculator.getSlope(star.getDir()).val() * star.getR().val())
 //            new StarAttribute("r", star -> star.getR().val()),
 //            new StarAttribute("p", star -> star.getParallax().val()),
 //            new StarAttribute("dr", star -> star.getR().err()),
-//            new StarAttribute("vmag", Star::getVMag)
+            new StarAttribute("vmag", Star::getVMag)
     );
 
     private static final ArrayList<Attribute> ATTRIBUTES = new ArrayList<Attribute>() {{
@@ -64,7 +61,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     ExperimentalClassifier(@NotNull final Star[] stars, @NotNull final Mode mode) {
         final Instances dataset = toInstances("dataset", this.stars = stars);
 
-        classifier = new SMO();
+        classifier = new Bagging()  ;
 //        classifier.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
         try {
             classifier.buildClassifier(dataset);
@@ -162,7 +159,6 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     }
 
     public static void main(String[] args) {
-        calculator = new DustTrendCalculator(StarFilter.of(Stars.ALL).hasExt().stars(), 18);
-        new ExperimentalClassifier(StarFilter.of(Stars.ALL).mainLumin().apply(Filter.by("has k", star -> calculator.getSlope(star.getDir()) != null)).bv(0.3, 0.6).stars(), Mode.TEST);
+        new ExperimentalClassifier(StarFilter.of(Stars.ALL).mainLumin().bv(0.3, 0.6).stars(), Mode.TEST);
     }
 }
