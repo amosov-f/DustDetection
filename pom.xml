@@ -13,8 +13,13 @@
         <module>commons</module>
         <module>util</module>
         <module>healpix</module>
+        <module>jmll/ml</module>
     </modules>
     <packaging>pom</packaging>
+
+    <properties>
+        <jmll.version>1.0-SNAPSHOT</jmll.version>
+    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -59,11 +64,24 @@
                 <artifactId>commons-io</artifactId>
                 <version>2.4</version>
             </dependency>
+
+            <!-- Machine Learning -->
             <dependency>
                 <groupId>nz.ac.waikato.cms.weka</groupId>
                 <artifactId>weka-dev</artifactId>
                 <version>3.7.12</version>
             </dependency>
+            <dependency>
+                <groupId>com.spbsu</groupId>
+                <artifactId>jmll</artifactId>
+                <version>${jmll.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.spbsu</groupId>
+                <artifactId>ml</artifactId>
+                <version>${jmll.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.jfree</groupId>
                 <artifactId>jfreechart</artifactId>
