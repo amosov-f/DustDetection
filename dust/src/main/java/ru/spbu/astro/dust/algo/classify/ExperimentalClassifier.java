@@ -1,11 +1,12 @@
 package ru.spbu.astro.dust.algo.classify;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.spect.LuminosityClass;
+import ru.spbu.astro.commons.spect.SpectType;
+import ru.spbu.astro.util.Filter;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.meta.Bagging;
@@ -14,10 +15,7 @@ import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.ToDoubleFunction;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -41,13 +39,8 @@ final class ExperimentalClassifier implements LuminosityClassifier {
             new StarAttribute("vmag", Star::getVMag)
     );
 
-    private static final ArrayList<Attribute> ATTRIBUTES = new ArrayList<Attribute>() {{
-        addAll(STAR_ATTRIBUTES.stream().map(StarAttribute::toAttribute).collect(Collectors.toList()));
-        add(new Attribute(
-                "luminosity classes",
-                Arrays.stream(LuminosityClass.MAIN).map(LuminosityClass::name).collect(Collectors.toList())
-        ));
-    }};
+    @NotNull
+    private final ArrayList<Attribute> attributes;
 
     @NotNull
     private final Classifier classifier;
@@ -59,9 +52,22 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     }
 
     ExperimentalClassifier(@NotNull final Star[] stars, @NotNull final Mode mode) {
+        attributes = new ArrayList<>();
+        attributes.addAll(STAR_ATTRIBUTES.stream().map(StarAttribute::toAttribute).collect(Collectors.toList()));
+        attributes.add(new Attribute(
+                "luminosity classes",
+                Arrays.stream(stars)
+                        .map(Star::getSpectType)
+                        .map(SpectType::getLumin)
+                        .sorted()
+                        .distinct()
+                        .map(LuminosityClass::name)
+                        .collect(Collectors.toList())
+        ));
+
         final Instances dataset = toInstances("dataset", this.stars = stars);
 
-        classifier = new Bagging()  ;
+        classifier = new Bagging();
 //        classifier.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
         try {
             classifier.buildClassifier(dataset);
@@ -105,17 +111,17 @@ final class ExperimentalClassifier implements LuminosityClassifier {
 //    }
 
     @NotNull
-    private static Instances toInstances(@NotNull final String name, @NotNull final Star[] stars) {
-        final Instances instances = new Instances(name, ATTRIBUTES, stars.length);
-        instances.setClassIndex(ATTRIBUTES.size() - 1);
+    private Instances toInstances(@NotNull final String name, @NotNull final Star[] stars) {
+        final Instances instances = new Instances(name, attributes, stars.length);
+        instances.setClassIndex(attributes.size() - 1);
         instances.addAll(Arrays.stream(stars).map(star -> {
-            final Instance instance = new DenseInstance(ATTRIBUTES.size());
-            for (int i = 0; i < ATTRIBUTES.size() - 1; i++) {
-                instance.setValue(ATTRIBUTES.get(i), STAR_ATTRIBUTES.get(i).apply(star));
+            final Instance instance = new DenseInstance(attributes.size());
+            for (int i = 0; i < attributes.size() - 1; i++) {
+                instance.setValue(attributes.get(i), STAR_ATTRIBUTES.get(i).apply(star));
             }
             instance.setValue(
-                    ATTRIBUTES.get(ATTRIBUTES.size() - 1),
-                    ArrayUtils.indexOf(LuminosityClass.MAIN, star.getSpectType().getLumin())
+                    attributes.get(attributes.size() - 1),
+                    Objects.toString(star.getSpectType().getLumin())
             );
             return instance;
         }).collect(Collectors.toList()));
@@ -159,6 +165,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     }
 
     public static void main(String[] args) {
-        new ExperimentalClassifier(StarFilter.of(Stars.ALL).mainLumin().bv(0.3, 0.6).stars(), Mode.TEST);
+        new ExperimentalClassifier(StarFilter.of(Stars.ALL).mainLumin().bv(0.3, 0.6).apply(Filter.by("V_mag", star -> star.getVMag() < 6.5)).stars(), Mode.TEST);
+//        new ExperimentalClassifier(StarFilter.of(Stars.ALL).lumin(LuminosityClass.II, LuminosityClass.III, LuminosityClass.V).bv(0.3, 0.9).absMag(Double.NEGATIVE_INFINITY, 1).stars(), Mode.TEST);
     }
 }
