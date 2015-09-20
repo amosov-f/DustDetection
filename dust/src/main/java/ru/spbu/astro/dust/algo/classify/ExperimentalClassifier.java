@@ -165,7 +165,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     }
 
     public static void main(String[] args) {
-        new ExperimentalClassifier(StarFilter.of(Stars.ALL).mainLumin().bv(0.3, 0.6).apply(Filter.by("V_mag", star -> star.getVMag() < 6.5)).stars(), Mode.TEST);
+        new ExperimentalClassifier(StarFilter.of(Stars.ALL).mainLumin().bv(0.3, 0.6).apply(Filter.by("V_mag", star -> star.getVMag() < 7)).stars(), Mode.TEST);
 //        new ExperimentalClassifier(StarFilter.of(Stars.ALL).lumin(LuminosityClass.II, LuminosityClass.III, LuminosityClass.V).bv(0.3, 0.9).absMag(Double.NEGATIVE_INFINITY, 1).stars(), Mode.TEST);
     }
 }
