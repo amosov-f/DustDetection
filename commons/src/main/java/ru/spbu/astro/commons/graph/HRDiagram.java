@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYDotRenderer;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
@@ -65,9 +66,11 @@ public final class HRDiagram {
             dataset.addSeries(series);
         }
 
+        final NumberAxis bvAxis = new NumberAxis("B-V [зв. вел.]");
+        bvAxis.setTickUnit(new NumberTickUnit(0.3));
         final XYPlot plot = new XYPlot(
                 dataset,
-                new NumberAxis("B-V [зв. вел.]"),
+                bvAxis,
                 new NumberAxis("M [зв. вел.]"),
                 new XYErrorRenderer()
         );

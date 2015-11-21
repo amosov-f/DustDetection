@@ -47,11 +47,11 @@ public class LuminosityClassifierShow {
         seriesCollection.addSeries(create("Разделяющая прямая", -3.0752, 0.4485, 1.4793));    // all new
 //        seriesCollection.addSeries(create("Разделяющая прямая (new)", classifier.getA(), classifier.getB(), classifier.getC()));
         plot.setDataset(1, seriesCollection);
-        plot.setDataset(2, theory());
+//        plot.setDataset(2, theory());
         plot.setRenderer(1, samplingRenderer(seriesCollection.getSeriesCount()));
         final XYItemRenderer renderer = samplingRenderer(2);
-        renderer.setSeriesPaint(0, Color.CYAN);
-        plot.setRenderer(2, renderer);
+        renderer.setSeriesPaint(0, Color.BLACK);
+        plot.setRenderer(1, renderer);
         plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
         diagram.show();
     }
