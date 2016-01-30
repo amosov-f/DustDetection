@@ -1,5 +1,6 @@
 package ru.spbu.astro.commons;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -80,14 +81,16 @@ public final class Catalog {
 
         @Nullable
         private static Row parse(@NotNull final String row, @NotNull final List<Parameter<?>> parameters) {
-            String[] fields = row.split("\\|");
-            fields = Arrays.copyOfRange(fields, 1, fields.length);
+            final String[] fields = ArrayUtils.remove(row.split("\\|"), 0);
 
             final Map<Parameter<?>, Object> values = new LinkedHashMap<>();
             for (int i = 0; i < parameters.size(); i++) {
-                final Object value = parameters.get(i).parse(fields[i].trim());
-                if (value != null) {
-                    values.put(parameters.get(i), value);
+                final Parameter<?> parameter = parameters.get(i);
+                if (parameter != null) {
+                    final Object value = parameter.parse(fields[i].trim());
+                    if (value != null) {
+                        values.put(parameter, value);
+                    }
                 }
             }
 
