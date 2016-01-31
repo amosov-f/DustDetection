@@ -1,19 +1,21 @@
 package ru.spbu.astro.commons.hist;
 
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.spect.SpectClass;
 
 import java.util.Comparator;
-import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * User: amosov-f
- * Date: 12.10.14
- * Time: 19:26
+ * Date: 31.01.16
+ * Time: 20:25
  */
-public final class SpectClassHist extends StarHist<String, Integer> {
+public abstract class SpectClassHist<Y extends Number> extends AbstractStarHist<String, Y> {
     private final int bin;
 
     public SpectClassHist(final int bin) {
@@ -37,20 +39,38 @@ public final class SpectClassHist extends StarHist<String, Integer> {
 
     @Nullable
     @Override
-    public Integer getY(@NotNull final Star[] stars) {
-        return stars.length > 1 ? stars.length : null;
+    protected Comparator<String> getComparator() {
+        return (spect1, spect2) -> new CompareToBuilder()
+                .append(SpectClass.TypeSymbol.parse(spect1.charAt(0)), SpectClass.TypeSymbol.parse(spect2.charAt(0)))
+                .append(spect1.substring(1), spect2.substring(1))
+                .build();
     }
 
-    @Nullable
-    @Override
-    protected Comparator<String> getComparator() {
-        return new Comparator<String>() {
-            @Override
-            public int compare(@NotNull final String x1, @NotNull final String x2) {
-                final int compare = Objects.requireNonNull(SpectClass.TypeSymbol.parse(x1.charAt(0)))
-                        .compareTo(Objects.requireNonNull(SpectClass.TypeSymbol.parse(x2.charAt(0))));
-                return compare != 0 ? compare : x1.substring(1).compareTo(x2.substring(1));
-            }
-        };
+    public static class Lambda<Y extends Number> extends SpectClassHist<Y> {
+        @NotNull
+        private final Function<Stream<Star>, Y> fy;
+
+        public Lambda(int bin, @NotNull final Function<Stream<Star>, Y> fy) {
+            super(bin);
+            this.fy = fy;
+        }
+
+        @Nullable
+        @Override
+        protected Y getY(@NotNull Stream<Star> stars) {
+            return fy.apply(stars);
+        }
+    }
+
+    public static class Average extends Lambda<Double> {
+        public Average(int bin, @NotNull Function<Star, Double> fy) {
+            super(bin, new ru.spbu.astro.commons.hist.Average<>(fy));
+        }
+    }
+
+    public static class Count extends Lambda<Integer> {
+        public Count(int bin) {
+            super(bin, new CountOrNull<>());
+        }
     }
 }

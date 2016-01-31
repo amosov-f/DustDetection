@@ -7,14 +7,16 @@ import ru.spbu.astro.util.Split;
 import ru.spbu.astro.util.TextUtils;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * User: amosov-f
  * Date: 25.10.14
  * Time: 18:49
  */
-public abstract class DoubleHist<Y extends Number> extends StarHist<Double, Y> {
+public abstract class DoubleHist<Y extends Number> extends AbstractStarHist<Double, Y> {
     @NotNull
     private final Function<Star, Double> f;
     @NotNull
@@ -36,13 +38,28 @@ public abstract class DoubleHist<Y extends Number> extends StarHist<Double, Y> {
         if (x < split.getMin() || split.getMax() < x) {
             return null;
         }
-        final double[] centers = Arrays.stream(split.getCenters()).map(TextUtils::removeUnnecessaryDigits).toArray();
-        double best = centers[0];
-        for (final double center : centers) {
-            if (Math.abs(x - center) < Math.abs(x - best)) {
-                best = center;
-            }
+        return Arrays.stream(split.getCenters())
+                .mapToObj(TextUtils::removeUnnecessaryDigits)
+                .min(Comparator.comparing(center -> Math.abs(x - center)))
+                .get();
+    }
+
+    public static class Lambda<Y extends Number> extends DoubleHist<Y> {
+        @NotNull
+        private final Function<Stream<Star>, Y> fy;
+
+        public Lambda(@NotNull final String name,
+                      @NotNull final Function<Star, Double> fx,
+                      @NotNull final Function<Stream<Star>, Y> fy,
+                      @NotNull Split split) {
+            super(name, fx, split);
+            this.fy = fy;
         }
-        return best;
+
+        @Nullable
+        @Override
+        protected Y getY(@NotNull Stream<Star> stars) {
+            return fy.apply(stars);
+        }
     }
 }

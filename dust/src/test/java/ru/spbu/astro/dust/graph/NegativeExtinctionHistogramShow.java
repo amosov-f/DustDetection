@@ -33,14 +33,14 @@ public class NegativeExtinctionHistogramShow {
 
     @Test
     public void histSpectType() {
-        new NegativeExtinctionHistogram(DustStars.ALL, new SpectClassHist(5)).show();
+        new NegativeExtinctionHistogram(DustStars.ALL, new SpectClassHist.Count(5)).show();
     }
 
     @Test
     public void histSpectTypeOfV() {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.DR30).lumin(V).stars(),
-                new SpectClassHist(5)
+                new SpectClassHist.Count(5)
         ).show();
     }
 
@@ -48,7 +48,7 @@ public class NegativeExtinctionHistogramShow {
     public void histSpectTypeOfIII() {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.DR30).lumin(III).stars(),
-                new SpectClassHist(5)
+                new SpectClassHist.Count(5)
         ).show();
     }
 

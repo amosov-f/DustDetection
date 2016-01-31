@@ -10,6 +10,8 @@ import ru.spbu.astro.util.Value;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static ru.spbu.astro.commons.Catalog.Parameter.*;
@@ -87,10 +89,10 @@ public final class Catalog {
             for (int i = 0; i < parameters.size(); i++) {
                 final Parameter<?> parameter = parameters.get(i);
                 if (parameter != null) {
-                    final Object value = parameter.parse(fields[i].trim());
-                    if (value != null) {
-                        values.put(parameter, value);
-                    }
+                    Optional.of(fields[i].trim())
+                            .filter(field -> !field.isEmpty())
+                            .map(parameter::parse)
+                            .ifPresent(value -> values.put(parameter, value));
                 }
             }
 
@@ -115,6 +117,11 @@ public final class Catalog {
             final Double bvColor = get(BV_COLOR);
             final Double bvColorError = get(BV_COLOR_ERROR);
             final Integer numberComponents = get(NUMBER_COMPONENTS);
+            final Double pmRa = get(PM_RA);
+            final Double pmRaError = get(PM_RA_ERROR);
+            final Double pmDec = get(PM_DEC);
+            final Double pmDecError = get(PM_DEC_ERROR);
+
 
             boolean invalid = lii == null || bii == null;
             invalid |= parallax == null || parallaxError == null;
@@ -122,6 +129,7 @@ public final class Catalog {
             invalid |= spectType == null;
             invalid |= bvColor == null || bvColorError == null;
             invalid |= numberComponents != null && numberComponents >= 2;
+            invalid |= pmRa == null || pmRaError == null || pmDec == null || pmDecError == null;
             if (invalid) {
                 return null;
             }
@@ -131,7 +139,10 @@ public final class Catalog {
                     .setParallax(Value.of(parallax, parallaxError))
                     .setVMag(vMag)
                     .setSpectType(spectType)
-                    .setBVColor(Value.of(bvColor, bvColorError)).build();
+                    .setBVColor(Value.of(bvColor, bvColorError))
+                    .setRaProperMotion(Value.of(pmRa, pmRaError))
+                    .setDecProperMotion(Value.of(pmDec, pmDecError))
+                    .build();
         }
 
         @NotNull
@@ -142,44 +153,37 @@ public final class Catalog {
     }
 
     abstract static class Parameter<T> {
+        private static final List<Parameter<?>> REGISTRY = new ArrayList<>();
+
         static final Parameter<Double> LII = new RadiansParameter("lii");
         static final Parameter<Double> BII = new RadiansParameter("bii");
         static final Parameter<Double> PARALLAX_ERROR = new DoubleParameter("parallax_error");
         static final Parameter<Double> VMAG = new DoubleParameter("vmag");
         static final Parameter<Double> BV_COLOR = new DoubleParameter("bv_color");
         static final Parameter<Double> BV_COLOR_ERROR = new DoubleParameter("bv_color_error");
-        static final Parameter<Double> PARALLAX = new DoubleParameter("parallax") {
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                final Double parallax = super.parse(value);
-                return parallax != null && parallax > 0 ? parallax : null;
-            }
-        };
+        static final Parameter<Double> PARALLAX = new Parameter.Lambda<>("parallax", value -> {
+            final double parallax = Double.parseDouble(value);
+            return parallax > 0 ? parallax : null;
+        });
         static final Parameter<Integer> NUMBER_COMPONENTS = new IntegerParameter("number_components");
-        static final Parameter<SpectType> SPECT_TYPE = new Parameter<SpectType>("spect_type") {
-            @Nullable
-            @Override
-            SpectType parse(@NotNull final String value) {
-                return SpectTypeParser.parse(value);
-            }
-        };
+        static final Parameter<SpectType> SPECT_TYPE = new Parameter.Lambda<>("spect_type", SpectTypeParser::parse);
         static final Parameter<Integer> HIP_NUMBER = new IntegerParameter("hip_number");
+        static final Parameter<Double> PM_RA = new DoubleParameter("pm_ra");
+        static final Parameter<Double> PM_DEC = new DoubleParameter("pm_dec");
+        static final Parameter<Double> PM_RA_ERROR = new DoubleParameter("pm_ra_error");
+        static final Parameter<Double> PM_DEC_ERROR = new DoubleParameter("pm_dec_error");
 
         @NotNull
         private final String name;
 
         private Parameter(@NotNull final String name) {
             this.name = name;
+            REGISTRY.add(this);
         }
 
         @NotNull
-        private static Parameter<?>[] values() {
-            return new Parameter[]{
-                    LII, BII, PARALLAX_ERROR, VMAG,
-                    BV_COLOR, BV_COLOR_ERROR, PARALLAX,
-                    NUMBER_COMPONENTS, SPECT_TYPE, HIP_NUMBER
-            };
+        private static List<Parameter<?>> values() {
+            return Collections.unmodifiableList(REGISTRY);
         }
 
         @Nullable
@@ -194,48 +198,42 @@ public final class Catalog {
 
         abstract T parse(@NotNull String value);
 
-        private static class DoubleParameter extends Parameter<Double> {
+        private static class Lambda<T> extends Parameter<T> {
+            @NotNull
+            private final Function<String, T> parser;
+
+            public Lambda(@NotNull final String name, @NotNull final Function<String, T> parser) {
+                super(name);
+                this.parser = parser;
+            }
+
+            @Nullable
+            @Override
+            final T parse(@NotNull final String value) {
+                try {
+                    return parser.apply(value);
+                } catch (RuntimeException e) {
+                    LOGGER.log(Level.WARNING, "Invalid value: " + value, e.getLocalizedMessage());
+                    return null;
+                }
+            }
+        }
+
+        private static class DoubleParameter extends Lambda<Double> {
             private DoubleParameter(@NotNull final String name) {
-                super(name);
-            }
-
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                try {
-                    return Double.valueOf(value);
-                } catch (NumberFormatException ignored) {
-                    return null;
-                }
+                super(name, Double::valueOf);
             }
         }
 
-        private static final class RadiansParameter extends DoubleParameter {
+        private static final class RadiansParameter extends Lambda<Double> {
             private RadiansParameter(@NotNull final String name) {
-                super(name);
-            }
-
-            @Nullable
-            @Override
-            Double parse(@NotNull final String value) {
-                final Double deg = super.parse(value);
-                return deg != null ? Math.toRadians(deg) : null;
+                super(name, value -> Math.toRadians(Double.parseDouble(value)));
             }
         }
 
-        private static final class IntegerParameter extends Parameter<Integer> {
+        private static final class IntegerParameter extends Lambda<Integer> {
             private IntegerParameter(@NotNull final String name) {
-                super(name);
-            }
-
-            @Nullable
-            @Override
-            Integer parse(@NotNull final String value) {
-                try {
-                    return Integer.valueOf(value);
-                } catch (NumberFormatException ignored) {
-                    return null;
-                }
+                super(name, Integer::valueOf);
             }
         }
     }

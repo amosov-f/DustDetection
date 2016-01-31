@@ -6,8 +6,7 @@ import org.junit.Test;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.graph.Histogram;
-import ru.spbu.astro.commons.hist.AverageHist;
-import ru.spbu.astro.commons.hist.CountHist;
+import ru.spbu.astro.commons.hist.*;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.util.Split;
@@ -91,9 +90,17 @@ public class HistogramTest {
 
     @Test
     public void showVMag() throws Exception {
+        final CountHist hist = new CountHist("Расстояние [пк]", Star::getVMag, new Split(2, 13, 9));
+        new Histogram<>(hist.histShares(Stars.ALL), "Видимая зв. вел.").show();
+    }
+
+    @Test
+    public void showProperMotion() {
         new Histogram<>(
-                new CountHist("Расстояние [пк]", Star::getVMag, new Split(2, 13, 9)).histShares(Stars.ALL),
-                "Видимая зв. вел."
+                new LuminosityClassHist<>(new Average<>(Star::getProperMotion)).hist(Stars.ALL),
+                "Видимая зв. вел.",
+                "Собственное движение",
+                false
         ).show();
     }
 

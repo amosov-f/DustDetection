@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * User: amosov-f
@@ -23,18 +24,16 @@ public class CountHist extends DoubleHist<Integer> {
 
     @Nullable
     @Override
-    public Integer getY(@NotNull final Star[] stars) {
-        return stars.length;
+    public Integer getY(@NotNull final Stream<Star> stars) {
+        return (int) stars.count();
     }
 
     @NotNull
-    public Map<Double, Double> histShares(@NotNull final Star[] stars) {
+    public Map<Double, Double> histShares(@NotNull final Star... stars) {
         final Map<Double, Integer> counts = hist(stars);
-        final Map<Double, Double> fracts = new TreeMap<>();
         final int count = IntStream.of(Ints.toArray(counts.values())).sum();
-        for (final Map.Entry<Double, Integer> entry : counts.entrySet()) {
-            fracts.put(entry.getKey(), (double) entry.getValue() / count);
-        }
+        final Map<Double, Double> fracts = new TreeMap<>();
+        counts.forEach((x, y) -> fracts.put(x, (double) y / count));
         return fracts;
     }
 }

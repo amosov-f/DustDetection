@@ -2,13 +2,13 @@ package ru.spbu.astro.commons;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.spect.SpectType;
 import ru.spbu.astro.util.Value;
 
 import java.util.Objects;
 
-import static java.lang.Math.log10;
-import static java.lang.Math.pow;
+import static java.lang.Math.*;
 
 public final class Star {
     private final int id;
@@ -21,6 +21,10 @@ public final class Star {
     private final SpectType spectType;
     @NotNull
     private final Value bvColor;
+    @NotNull
+    private final Value raProperMotion;
+    @NotNull
+    private final Value decProperMotion;
 
     public Star(@NotNull final Builder builder) {
         id = builder.id;
@@ -29,6 +33,8 @@ public final class Star {
         vMag = builder.vMag;
         spectType = builder.spectType;
         bvColor = builder.bvColor;
+        raProperMotion = Objects.requireNonNull(builder.raProperMotion, "No RA proper motion!");
+        decProperMotion = Objects.requireNonNull(builder.decProperMotion, "No DEC proper motion!");
     }
 
     @NotNull
@@ -84,6 +90,23 @@ public final class Star {
     }
 
     @NotNull
+    public Value getRaProperMotion() {
+        return raProperMotion;
+    }
+
+    @NotNull
+    public Value getDecProperMotion() {
+        return decProperMotion;
+    }
+
+    public double getProperMotion() {
+        final double muDec = getDecProperMotion().val();
+        final double muRa = getRaProperMotion().val();
+        final double dec = getDir().toEquatorial().getDec();
+        return sqrt(pow(muDec, 2) + pow(muRa * cos(dec), 2));
+    }
+
+    @NotNull
     @Override
     public String toString() {
         return String.format(
@@ -99,6 +122,10 @@ public final class Star {
         private double vMag;
         private SpectType spectType;
         private Value bvColor;
+        @Nullable
+        private Value raProperMotion;
+        @Nullable
+        private Value decProperMotion;
 
         public Builder(final int id) {
             this.id = id;
@@ -111,6 +138,8 @@ public final class Star {
             setVMag(star.vMag);
             setSpectType(star.spectType);
             setBVColor(star.bvColor);
+            setRaProperMotion(star.raProperMotion);
+            setDecProperMotion(star.decProperMotion);
         }
 
         @NotNull
@@ -140,6 +169,18 @@ public final class Star {
         @NotNull
         public Builder setBVColor(@NotNull final Value bvColor) {
             this.bvColor = bvColor;
+            return this;
+        }
+
+        @NotNull
+        public Builder setRaProperMotion(@NotNull final Value raProperMotion) {
+            this.raProperMotion = raProperMotion;
+            return this;
+        }
+
+        @NotNull
+        public Builder setDecProperMotion(@NotNull final Value decProperMotion) {
+            this.decProperMotion = decProperMotion;
             return this;
         }
 

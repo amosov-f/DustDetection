@@ -3,8 +3,10 @@ package ru.spbu.astro.commons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * User: amosov-f
@@ -13,12 +15,11 @@ import java.util.Map;
  */
 public final class Stars {
     public static final Star[] ALL = Catalogs.HIPPARCOS_2007.getStars();
+    public static final Star BARNARDS = Objects.requireNonNull(Catalogs.HIPPARCOS_2007.get(87937));
 
     @NotNull
     public static Map<Integer, Star> map(@NotNull final Star[] stars) {
-        return new HashMap<Integer, Star>() {{
-            Arrays.stream(stars).forEach(star -> put(star.getId(), star));
-        }};
+        return Arrays.stream(stars).collect(Collectors.toMap(Star::getId, Function.identity()));
     }
 
     private Stars() {
