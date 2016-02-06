@@ -42,7 +42,7 @@ public final class LuminosityClassifierRegressionTest {
             sb.append(star.getId()).append("\t")
                     .append(String.format(Locale.US, "%.2f\t%.2f\t", Math.toDegrees(star.getDir().getL()), Math.toDegrees(star.getDir().getB())))
                     .append(star.getVMag()).append("\t")
-                    .append(star.getSpectType().getSpect()).append("\t")
+                    .append(star.getSpectType().getTemp()).append("\t")
                     .append(star.getSpectType().getLumin()).append("\n");
         }
         return sb.toString();

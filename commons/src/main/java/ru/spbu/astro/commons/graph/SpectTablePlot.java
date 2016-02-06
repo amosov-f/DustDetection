@@ -10,7 +10,7 @@ import org.jfree.chart.renderer.xy.XYSplineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.commons.spect.SpectClass;
+import ru.spbu.astro.commons.spect.TempClass;
 import ru.spbu.astro.commons.spect.SpectTable;
 
 import java.util.Collections;
@@ -47,7 +47,7 @@ public final class SpectTablePlot {
             }
         }
 
-        final List<String> spects = SpectTable.codeRange().mapToObj(code -> SpectClass.valueOf(code).toString()).collect(Collectors.toList());
+        final List<String> spects = SpectTable.codeRange().mapToObj(code -> TempClass.valueOf(code).toString()).collect(Collectors.toList());
 
         final XYPlot plot = new XYPlot(
                 dataset,

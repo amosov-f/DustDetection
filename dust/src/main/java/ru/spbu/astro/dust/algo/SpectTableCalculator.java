@@ -47,7 +47,7 @@ public final class SpectTableCalculator {
         for (final Star star : DustStars.DR30) {
             final LuminosityClass lumin = star.getSpectType().getLumin();
             if (spect2stars.containsKey(lumin)) {
-                final int key = key(star.getSpectType().getSpect().getCode());
+                final int key = key(star.getSpectType().getTemp().getCode());
                 spect2stars.get(lumin).putIfAbsent(key, new ArrayList<>());
                 spect2stars.get(lumin).get(key).add(star);
             }

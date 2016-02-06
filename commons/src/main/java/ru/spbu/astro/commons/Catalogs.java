@@ -11,12 +11,12 @@ import java.util.Map;
  * Date: 17.01.15
  * Time: 2:16
  */
-public final class Catalogs {
-    public static final Catalog HIPPARCOS_1997 = Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos1997.txt"));
-    static final Catalog HIPPARCOS_2007 = innerJoin(Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos2007.txt")), HIPPARCOS_1997);
+public enum Catalogs {
+    ;
 
-    private Catalogs() {
-    }
+    static final Catalog HIPPARCOS = Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos.txt"));
+    static final Catalog HIPNEWCAT = innerJoin(Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipnewcat.txt")), HIPPARCOS);
+    static final Catalog XHIP = Catalog.read(Catalog.class.getResourceAsStream("/catalog/xhip.txt"));
 
     @NotNull
     private static Catalog innerJoin(@NotNull final Catalog catalog1, @NotNull final Catalog catalog2) {

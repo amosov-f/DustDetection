@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -13,15 +12,17 @@ import java.util.stream.Collectors;
  * Date: 28.03.15
  * Time: 19:00
  */
-public final class Stars {
-    public static final Star[] ALL = Catalogs.HIPPARCOS_2007.getStars();
-    public static final Star BARNARDS = Objects.requireNonNull(Catalogs.HIPPARCOS_2007.get(87937));
+public enum Stars {
+    ;
+
+    public static final Star[] ALL = Catalogs.HIPNEWCAT.getStars();
+    public static final Map<Integer, Star> MAP = map(ALL);
+
+    public static final Star BARNARDS = MAP.get(87937);
+    public static final Star KAPTEYNS = MAP.get(24186);
 
     @NotNull
     public static Map<Integer, Star> map(@NotNull final Star[] stars) {
         return Arrays.stream(stars).collect(Collectors.toMap(Star::getId, Function.identity()));
-    }
-
-    private Stars() {
     }
 }

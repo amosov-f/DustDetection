@@ -2,7 +2,7 @@ package ru.spbu.astro.dust.spect;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.commons.spect.SpectClass;
+import ru.spbu.astro.commons.spect.TempClass;
 import ru.spbu.astro.commons.spect.SpectTable;
 
 import static ru.spbu.astro.commons.spect.LuminosityClass.III;
@@ -13,7 +13,7 @@ import static ru.spbu.astro.commons.spect.LuminosityClass.III;
  * Time: 14:24
  */
 public final class IIIM2SpectTableCombiner implements SpectTableCombiner {
-    private static final double CODE = SpectClass.valueOf("M2").getDoubleNumber();
+    private static final double CODE = TempClass.valueOf("M2").getDoubleNumber();
 
     @NotNull
     @Override

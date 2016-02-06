@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.hist.CountHist;
-import ru.spbu.astro.commons.hist.SpectClassHist;
+import ru.spbu.astro.commons.hist.TempClassHist;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.util.Split;
 
@@ -33,14 +33,14 @@ public class NegativeExtinctionHistogramShow {
 
     @Test
     public void histSpectType() {
-        new NegativeExtinctionHistogram(DustStars.ALL, new SpectClassHist.Count(5)).show();
+        new NegativeExtinctionHistogram(DustStars.ALL, new TempClassHist.Count(5)).show();
     }
 
     @Test
     public void histSpectTypeOfV() {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.DR30).lumin(V).stars(),
-                new SpectClassHist.Count(5)
+                new TempClassHist.Count(5)
         ).show();
     }
 
@@ -48,7 +48,7 @@ public class NegativeExtinctionHistogramShow {
     public void histSpectTypeOfIII() {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.DR30).lumin(III).stars(),
-                new SpectClassHist.Count(5)
+                new TempClassHist.Count(5)
         ).show();
     }
 
@@ -57,7 +57,7 @@ public class NegativeExtinctionHistogramShow {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.DR30)
                         .lumin(III)
-                        .spect(65, 69)
+                        .temp(65, 69)
                         .stars(),
                 new CountHist("Ошибка B-V у звезд III, M5-9", star -> star.getBVColor().val(), new Split(0, 2.3, 0.2))
         ).show();
@@ -88,7 +88,7 @@ public class NegativeExtinctionHistogramShow {
         new NegativeExtinctionHistogram(
                 StarFilter.of(DustStars.DR30)
                         .lumin(III)
-                        .spect(65, 69)
+                        .temp(65, 69)
                         .stars(),
                 new CountHist("Относительная ошибка в расстоянии у звезд III, M5-9", star -> star.getR().relErr(), new Split(0.1))
         ).show();

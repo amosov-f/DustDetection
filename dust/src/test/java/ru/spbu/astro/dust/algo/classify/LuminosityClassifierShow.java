@@ -21,6 +21,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static ru.spbu.astro.commons.graph.HRDiagram.BV_COLOR_LOWER_BOUND;
 import static ru.spbu.astro.commons.graph.HRDiagram.BV_COLOR_UPPER_BOUND;
@@ -44,7 +45,7 @@ public class LuminosityClassifierShow {
 //        seriesCollection.addSeries(create("Разделяющая прямая", -2.8388, 0.5055, 1.0056)); // all small errors
 //        seriesCollection.addSeries(create("Разделяющая прямая", -3.9761, 0.668, 1.377)); // > 0.6
 //        seriesCollection.addSeries(create("Разделяющая прямая", -2.9876, 0.4526, 1.3547)); // all
-        seriesCollection.addSeries(create("Разделяющая прямая", -3.0752, 0.4485, 1.4793));    // all new
+//        seriesCollection.addSeries(create("Разделяющая прямая", -3.0752, 0.4485, 1.4793));    // all new
 //        seriesCollection.addSeries(create("Разделяющая прямая (new)", classifier.getA(), classifier.getB(), classifier.getC()));
         plot.setDataset(1, seriesCollection);
 //        plot.setDataset(2, theory());
@@ -86,9 +87,7 @@ public class LuminosityClassifierShow {
     @NotNull
     private static XYItemRenderer samplingRenderer(final int nSeries) {
         final XYItemRenderer renderer = new SamplingXYLineRenderer();
-        for (int i = 0; i < nSeries; i++) {
-            renderer.setSeriesStroke(i, new BasicStroke(3));
-        }
+        IntStream.range(0, nSeries).forEach(i -> renderer.setSeriesStroke(i, new BasicStroke(3)));
         return renderer;
     }
 

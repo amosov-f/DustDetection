@@ -3,7 +3,7 @@ package ru.spbu.astro.commons;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.commons.spect.SpectClass;
+import ru.spbu.astro.commons.spect.TempClass;
 import ru.spbu.astro.util.Filter;
 import ru.spbu.astro.util.TextUtils;
 
@@ -17,7 +17,9 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.ArrayUtils.contains;
 
 public final class StarFilter {
-    private static final Logger LOGGER = Logger.getLogger(StarFilter.class.getName());
+    private static final Logger LOG = Logger.getLogger(StarFilter.class.getName());
+
+    public static final StarFilter[] EMPTY_ARRAY = new StarFilter[0];
 
     public static final Filter<Star> HAS_EXT = Filter.by("has ext", star -> star.getSpectType().toBV() != null);
     public static final Filter<Star> NEG_EXT = Filter.by("ext + 3sigma < 0", HAS_EXT.and(star -> star.getExtinction().plusNSigma(3) < 0));
@@ -31,10 +33,8 @@ public final class StarFilter {
     @NotNull
     private final StarFilter[] history;
 
-    private StarFilter(@NotNull final Star[] stars) {
-        this.name = "filter";
-        this.stars = stars;
-        this.history = new StarFilter[]{this};
+    private StarFilter(@NotNull final Star... stars) {
+        this("filter", stars, EMPTY_ARRAY);
     }
 
     private StarFilter(@NotNull final String name, @NotNull final Star[] stars, @NotNull final StarFilter[] history) {
@@ -169,16 +169,16 @@ public final class StarFilter {
     }
 
     @NotNull
-    public StarFilter spect(final double minCode, final double maxCode) {
+    public StarFilter temp(final double minCode, final double maxCode) {
         return apply(format("%.0f < spect < %.0f", minCode, maxCode), star -> {
-            final double code = star.getSpectType().getSpect().getDoubleCode();
+            final double code = star.getSpectType().getTemp().getDoubleCode();
             return minCode <= code && code <= maxCode;
         });
     }
 
     @NotNull
-    public StarFilter spect(@NotNull final SpectClass spect) {
-        return apply(spect.toString(), s -> s.getSpectType().getSpect().equals(spect));
+    public StarFilter temp(@NotNull final TempClass temp) {
+        return apply(temp.toString(), s -> s.getSpectType().getTemp().equals(temp));
     }
 
     @NotNull
@@ -192,7 +192,7 @@ public final class StarFilter {
 
     @NotNull
     public Star[] stars() {
-        LOGGER.info(toString());
+        LOG.info(toString());
         return stars;
     }
 

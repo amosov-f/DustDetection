@@ -31,11 +31,11 @@ public final class SpectTableTest {
 
     @Test
     public void testBV() throws Exception {
-        assertEquals(Value.of(-0.26, 0.01), spectTable.getBV(SpectClass.valueOf("B1"), LuminosityClass.III));
-        final Value bv = requireNonNull(spectTable.getBV(SpectClass.valueOf("B0.5"), LuminosityClass.III));
+        assertEquals(Value.of(-0.26, 0.01), spectTable.getBV(TempClass.valueOf("B1"), LuminosityClass.III));
+        final Value bv = requireNonNull(spectTable.getBV(TempClass.valueOf("B0.5"), LuminosityClass.III));
         assertEquals(-0.28, bv.val(), EPS);
         assertEquals(0.01, bv.err(), EPS);
-        assertNull(spectTable.getBV(SpectClass.valueOf("O4"), LuminosityClass.V));
+        assertNull(spectTable.getBV(TempClass.valueOf("O4"), LuminosityClass.V));
     }
 
     @Test
@@ -46,7 +46,7 @@ public final class SpectTableTest {
         final PrintWriter fout = new PrintWriter("docs/articles/dust/other/bv-err/bv-diff.txt");
         for (final LuminosityClass lumin : LuminosityClass.MAIN) {
             for (final int code : Sets.intersection(table1.getBVs(lumin).keySet(), table2.getBVs(lumin).keySet())) {
-                final SpectClass spect = SpectClass.valueOf(code);
+                final TempClass spect = TempClass.valueOf(code);
                 final Value bv1 = table1.getBV(spect, lumin);
                 final Value bv2 = table2.getBV(spect, lumin);
                 if (bv1 != null && bv2 != null) {

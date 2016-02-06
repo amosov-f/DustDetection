@@ -8,7 +8,7 @@ import org.junit.Test;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.spect.LuminosityClass;
-import ru.spbu.astro.commons.spect.SpectClass;
+import ru.spbu.astro.commons.spect.TempClass;
 import ru.spbu.astro.commons.spect.SpectTable;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.util.Filter;
@@ -64,8 +64,8 @@ public class DustTrendCalculatorRegressionTest {
         final PrintWriter fout = new PrintWriter("pizza.txt");
         for (final LuminosityClass lumin : LuminosityClass.MAIN) {
             for (int code = 5; code < 70; code++) {
-                final SpectClass spect = SpectClass.valueOf(code);
-                final Star[] stars = StarFilter.of(allStars).spect(spect).lumin(lumin).stars();
+                final TempClass spect = TempClass.valueOf(code);
+                final Star[] stars = StarFilter.of(allStars).temp(spect).lumin(lumin).stars();
                 fout.print(lumin + "\t" + spect + "\t" + stars.length + "\t" + SpectTable.getInstance().getBV(spect, lumin).val());
                 if (stars.length != 0) {
                     final Value bvObs = MathTools.average(Arrays.stream(stars).mapToDouble(s -> s.getBVColor().val()).toArray());

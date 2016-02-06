@@ -13,11 +13,11 @@ public final class CatalogTest {
 
     @Test
     public void testReading() {
-        final Star star = Catalogs.HIPPARCOS_1997.get(42708);
+        final Star star = Catalogs.HIPPARCOS.get(42708);
         assertNotNull(star);
         assertEquals(2.39, star.getParallax().val(), EPS);
         assertEquals(LuminosityClass.III, star.getSpectType().getLumin());
-        assertEquals(61, star.getSpectType().getSpect().getCode());
+        assertEquals(71, star.getSpectType().getTemp().getCode());
         final Value bv = star.getSpectType().toBV();
         assertNotNull(bv);
         assertEquals(1.584, bv.val(), EPS);
@@ -32,11 +32,11 @@ public final class CatalogTest {
 
     @Test
     public void testInnerJoin() {
-        final Star star = Catalogs.HIPPARCOS_1997.get(71729);
+        final Star star = Catalogs.HIPPARCOS.get(71729);
         assertNotNull(star);
         assertEquals(9.47, star.getParallax().val(), EPS);
         assertEquals("G0V", star.getSpectType().toString());
-        final Star updatedStar = Catalogs.HIPPARCOS_2007.get(71729);
+        final Star updatedStar = Catalogs.HIPNEWCAT.get(71729);
         assertNotNull(updatedStar);
         assertEquals(8.60, updatedStar.getParallax().val(), EPS);
         assertEquals("G0V", star.getSpectType().toString());

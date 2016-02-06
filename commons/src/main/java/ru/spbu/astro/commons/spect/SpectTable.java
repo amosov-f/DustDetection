@@ -24,15 +24,15 @@ public class SpectTable {
     public static final SpectTable STRIGEST = read("strigest", SpectTable.class.getResourceAsStream("/table/strigest.txt"));
     public static final SpectTable BINNEY_MERRIFIELD = read("binney-merrifield", SpectTable.class.getResourceAsStream("/table/binney-merrifield.txt"));
 
-    public static final int MIN_CODE = 5;
-    public static final int MAX_CODE = 69;
+    public static final int MIN_CODE = 15;
+    public static final int MAX_CODE = 79;
 
     private static final double BV_ERROR = 0.01;
 
     @NotNull
     private final String name;
     @NotNull
-    private final EnumMap<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
+    private final Map<LuminosityClass, NavigableMap<Integer, Double>> table = new EnumMap<>(LuminosityClass.class);
 
     public SpectTable(@NotNull final String name) {
         this.name = name;
@@ -58,7 +58,7 @@ public class SpectTable {
             for (int i = 1; i < titles.length; i++) {
                 if (!"-".equals(fields[i])) {
                     final double bv = Double.parseDouble(fields[i]);
-                    final SpectClass spect = SpectClass.parse(fields[0]);
+                    final TempClass spect = TempClass.parse(fields[0]);
                     if (spect == null) {
                         throw new RuntimeException(fields[0] + " isn't spectral class!");
                     }
@@ -83,7 +83,7 @@ public class SpectTable {
         }
         writer.println();
         for (final int code : table.get(LuminosityClass.V).keySet()) {
-            final SpectClass spect = SpectClass.valueOf(code);
+            final TempClass spect = TempClass.valueOf(code);
             writer.print(spect + "\t");
             for (final LuminosityClass lumin : table.keySet()) {
                 writer.printf(Locale.US, "%.3f\t", getBV(spect, lumin));
@@ -109,7 +109,7 @@ public class SpectTable {
     }
 
     @Nullable
-    public Value getBV(@NotNull final SpectClass spect, @NotNull final LuminosityClass lumin) {
+    public Value getBV(@NotNull final TempClass spect, @NotNull final LuminosityClass lumin) {
         if (!table.containsKey(lumin)) {
             return null;
         }

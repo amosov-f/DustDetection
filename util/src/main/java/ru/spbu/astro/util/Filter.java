@@ -1,6 +1,7 @@
 package ru.spbu.astro.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
@@ -52,7 +53,7 @@ public final class Filter<T> implements Predicate<T> {
     }
 
     @Override
-    public boolean test(@NotNull  T t) {
+    public boolean test(@Nullable final T t) {
         return predicate.test(t);
     }
 

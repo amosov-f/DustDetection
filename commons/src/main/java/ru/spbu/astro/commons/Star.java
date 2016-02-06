@@ -102,8 +102,7 @@ public final class Star {
     public double getProperMotion() {
         final double muDec = getDecProperMotion().val();
         final double muRa = getRaProperMotion().val();
-        final double dec = getDir().toEquatorial().getDec();
-        return sqrt(pow(muDec, 2) + pow(muRa * cos(dec), 2));
+        return sqrt(pow(muDec, 2) + pow(muRa, 2));
     }
 
     @NotNull
@@ -188,5 +187,10 @@ public final class Star {
         public Star build() {
             return new Star(this);
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(163.31);
+        System.out.println(163.54 * Math.cos(Math.toRadians(-79.06183132)));
     }
 }

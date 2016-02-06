@@ -38,6 +38,6 @@ public class StarFilterTest {
         assertEquals(16681, StarFilter.of(Stars.ALL).mainLumin().rightBV().lumin(LuminosityClass.III).stars().length);
         assertEquals(49542, StarFilter.of(Stars.ALL).apply(StarFilter.HAS_LUMIN.negate()).stars().length);
         assertEquals(39807, StarFilter.of(Stars.ALL).hasExt().mainLumin().stars().length);
-        System.out.println(StarFilter.of(Stars.ALL).spect(60, 70).stars().length);
+        System.out.println(StarFilter.of(Stars.ALL).temp(60, 70).stars().length);
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 
 public final class SpectType {
     @NotNull
-    private final List<SpectClass> spects;
+    private final List<TempClass> temps;
     @NotNull
     private final List<LuminosityClass> lumins;
     @NotNull
@@ -19,24 +19,34 @@ public final class SpectType {
     @NotNull
     private final Relation luminsRelation;
 
-    SpectType(@NotNull final List<SpectClass> spects,
+    SpectType(@NotNull final List<TempClass> temps,
               @NotNull final Relation spectsRelation,
               @NotNull final List<LuminosityClass> lumins,
               @NotNull final Relation luminsRelation)
     {
-        this.spects = spects;
+        this.temps = temps;
         this.spectsRelation = spectsRelation;
         this.lumins = lumins;
         this.luminsRelation = luminsRelation;
     }
 
     @NotNull
+    public static SpectType valueOf(@NotNull final TempClass temp, @Nullable final LuminosityClass lumin) {
+        return new SpectType(
+                Collections.singletonList(temp),
+                Relation.INTERMEDIATE,
+                lumin != null ? Collections.singletonList(lumin) : Collections.emptyList(),
+                Relation.INTERMEDIATE
+        );
+    }
+
+    @NotNull
     @Override
     public String toString() {
         String s = "";
-        for (int i = 0; i < spects.size(); ++i) {
-            s += spects.get(i);
-            if (i < spects.size() - 1) {
+        for (int i = 0; i < temps.size(); ++i) {
+            s += temps.get(i);
+            if (i < temps.size() - 1) {
                 s += spectsRelation.getSymbol();
             }
         }
@@ -52,7 +62,7 @@ public final class SpectType {
     @Nullable
     public Value toBV() {
         final List<Value> bvs = new ArrayList<>();
-        for (final SpectClass spect : spects) {
+        for (final TempClass spect : temps) {
             for (final LuminosityClass lumin : lumins) {
                 final Value bv = SpectTable.getInstance().getBV(spect, lumin);
                 if (bv != null) {
@@ -88,12 +98,12 @@ public final class SpectType {
         if (hasLumin()) {
             throw new RuntimeException("Already has luminosity class!");
         }
-        return new SpectType(spects, spectsRelation, Collections.singletonList(lumin), luminsRelation);
+        return new SpectType(temps, spectsRelation, Collections.singletonList(lumin), luminsRelation);
     }
 
     @NotNull
-    public SpectClass getSpect() {
-        return SpectClass.valueOf(spects.stream().mapToInt(SpectClass::getCode).sum() / spects.size());
+    public TempClass getTemp() {
+        return TempClass.valueOf((int) temps.stream().mapToInt(TempClass::getCode).average().getAsDouble());
     }
 
     enum Relation {

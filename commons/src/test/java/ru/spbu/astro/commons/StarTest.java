@@ -13,5 +13,6 @@ public final class StarTest {
     public void testProperMotion() throws Exception {
         // Barnard's Star, http://www.solstation.com/stars/barnards.htm
         Assert.assertEquals(10.3, Stars.BARNARDS.getProperMotion() / 1000, 0.1);
+        Assert.assertEquals(8.7, Stars.KAPTEYNS.getProperMotion() / 1000, 0.1);
     }
 }

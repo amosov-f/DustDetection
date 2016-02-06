@@ -14,14 +14,13 @@ import java.util.Map;
  * Date: 07.01.15
  * Time: 1:17
  */
-public final class SpectTypeParser {
+public enum SpectTypeParser {
+    INSTANCE;
+
     private static final Map<String, SpectType> CACHE = new HashMap<>();
 
-    private SpectTypeParser() {
-    }
-
     @Nullable
-    public static SpectType parse(@NotNull final String str) {
+    public SpectType parse(@NotNull final String str) {
         if (CACHE.containsKey(str)) {
             return CACHE.get(str);
         }
@@ -30,33 +29,33 @@ public final class SpectTypeParser {
             return process(str, null);
         }
 
-        final List<SpectClass> spects = new ArrayList<>();
+        final List<TempClass> temps = new ArrayList<>();
         final List<LuminosityClass> lumins = new ArrayList<>();
-        SpectType.Relation spectsRelation = SpectType.Relation.INTERMEDIATE;
+        SpectType.Relation tempsRelation = SpectType.Relation.INTERMEDIATE;
         SpectType.Relation luminRelation = SpectType.Relation.INTERMEDIATE;
 
-        boolean lastSpect = true;
+        boolean lastTemp = true;
         String s = str;
         while (!s.isEmpty()) {
-            final SpectClass spect = nextSpect(s);
-            if (spect != null) {
-                s = s.substring(spect.toString().length());
-                spects.add(spect);
-                lastSpect = true;
+            final TempClass temp = nextTemp(s);
+            if (temp != null) {
+                s = s.substring(temp.toString().length());
+                temps.add(temp);
+                lastTemp = true;
                 continue;
             }
             final LuminosityClass lumin = nextLumin(s);
             if (lumin != null) {
                 s = s.substring(lumin.name().length());
                 lumins.add(lumin);
-                lastSpect = false;
+                lastTemp = false;
                 continue;
             }
             final SpectType.Relation relation = nextRelation(s);
             if (relation != null) {
                 s = s.substring(1);
-                if (lastSpect) {
-                    spectsRelation = relation;
+                if (lastTemp) {
+                    tempsRelation = relation;
                 } else {
                     luminRelation = relation;
                 }
@@ -64,10 +63,10 @@ public final class SpectTypeParser {
             }
             s = s.substring(1);
         }
-        if (spects.isEmpty()) {
+        if (temps.isEmpty()) {
             return null;
         }
-        return process(str, new SpectType(spects, spectsRelation, lumins, luminRelation));
+        return process(str, new SpectType(temps, tempsRelation, lumins, luminRelation));
     }
 
     @Nullable
@@ -77,11 +76,11 @@ public final class SpectTypeParser {
     }
 
     @Nullable
-    private static SpectClass nextSpect(@NotNull final String str) {
+    private static TempClass nextTemp(@NotNull final String str) {
         for (int i = str.length(); i > 0; i--) {
-            final SpectClass spect = SpectClass.parse(str.substring(0, i));
-            if (spect != null) {
-                return spect;
+            final TempClass temp = TempClass.parse(str.substring(0, i));
+            if (temp != null) {
+                return temp;
             }
         }
         return null;
