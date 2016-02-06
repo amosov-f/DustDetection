@@ -4,9 +4,11 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
 import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.graph.Histogram;
 import ru.spbu.astro.commons.hist.*;
+import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.dust.DustStars;
 import ru.spbu.astro.dust.algo.DustTrendCalculator;
 import ru.spbu.astro.util.Split;
@@ -98,10 +100,22 @@ public class HistogramTest {
     public void showProperMotion() {
         new Histogram<>(
                 new LuminosityClassHist<>(new Average<>(Star::getProperMotion)).hist(Stars.ALL),
-                "Видимая зв. вел.",
-                "Собственное движение",
+                "Класс светимости",
+                "Собственное движение, mas/yr",
                 false
         ).show();
+    }
+
+    @Test
+    public void showGiantProperMotion() {
+        final Star[] stars = StarFilter.of(Stars.ALL).lumin(LuminosityClass.III).stars();
+        final AverageHist hist = new AverageHist("pizza", s -> s.getR().val(), Star::getProperMotion, new Split(0, 400, 10));
+        new Histogram<>(hist.hist(stars), "Расстояние [пк]", "Собственное движение, mas/yr", false).show();
+    }
+
+    @Test
+    public void showProperMotions() throws Exception {
+
     }
 
     @After

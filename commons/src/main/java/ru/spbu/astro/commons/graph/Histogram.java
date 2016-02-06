@@ -1,7 +1,6 @@
 package ru.spbu.astro.commons.graph;
 
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.Doubles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFactory;
@@ -20,8 +19,8 @@ import org.jfree.ui.TextAnchor;
 
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.Map;
-import java.util.stream.DoubleStream;
 
 /**
  * User: amosov-f
@@ -44,10 +43,7 @@ public final class Histogram<T extends Comparable<T>> {
                      final boolean percents) 
     {
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        for (final T type : hist.keySet()) {
-            dataset.addValue(hist.get(type), "pizza", type);
-        }
+        hist.forEach((type, value) -> dataset.addValue(value, "rowKey", type));
 
         final JFreeChart chart = ChartFactory.createBarChart(
                 null,
@@ -90,7 +86,7 @@ public final class Histogram<T extends Comparable<T>> {
         if (percents) {
             rangeAxis.setNumberFormatOverride(new DecimalFormat("#%"));
         }
-        rangeAxis.setRange(0.0, percents ? 1 : (1.1 * DoubleStream.of(Doubles.toArray(hist.values())).max().getAsDouble()));
+        rangeAxis.setRange(0.0, percents ? 1 : 1.1 * Collections.max(hist.values()));
 
         plot.getDomainAxis().setTickLabelFont(new Font("SansSerif", Font.PLAIN, 16));
         plot.getDomainAxis().setLabelFont(new Font("SansSerif", Font.PLAIN, 16));

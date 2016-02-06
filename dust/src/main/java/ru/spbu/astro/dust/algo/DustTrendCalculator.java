@@ -97,7 +97,7 @@ public final class DustTrendCalculator {
         if (slopeFilter != null) {
             final int acceptedSlopesCount = (int) Arrays.stream(regressions)
                     .filter(((Predicate<Regression>) Objects::nonNull)
-                            .and(regression -> slopeFilter.getPredicate().test(regression.getSlope())))
+                            .and(regression -> slopeFilter.test(regression.getSlope())))
                     .count();
             sb.append("n_accepted_pix = ").append(acceptedSlopesCount);
             sb.append(" (").append(100 * acceptedSlopesCount / healpix.getNPix()).append("%)\n");
@@ -107,7 +107,7 @@ public final class DustTrendCalculator {
         for (int pix = 0; pix < rings.length; ++pix) {
             final Spheric dir = healpix.getCenter(pix);
             final Value k = regressions[pix] != null ? regressions[pix].getSlope() : null;
-            if (k != null && (slopeFilter == null || slopeFilter.getPredicate().test(k))) {
+            if (k != null && (slopeFilter == null || slopeFilter.test(k))) {
                 sb.append(String.format(
                         Locale.US, "%d\t%f\t%f\t%d\t%.2f ± %.2f\n",
                         pix, Math.toDegrees(dir.getL()), Math.toDegrees(dir.getB()), rings[pix].length, 1000 * k.val(), 1000 * k.err()
@@ -123,7 +123,7 @@ public final class DustTrendCalculator {
         for (int pix = 0; pix < rings.length; ++pix) {
             final Spheric dir = healpix.getCenter(pix);
             final Value k = regressions[pix] != null ? regressions[pix].getSlope().multiply(1000) : null;
-            if (k != null && (slopeFilter == null || slopeFilter.getPredicate().test(k))) {
+            if (k != null && (slopeFilter == null || slopeFilter.test(k))) {
                 table.add(new Object[]{
                         pix,
                         String.format(Locale.US, "(%.2f, %.2f)", Math.toDegrees(dir.getL()), Math.toDegrees(dir.getB())),

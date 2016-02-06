@@ -20,7 +20,7 @@ public final class StarFilter {
     private static final Logger LOGGER = Logger.getLogger(StarFilter.class.getName());
 
     public static final Filter<Star> HAS_EXT = Filter.by("has ext", star -> star.getSpectType().toBV() != null);
-    public static final Filter<Star> NEG_EXT = Filter.by("ext + 3sigma < 0", HAS_EXT.getPredicate().and(star -> star.getExtinction().plusNSigma(3) < 0));
+    public static final Filter<Star> NEG_EXT = Filter.by("ext + 3sigma < 0", HAS_EXT.and(star -> star.getExtinction().plusNSigma(3) < 0));
     public static final Filter<Star> HAS_LUMIN = Filter.by("has lumin", star -> star.getSpectType().hasLumin());
     public static final Filter<Star> MAIN_LUMIN = byLumin(LuminosityClass.MAIN);
 
@@ -66,7 +66,7 @@ public final class StarFilter {
 
     @NotNull
     public StarFilter apply(@NotNull final Filter<Star> filter) {
-        return apply(filter.getName(), filter.getPredicate());
+        return apply(filter.getName(), filter);
     }
 
     @NotNull
@@ -200,7 +200,6 @@ public final class StarFilter {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-
         for (int i = 0; i < history.length; i++) {
             sb.append(history[i].name)
                     .append(": #")

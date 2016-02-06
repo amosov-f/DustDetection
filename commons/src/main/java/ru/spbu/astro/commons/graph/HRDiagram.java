@@ -11,6 +11,8 @@ import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.XYIntervalSeries;
 import org.jfree.data.xy.XYIntervalSeriesCollection;
 import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 
 import java.awt.*;
@@ -114,5 +116,9 @@ public final class HRDiagram {
     
     public void show() {
         frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        new HRDiagram(StarFilter.of(Stars.ALL).mainLumin().stars()).show();
     }
 }

@@ -1,7 +1,6 @@
 package ru.spbu.astro.commons.graph;
 
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.Ints;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jfree.chart.ChartFactory;
@@ -24,7 +23,6 @@ import ru.spbu.astro.util.Value;
 
 import java.text.DecimalFormat;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 public class OutlierHistogram {
     @NotNull
@@ -41,21 +39,19 @@ public class OutlierHistogram {
         final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         final Map<T, Integer> outlierCounts = hist.hist(outliers);
-        final int outlierCount = IntStream.of(Ints.toArray(outlierCounts.values())).sum();
+        final int outlierCount = outlierCounts.values().stream().mapToInt(i -> i).sum();
         final Map<T, Integer> counts = hist.hist(stars);
-        final int count = IntStream.of(Ints.toArray(counts.values())).sum();
+        final int totalCount = counts.values().stream().mapToInt(i -> i).sum();
 
-        for (final T type : counts.keySet()) {
-            if (outlierCounts.get(type) == null) {
-                outlierCounts.put(type, 0);
-            }
-            dataset.addValue(1.0 * outlierCounts.get(type) / counts.get(type), "pizza", type);
-        }
+        counts.forEach((type, count) ->
+                dataset.addValue(1d * outlierCounts.computeIfAbsent(type, t -> 0) / count, "", type)
+        );
 
         final JFreeChart chart = ChartFactory.createBarChart(
                 String.format(
                         "%s\nОтрицательное покраснение у %d%% (%d/%d)",
-                        hist.getName(), 100 * outlierCount / count, outlierCount, count),
+                        hist.getName(), 100 * outlierCount / totalCount, outlierCount, totalCount
+                ),
                 hist.getName(),
                 "Доля",
                 dataset,
@@ -98,7 +94,7 @@ public class OutlierHistogram {
         frame = new ChartFrame("Звезды с отрицательным покраснением", chart);
         frame.pack();
     }
-    
+
     public void show() {
         frame.setVisible(true);
     }

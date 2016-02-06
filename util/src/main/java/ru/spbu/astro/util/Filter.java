@@ -9,7 +9,7 @@ import java.util.function.Predicate;
  * Date: 04.04.15
  * Time: 17:51
  */
-public final class Filter<T> {
+public final class Filter<T> implements Predicate<T> {
     @NotNull
     private final String name;
 
@@ -51,9 +51,9 @@ public final class Filter<T> {
         return name;
     }
 
-    @NotNull
-    public Predicate<T> getPredicate() {
-        return predicate;
+    @Override
+    public boolean test(@NotNull  T t) {
+        return predicate.test(t);
     }
 
     @NotNull

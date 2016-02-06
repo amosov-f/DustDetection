@@ -4,9 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbu.astro.commons.Star;
 import ru.spbu.astro.util.Split;
-import ru.spbu.astro.util.TextUtils;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -38,8 +36,8 @@ public abstract class DoubleHist<Y extends Number> extends AbstractStarHist<Doub
         if (x < split.getMin() || split.getMax() < x) {
             return null;
         }
-        return Arrays.stream(split.getCenters())
-                .mapToObj(TextUtils::removeUnnecessaryDigits)
+        return split.getCenters()
+                .mapToObj(d -> d)
                 .min(Comparator.comparing(center -> Math.abs(x - center)))
                 .get();
     }
@@ -51,7 +49,8 @@ public abstract class DoubleHist<Y extends Number> extends AbstractStarHist<Doub
         public Lambda(@NotNull final String name,
                       @NotNull final Function<Star, Double> fx,
                       @NotNull final Function<Stream<Star>, Y> fy,
-                      @NotNull Split split) {
+                      @NotNull Split split)
+        {
             super(name, fx, split);
             this.fy = fy;
         }

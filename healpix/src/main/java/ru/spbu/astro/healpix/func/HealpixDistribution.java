@@ -26,7 +26,7 @@ public class HealpixDistribution implements SphericDistribution {
 
     public HealpixDistribution(@NotNull final Value[] values, @Nullable final Filter<Value> filter) {
         this.values = new Value[values.length];
-        Arrays.setAll(this.values, pix -> filter == null || filter.getPredicate().test(values[pix]) ? values[pix] : null);
+        Arrays.setAll(this.values, pix -> filter == null || filter.test(values[pix]) ? values[pix] : null);
         healpix = new Healpix(Healpix.nSide(values.length));
     }
 

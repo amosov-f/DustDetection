@@ -2,6 +2,7 @@ package ru.spbu.astro.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 /**
@@ -49,7 +50,9 @@ public final class Split {
     }
     
     @NotNull
-    public double[] getCenters() {
-        return IntStream.range(0, size).mapToDouble(i -> min + getDel() * (i + 0.5)).toArray();
+    public DoubleStream getCenters() {
+        return IntStream.range(0, size)
+                .mapToDouble(i -> min + getDel() * (i + 0.5))
+                .map(TextUtils::removeUnnecessaryDigits);
     }
 }

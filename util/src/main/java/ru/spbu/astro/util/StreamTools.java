@@ -16,6 +16,6 @@ public enum StreamTools {
 
     @NotNull
     public static DoubleStream convert(@NotNull final Stream<Double> s) {
-        return s.filter(Objects::nonNull).mapToDouble(MoreFunctions.identity());
+        return s.filter(Objects::nonNull).mapToDouble(d -> d);
     }
 }
