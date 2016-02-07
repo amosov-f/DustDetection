@@ -14,15 +14,18 @@ import java.util.Map;
 public enum Catalogs {
     ;
 
-    static final Catalog HIPPARCOS = Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipparcos.txt"));
-    static final Catalog HIPNEWCAT = innerJoin(Catalog.read(Catalog.class.getResourceAsStream("/catalog/hipnewcat.txt")), HIPPARCOS);
-    static final Catalog XHIP = Catalog.read(Catalog.class.getResourceAsStream("/catalog/xhip.txt"));
+    static final Catalog HIPPARCOS = Catalog.read("hipparcos", Catalog.class.getResourceAsStream("/catalog/hipparcos.txt"));
+    static final Catalog HIPNEWCAT = innerJoin("hipnewcat", Catalog.read("hipnewcat", Catalog.class.getResourceAsStream("/catalog/hipnewcat.txt")), HIPPARCOS);
+    static final Catalog XHIP = Catalog.read("xhip", Catalog.class.getResourceAsStream("/catalog/xhip.txt"));
 
     @NotNull
-    private static Catalog innerJoin(@NotNull final Catalog catalog1, @NotNull final Catalog catalog2) {
-        final Catalog result = new Catalog();
+    private static Catalog innerJoin(@NotNull final String name,
+                                     @NotNull final Catalog catalog1,
+                                     @NotNull final Catalog catalog2)
+    {
+        final Catalog result = new Catalog(name);
         for (final int id : Sets.intersection(catalog1.id2row.keySet(), catalog2.id2row.keySet())) {
-            final Map<Catalog.Parameter<?>, Object> values = new HashMap<>(catalog2.id2row.get(id).values);
+            final Map<Parameter<?>, Object> values = new HashMap<>(catalog2.id2row.get(id).values);
             values.putAll(catalog1.id2row.get(id).values);
             result.add(new Catalog.Row(id, values));
         }

@@ -44,7 +44,10 @@ public final class Star {
 
     @NotNull
     public Value getR() {
-        return Value.of(1000 / parallax.val(), 1000 * parallax.err() / pow(parallax.val(), 2));
+        final double p = parallax.val();
+        final double dp = parallax.err();
+        final double r = 1000 / (p * (1 + 1.2 * Math.pow(dp / p, 2)));
+        return Value.of(r, dp / p * r);
     }
 
     @NotNull
@@ -187,10 +190,5 @@ public final class Star {
         public Star build() {
             return new Star(this);
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println(163.31);
-        System.out.println(163.54 * Math.cos(Math.toRadians(-79.06183132)));
     }
 }

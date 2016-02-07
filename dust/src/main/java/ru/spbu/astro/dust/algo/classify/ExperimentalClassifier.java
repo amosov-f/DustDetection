@@ -2,10 +2,13 @@ package ru.spbu.astro.dust.algo.classify;
 
 import org.jetbrains.annotations.NotNull;
 import ru.spbu.astro.commons.Star;
+import ru.spbu.astro.commons.StarFilter;
+import ru.spbu.astro.commons.Stars;
 import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectType;
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.SMO;
+import weka.classifiers.meta.Bagging;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -26,13 +29,13 @@ final class ExperimentalClassifier implements LuminosityClassifier {
 
 
     private static final List<StarAttribute> STAR_ATTRIBUTES = Arrays.asList(
-//            new StarAttribute("bv color", star -> star.getBVColor().val()),
-//            new StarAttribute("mag", star -> star.getAbsMag().val())
+            new StarAttribute("bv color", star -> star.getBVColor().val()),
+            new StarAttribute("mag", star -> star.getAbsMag().val()),
 //            new StarAttribute("res", star -> star.getBVColor().val() - calculator.getSlope(star.getDir()).val() * star.getR().val()),
 //            new StarAttribute("r", star -> star.getR().val()),
 //            new StarAttribute("p", star -> star.getParallax().val()),
 //            new StarAttribute("dr", star -> star.getR().err()),
-//            new StarAttribute("vmag", Star::getVMag),
+            new StarAttribute("vmag", Star::getVMag),
             new StarAttribute("pm", Star::getProperMotion)
     );
 
@@ -40,7 +43,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     private final ArrayList<Attribute> attributes;
 
     @NotNull
-    private final SMO classifier;
+    private final Classifier classifier;
     @NotNull
     private final Star[] stars;
 
@@ -64,7 +67,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
 
         final Instances dataset = toInstances("dataset", this.stars = stars);
 
-        classifier = new SMO();
+        classifier = new Bagging();
 //        classifier.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
         try {
             classifier.buildClassifier(dataset);
@@ -161,12 +164,12 @@ final class ExperimentalClassifier implements LuminosityClassifier {
         }
     }
 
-//    public static void main(String[] args) {
-//        final Star[] stars = StarFilter.of(Stars.ALL)
-//                .mainLumin()
-////                .bv(Double.NEGATIVE_INFINITY, 0.6)
-//                .bv(0.6, Double.POSITIVE_INFINITY)
-//                .stars();
+    public static void main(String[] args) {
+        final Star[] stars = StarFilter.of(Stars.ALL)
+                .mainLumin()
+//                .bv(Double.NEGATIVE_INFINITY, 0.6)
+                .bv(0.6, Double.POSITIVE_INFINITY)
+                .stars();
 //        Arrays.sort(stars, Comparator.comparing(Star::getProperMotion));
 //        int counter = 0;
 //        int discounter = 0;
@@ -183,7 +186,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
 //            }
 //        }
 //        System.out.println(counter + " " + discounter);
-////        new ExperimentalClassifier(stars, Mode.TEST);
+       new ExperimentalClassifier(stars, Mode.TEST);
 ////        new ExperimentalClassifier(StarFilter.of(Stars.ALL).lumin(LuminosityClass.II, LuminosityClass.III, LuminosityClass.V).bv(0.3, 0.9).absMag(Double.NEGATIVE_INFINITY, 1).stars(), Mode.TEST);
-//    }
+    }
 }
