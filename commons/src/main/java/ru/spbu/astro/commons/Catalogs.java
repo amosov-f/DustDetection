@@ -14,14 +14,12 @@ import java.util.Map;
 public enum Catalogs {
     ;
 
-    static final Catalog HIPPARCOS = Catalog.read("hipparcos", Catalog.class.getResourceAsStream("/catalog/hipparcos.txt"));
-    static final Catalog HIPNEWCAT = innerJoin("hipnewcat", Catalog.read("hipnewcat", Catalog.class.getResourceAsStream("/catalog/hipnewcat.txt")), HIPPARCOS);
     static final Catalog XHIP = Catalog.read("xhip", Catalog.class.getResourceAsStream("/catalog/xhip.txt"));
 
     @NotNull
-    private static Catalog innerJoin(@NotNull final String name,
-                                     @NotNull final Catalog catalog1,
-                                     @NotNull final Catalog catalog2)
+    static Catalog innerJoin(@NotNull final String name,
+                             @NotNull final Catalog catalog1,
+                             @NotNull final Catalog catalog2)
     {
         final Catalog result = new Catalog(name);
         for (final int id : Sets.intersection(catalog1.id2row.keySet(), catalog2.id2row.keySet())) {

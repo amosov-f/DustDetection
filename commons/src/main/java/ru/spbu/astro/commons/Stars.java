@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public enum Stars {
     ;
 
-    public static final Star[] ALL = Catalogs.HIPNEWCAT.getStars();
+    public static final Star[] ALL = Catalogs.XHIP.getStars();
     public static final Map<Integer, Star> MAP = map(ALL);
 
     public static final Star BARNARDS = MAP.get(87937);
