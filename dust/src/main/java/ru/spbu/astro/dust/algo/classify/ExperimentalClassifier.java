@@ -8,7 +8,7 @@ import ru.spbu.astro.commons.spect.LuminosityClass;
 import ru.spbu.astro.commons.spect.SpectType;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.meta.Bagging;
+import weka.classifiers.functions.SMO;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -25,17 +25,17 @@ import java.util.stream.Collectors;
  * Time: 1:23
  */
 final class ExperimentalClassifier implements LuminosityClassifier {
-    private static final Logger LOGGER = Logger.getLogger(ExperimentalClassifier.class.getName());
+    private static final Logger LOG = Logger.getLogger(ExperimentalClassifier.class.getName());
 
 
     private static final List<StarAttribute> STAR_ATTRIBUTES = Arrays.asList(
-            new StarAttribute("bv color", star -> star.getBVColor().val()),
-            new StarAttribute("mag", star -> star.getAbsMag().val()),
+//            new StarAttribute("bv color", star -> star.getBVColor().val()),
+//            new StarAttribute("mag", star -> star.getAbsMag().val()),
 //            new StarAttribute("res", star -> star.getBVColor().val() - calculator.getSlope(star.getDir()).val() * star.getR().val()),
 //            new StarAttribute("r", star -> star.getR().val()),
 //            new StarAttribute("p", star -> star.getParallax().val()),
 //            new StarAttribute("dr", star -> star.getR().err()),
-            new StarAttribute("vmag", Star::getVMag),
+//            new StarAttribute("vmag", Star::getVMag),
             new StarAttribute("pm", Star::getProperMotion)
     );
 
@@ -67,7 +67,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
 
         final Instances dataset = toInstances("dataset", this.stars = stars);
 
-        classifier = new Bagging();
+        classifier = new SMO();
 //        classifier.setFilterType(new SelectedTag(SMO.FILTER_NONE, SMO.TAGS_FILTER));
         try {
             classifier.buildClassifier(dataset);
@@ -75,7 +75,7 @@ final class ExperimentalClassifier implements LuminosityClassifier {
             throw new RuntimeException(e);
         }
 
-        LOGGER.info(classifier.toString());
+        LOG.info(classifier.toString());
 
         if (mode == Mode.DEFAULT) {
 //            return;
@@ -85,9 +85,9 @@ final class ExperimentalClassifier implements LuminosityClassifier {
             final Evaluation evaluation = new Evaluation(dataset);
             evaluation.crossValidateModel(classifier, dataset, 10, new Random(0));
 
-            LOGGER.info(evaluation.toSummaryString());
-            LOGGER.info(evaluation.toMatrixString());
-            LOGGER.info(evaluation.toClassDetailsString());
+            LOG.info(evaluation.toSummaryString());
+            LOG.info(evaluation.toMatrixString());
+            LOG.info(evaluation.toClassDetailsString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -167,8 +167,8 @@ final class ExperimentalClassifier implements LuminosityClassifier {
     public static void main(String[] args) {
         final Star[] stars = StarFilter.of(Stars.ALL)
                 .mainLumin()
-//                .bv(Double.NEGATIVE_INFINITY, 0.6)
-                .bv(0.6, Double.POSITIVE_INFINITY)
+//                .leftBV()
+                .rightBV()
                 .stars();
 //        Arrays.sort(stars, Comparator.comparing(Star::getProperMotion));
 //        int counter = 0;
